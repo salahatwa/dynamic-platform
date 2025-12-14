@@ -1,8 +1,8 @@
-<div class="error-code-management">
+<div class="admin-page-container">
   <!-- Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <div class="title-section">
+  <div class="admin-page-header">
+    <div class="admin-header-content">
+      <div class="admin-title-section">
         <h1>{{ 'errorCode.title' | translate }}</h1>
         <p class="subtitle" *ngIf="selectedApp()">
           Manage error codes for app "{{ selectedApp()!.name }}"
@@ -11,325 +11,278 @@
           Select an app to manage error codes
         </p>
       </div>
-      <div class="header-actions" *ngIf="selectedApp()">
-        <button class="btn btn-primary" (click)="openCreateModal()">
+      <div class="admin-header-actions" *ngIf="selectedApp()">
+        <button class="btn btn-primary btn-lg" (click)="openCreateModal()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
-          Create New Error Code for "{{ selectedApp()!.name }}"
+          Create New Error Code
         </button>
       </div>
     </div>
   </div>
 
-  <!-- No App Selected State -->
-  <div class="no-app-state" *ngIf="!selectedApp() && hasApps()">
-    <div class="empty-state-content">
-      <div class="empty-illustration">
-        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <defs>
-            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color: var(--primary); stop-opacity: 0.1" />
-              <stop offset="100%" style="stop-color: var(--secondary); stop-opacity: 0.1" />
-            </linearGradient>
-          </defs>
-          <circle cx="12" cy="12" r="10" fill="url(#iconGradient)" stroke="none" />
+  <!-- Content Container -->
+  <div class="container">
+    <!-- No App Selected State -->
+    <div class="admin-empty-state" *ngIf="!selectedApp() && hasApps()">
+      <div class="empty-icon">
+        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" stroke-width="1.5" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            style="stroke: var(--primary)" />
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       </div>
       <h3>Select an App</h3>
       <p>Choose an app from the header dropdown to manage its error codes.</p>
     </div>
-  </div>
 
-  <!-- No Apps State -->
-  <div class="no-apps-state" *ngIf="!hasApps()">
-    <div class="empty-state-content">
-      <div class="empty-illustration">
-        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <defs>
-            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color: var(--primary); stop-opacity: 0.1" />
-              <stop offset="100%" style="stop-color: var(--secondary); stop-opacity: 0.1" />
-            </linearGradient>
-          </defs>
-          <circle cx="12" cy="12" r="10" fill="url(#iconGradient)" stroke="none" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            style="stroke: var(--primary)" />
+    <!-- No Apps State -->
+    <div class="admin-empty-state" *ngIf="!hasApps()">
+      <div class="empty-icon">
+        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       </div>
       <h3>Welcome to Error Codes</h3>
       <p>Start by creating your first application to manage error codes efficiently.</p>
-      <div class="empty-actions">
-        <a href="/admin/apps/create" class="btn btn-primary btn-lg">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Create New App
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters-section" *ngIf="selectedApp()">
-    <div class="filters-grid">
-      <!-- Search -->
-      <div class="filter-item search-filter">
-        <input 
-          type="text" 
-          class="form-control"
-          [value]="searchTerm()"
-          (input)="searchTerm.set($any($event.target).value)"
-          (keyup.enter)="onSearch()"
-          placeholder="{{ 'errorCode.search' | translate }}">
-        <button class="search-btn" (click)="onSearch()">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-        </button>
-      </div>
-
-
-
-      <!-- Category Filter -->
-      <div class="filter-item">
-        <select class="form-control" [value]="selectedCategory() || ''" (change)="onCategoryChange($any($event.target).value)">
-          <option value="">{{ 'errorCode.allCategories' | translate }}</option>
-          @for (category of categories(); track category.id) {
-            <option [value]="category.id">{{ category.categoryName }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Severity Filter -->
-      <div class="filter-item">
-        <select class="form-control" [value]="selectedSeverity() || ''" (change)="onSeverityChange($any($event.target).value)">
-          <option value="">{{ 'errorCode.allSeverities' | translate }}</option>
-          @for (severity of severityOptions; track severity) {
-            <option [value]="severity">{{ severity }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Status Filter -->
-      <div class="filter-item">
-        <select class="form-control" [value]="selectedStatus() || ''" (change)="onStatusChange($any($event.target).value)">
-          <option value="">{{ 'errorCode.allStatuses' | translate }}</option>
-          @for (status of statusOptions; track status) {
-            <option [value]="status">{{ status }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- View Toggle -->
-      <div class="filter-item view-toggle">
-        <button class="btn-icon" [class.active]="viewMode() === 'grid'" (click)="viewMode.set('grid')">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
-          </svg>
-        </button>
-        <button class="btn-icon" [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/>
-          </svg>
-        </button>
-      </div>
+      <a href="/admin/apps/create" class="btn btn-primary btn-lg">
+        Create New App
+      </a>
     </div>
 
-    @if (hasFilters()) {
-      <button class="btn-clear-filters" (click)="clearFilters()">
-        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-        {{ 'errorCode.clearFilters' | translate }}
-      </button>
-    }
-  </div>
+    <!-- Main Content (only show when app is selected) -->
+    <div *ngIf="selectedApp()">
+      <!-- Filters -->
+      <div class="admin-filters-section">
+        <div class="admin-filters-grid">
+          <!-- Search -->
+          <div class="filter-item search-filter">
+            <span class="search-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </span>
+            <input 
+              type="text" 
+              class="form-control"
+              [value]="searchTerm()"
+              (input)="searchTerm.set($any($event.target).value)"
+              (keyup.enter)="onSearch()"
+              placeholder="{{ 'errorCode.search' | translate }}">
+          </div>
 
-  <!-- Main Content (only show when app is selected) -->
-  <div *ngIf="selectedApp()">
-    <!-- Loading State -->
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>{{ 'common.loading' | translate }}</p>
-    </div>
-  }
+          <!-- Category Filter -->
+          <div class="filter-item">
+            <select class="form-control" [value]="selectedCategory() || ''" (change)="onCategoryChange($any($event.target).value)">
+              <option value="">{{ 'errorCode.allCategories' | translate }}</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">{{ category.categoryName }}</option>
+              }
+            </select>
+          </div>
 
-  <!-- Error Codes Grid/List -->
-  @if (!loading()) {
-    @if (errorCodes().length === 0) {
-      <div class="empty-state">
-        <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-        <h3>{{ 'errorCode.noResults' | translate }}</h3>
-        <p>{{ 'errorCode.noResultsDesc' | translate }}</p>
+          <!-- Severity Filter -->
+          <div class="filter-item">
+            <select class="form-control" [value]="selectedSeverity() || ''" (change)="onSeverityChange($any($event.target).value)">
+              <option value="">{{ 'errorCode.allSeverities' | translate }}</option>
+              @for (severity of severityOptions; track severity) {
+                <option [value]="severity">{{ severity }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- View Toggle -->
+          <div class="view-toggle">
+            <button class="btn btn-icon" [class.btn-primary]="viewMode() === 'grid'" [class.btn-outline]="viewMode() !== 'grid'" (click)="viewMode.set('grid')" title="Grid View">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+              </svg>
+            </button>
+            <button class="btn btn-icon" [class.btn-primary]="viewMode() === 'list'" [class.btn-outline]="viewMode() !== 'list'" (click)="viewMode.set('list')" title="List View">
+               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        @if (hasFilters()) {
+          <div class="d-flex justify-content-end mt-4">
+               <button class="btn btn-ghost btn-sm text-muted" (click)="clearFilters()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                {{ 'errorCode.clearFilters' | translate }}
+              </button>
+          </div>
+        }
       </div>
-    } @else {
-      <!-- Grid View -->
-      @if (viewMode() === 'grid') {
-        <div class="error-codes-grid">
-          @for (errorCode of errorCodes(); track errorCode.id) {
-            <div class="error-code-card">
-              <div class="card-header">
-                <div class="code-badge">{{ errorCode.errorCode }}</div>
-                <div class="card-actions">
-                  <button class="btn-icon-sm" (click)="openEditModal(errorCode)" title="Edit">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                  </button>
-                  <button class="btn-icon-sm btn-danger" (click)="deleteErrorCode(errorCode.id!)" title="Delete">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              
-              <div class="card-body">
-                <div class="badges">
-                  <span class="badge" [ngClass]="getSeverityClass(errorCode.severity)">
-                    {{ errorCode.severity }}
-                  </span>
-                  <span class="badge" [ngClass]="getStatusClass(errorCode.status)">
-                    {{ errorCode.status }}
-                  </span>
-                  @if (errorCode.httpStatusCode) {
-                    <span class="badge badge-http">HTTP {{ errorCode.httpStatusCode }}</span>
-                  }
-                </div>
 
-                <h3 class="card-title">{{ errorCode.defaultMessage }}</h3>
-                
-                <div class="card-meta">
-                  <div class="meta-item">
-                    <span class="meta-label">App:</span>
-                    <span class="meta-value">{{ errorCode.appName }}</span>
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="admin-empty-state">
+          <div class="spinner"></div>
+          <p>{{ 'common.loading' | translate }}</p>
+        </div>
+      }
+
+      <!-- Error Codes Content -->
+      @if (!loading()) {
+        @if (errorCodes().length === 0) {
+          <div class="admin-empty-state">
+            <div class="empty-icon">
+               <svg width="100%" height="100%" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <h3>{{ 'errorCode.noResults' | translate }}</h3>
+            <p>{{ 'errorCode.noResultsDesc' | translate }}</p>
+            <button class="btn btn-outline" (click)="clearFilters()" *ngIf="hasFilters()">
+                Clear Filters
+            </button>
+          </div>
+        } @else {
+          <!-- Grid View -->
+          @if (viewMode() === 'grid') {
+            <div class="admin-grid">
+              @for (errorCode of errorCodes(); track errorCode.id) {
+                <div class="admin-card cursor-pointer" (click)="openEditModal(errorCode)">
+                  <div class="admin-card-header">
+                    <span class="card-badge bg-primary-subtle text-primary">
+                      {{ errorCode.errorCode }}
+                    </span>
+                    <div class="d-flex gap-2">
+                         <span class="status-badge" [ngClass]="getSeverityClass(errorCode.severity)">
+                            {{ errorCode.severity }}
+                        </span>
+                    </div>
                   </div>
-                  @if (errorCode.moduleName) {
-                    <div class="meta-item">
-                      <span class="meta-label">Module:</span>
-                      <span class="meta-value">{{ errorCode.moduleName }}</span>
+                  
+                  <div class="admin-card-body">
+                    <h3 class="admin-card-title">{{ errorCode.defaultMessage }}</h3>
+                    
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="status-badge" [ngClass]="getStatusClass(errorCode.status)">
+                            {{ errorCode.status }}
+                        </span>
+                        <span class="status-badge info" *ngIf="errorCode.httpStatusCode">
+                            HTTP {{ errorCode.httpStatusCode }}
+                        </span>
+                        <span class="status-badge neutral" *ngIf="errorCode.isPublic">Public</span>
                     </div>
-                  }
-                  @if (errorCode.categoryId) {
-                    <div class="meta-item">
-                      <span class="meta-label">Category:</span>
-                      <span class="meta-value">{{ getCategoryName(errorCode.categoryId) }}</span>
-                    </div>
-                  }
-                </div>
 
-                <div class="card-flags">
-                  @if (errorCode.isPublic) {
-                    <span class="flag flag-public">Public</span>
-                  }
-                  @if (errorCode.isRetryable) {
-                    <span class="flag flag-retryable">Retryable</span>
-                  }
+                    <div class="admin-card-meta">
+                      <div class="meta-row">
+                        <span class="label">Module</span>
+                        <span class="value">{{ errorCode.moduleName || '-' }}</span>
+                      </div>
+                      <div class="meta-row">
+                        <span class="label">Category</span>
+                        <span class="value">{{ getCategoryName(errorCode.categoryId) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Hover Actions (optional, visible on hover via CSS) -->
+                   <!-- We use full card click for edit, but maybe add explicit Delete/Edit actions? -->
+                   <div class="p-3 border-top bg-surface-hover d-flex justify-content-end gap-2" (click)="$event.stopPropagation()">
+                        <button class="btn btn-sm btn-ghost" (click)="openEditModal(errorCode)">Edit</button>
+                        <button class="btn btn-sm btn-ghost text-danger" (click)="deleteErrorCode(errorCode.id!)">Delete</button>
+                   </div>
                 </div>
-              </div>
+              }
             </div>
           }
-        </div>
-      }
 
-      <!-- List View -->
-      @if (viewMode() === 'list') {
-        <div class="error-codes-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Message</th>
-                <th>App</th>
-                <th>Category</th>
-                <th>Severity</th>
-                <th>Status</th>
-                <th>HTTP</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (errorCode of errorCodes(); track errorCode.id) {
-                <tr>
-                  <td><span class="code-badge-sm">{{ errorCode.errorCode }}</span></td>
-                  <td class="message-cell">{{ errorCode.defaultMessage }}</td>
-                  <td>{{ errorCode.appName }}</td>
-                  <td>{{ getCategoryName(errorCode.categoryId) }}</td>
-                  <td>
-                    <span class="badge badge-sm" [ngClass]="getSeverityClass(errorCode.severity)">
-                      {{ errorCode.severity }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge badge-sm" [ngClass]="getStatusClass(errorCode.status)">
-                      {{ errorCode.status }}
-                    </span>
-                  </td>
-                  <td>{{ errorCode.httpStatusCode || '-' }}</td>
-                  <td class="actions-cell">
-                    <button class="btn-icon-sm" (click)="openEditModal(errorCode)">
-                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                      </svg>
-                    </button>
-                    <button class="btn-icon-sm btn-danger" (click)="deleteErrorCode(errorCode.id!)">
-                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
+          <!-- List View -->
+          @if (viewMode() === 'list') {
+            <div class="admin-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Message</th>
+                    <th>Module</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>HTTP</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (errorCode of errorCodes(); track errorCode.id) {
+                    <tr class="cursor-pointer" (click)="openEditModal(errorCode)">
+                      <td>
+                        <span class="card-badge bg-primary-subtle text-primary">
+                            {{ errorCode.errorCode }}
+                        </span>
+                      </td>
+                      <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ errorCode.defaultMessage }}
+                      </td>
+                      <td>{{ errorCode.moduleName || '-' }}</td>
+                      <td>
+                        <span class="status-badge" [ngClass]="getSeverityClass(errorCode.severity)">
+                          {{ errorCode.severity }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(errorCode.status)">
+                          {{ errorCode.status }}
+                        </span>
+                      </td>
+                      <td>{{ errorCode.httpStatusCode || '-' }}</td>
+                      <td>
+                         <div class="d-flex justify-content-end gap-2" (click)="$event.stopPropagation()">
+                             <button class="btn btn-icon btn-sm btn-ghost" (click)="openEditModal(errorCode)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                             </button>
+                             <button class="btn btn-icon btn-sm btn-ghost text-danger" (click)="deleteErrorCode(errorCode.id!)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                             </button>
+                         </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
 
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-        <div class="pagination">
-          <button class="btn-page" [disabled]="currentPage() === 0" (click)="previousPage()">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-          
-          <span class="page-info">
-            Page {{ currentPage() + 1 }} of {{ totalPages() }} ({{ totalElements() }} total)
-          </span>
-          
-          <button class="btn-page" [disabled]="currentPage() >= totalPages() - 1" (click)="nextPage()">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
-        </div>
+          <!-- Pagination -->
+          @if (totalPages() > 1) {
+            <div class="d-flex justify-content-center gap-2 mt-4">
+              <button class="btn btn-outline btn-sm" [disabled]="currentPage() === 0" (click)="previousPage()">
+                Previous
+              </button>
+              <span class="d-flex align-items-center px-2 text-muted">
+                 Page {{ currentPage() + 1 }} of {{ totalPages() }}
+              </span>
+              <button class="btn btn-outline btn-sm" [disabled]="currentPage() >= totalPages() - 1" (click)="nextPage()">
+                Next
+              </button>
+            </div>
+          }
+        }
       }
-    }
-  }
+    </div>
+  </div>
 </div>
 
-<!-- Create/Edit Modal -->
+<!-- Create/Edit Modal - Kept in component for now but using modern form styles -->
 @if (showModal() && currentErrorCode()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>{{ modalMode() === 'create' ? 'Create New Error Code for "' + selectedApp()?.name + '"' : 'Edit Error Code' }}</h2>
-        <button class="btn-close" (click)="closeModal()">
+        <h2>{{ modalMode() === 'create' ? 'Create New Error Code' : 'Edit Error Code' }}</h2>
+        <button class="btn btn-icon btn-sm btn-ghost" (click)="closeModal()">
           <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -340,7 +293,7 @@
         <div class="form-grid">
           <!-- Error Code -->
           <div class="form-group">
-            <label>{{ 'errorCode.code' | translate }} *</label>
+            <label class="form-label">{{ 'errorCode.code' | translate }} *</label>
             <input 
               type="text" 
               class="form-control"
@@ -348,11 +301,9 @@
               placeholder="e.g., AUTH_001">
           </div>
 
-
-
           <!-- Module Name -->
           <div class="form-group">
-            <label>{{ 'errorCode.moduleName' | translate }}</label>
+            <label class="form-label">{{ 'errorCode.moduleName' | translate }}</label>
             <input 
               type="text" 
               class="form-control"
@@ -362,7 +313,7 @@
 
           <!-- Category -->
           <div class="form-group">
-            <label>{{ 'errorCode.category' | translate }}</label>
+            <label class="form-label">{{ 'errorCode.category' | translate }}</label>
             <select class="form-control" [(ngModel)]="currentErrorCode()!.categoryId">
               <option [ngValue]="undefined">{{ 'errorCode.none' | translate }}</option>
               @for (category of categories(); track category.id) {
@@ -373,7 +324,7 @@
 
           <!-- Severity -->
           <div class="form-group">
-            <label>{{ 'errorCode.severity' | translate }} *</label>
+            <label class="form-label">{{ 'errorCode.severity' | translate }} *</label>
             <select class="form-control" [(ngModel)]="currentErrorCode()!.severity">
               @for (severity of severityOptions; track severity) {
                 <option [value]="severity">{{ severity }}</option>
@@ -383,7 +334,7 @@
 
           <!-- Status -->
           <div class="form-group">
-            <label>{{ 'errorCode.status' | translate }} *</label>
+            <label class="form-label">{{ 'errorCode.status' | translate }} *</label>
             <select class="form-control" [(ngModel)]="currentErrorCode()!.status">
               @for (status of statusOptions; track status) {
                 <option [value]="status">{{ status }}</option>
@@ -393,7 +344,7 @@
 
           <!-- HTTP Status Code -->
           <div class="form-group">
-            <label>{{ 'errorCode.httpCode' | translate }}</label>
+            <label class="form-label">{{ 'errorCode.httpCode' | translate }}</label>
             <input 
               type="number" 
               class="form-control"
@@ -402,21 +353,23 @@
           </div>
 
           <!-- Flags -->
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" [(ngModel)]="currentErrorCode()!.isPublic">
-              <span>{{ 'errorCode.isPublic' | translate }}</span>
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" [(ngModel)]="currentErrorCode()!.isRetryable">
-              <span>{{ 'errorCode.isRetryable' | translate }}</span>
-            </label>
+          <div class="form-group full-width">
+             <div class="d-flex gap-4 p-2 bg-surface rounded border">
+                <label class="checkbox-label d-flex align-items-center gap-2 cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="currentErrorCode()!.isPublic">
+                  <span>{{ 'errorCode.isPublic' | translate }}</span>
+                </label>
+                <label class="checkbox-label d-flex align-items-center gap-2 cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="currentErrorCode()!.isRetryable">
+                  <span>{{ 'errorCode.isRetryable' | translate }}</span>
+                </label>
+             </div>
           </div>
         </div>
 
         <!-- Default Message -->
-        <div class="form-group">
-          <label>{{ 'errorCode.defaultMessage' | translate }} *</label>
+        <div class="form-group mt-3">
+          <label class="form-label">{{ 'errorCode.defaultMessage' | translate }} *</label>
           <textarea 
             class="form-control"
             [(ngModel)]="currentErrorCode()!.defaultMessage"
@@ -425,8 +378,8 @@
         </div>
 
         <!-- Technical Details -->
-        <div class="form-group">
-          <label>{{ 'errorCode.technicalDetails' | translate }}</label>
+        <div class="form-group mt-3">
+          <label class="form-label">{{ 'errorCode.technicalDetails' | translate }}</label>
           <textarea 
             class="form-control"
             [(ngModel)]="currentErrorCode()!.technicalDetails"
@@ -435,8 +388,8 @@
         </div>
 
         <!-- Resolution Steps -->
-        <div class="form-group">
-          <label>{{ 'errorCode.resolutionSteps' | translate }}</label>
+        <div class="form-group mt-3">
+          <label class="form-label">{{ 'errorCode.resolutionSteps' | translate }}</label>
           <textarea 
             class="form-control"
             [(ngModel)]="currentErrorCode()!.resolutionSteps"
@@ -445,8 +398,8 @@
         </div>
 
         <!-- Documentation URL -->
-        <div class="form-group">
-          <label>{{ 'errorCode.documentationUrl' | translate }}</label>
+        <div class="form-group mt-3">
+          <label class="form-label">{{ 'errorCode.documentationUrl' | translate }}</label>
           <input 
             type="url" 
             class="form-control"
@@ -455,9 +408,9 @@
         </div>
 
         <!-- Translations -->
-        <div class="translations-section">
-          <div class="translations-header">
-            <h3>{{ 'errorCode.translations' | translate }}</h3>
+        <div class="translations-section mt-5 border-top pt-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h5 m-0">{{ 'errorCode.translations' | translate }}</h3>
             <div class="add-language-dropdown">
               <select 
                 class="form-control form-control-sm"
@@ -472,13 +425,13 @@
           
           <!-- Dynamic Language Translations -->
           @for (langCode of selectedLanguages(); track langCode) {
-            <div class="translation-group">
-              <div class="translation-group-header">
-                <h4>{{ getLanguageName(langCode) }}</h4>
+            <div class="translation-group p-3 bg-surface rounded border mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4 class="h6 m-0 text-muted">{{ getLanguageName(langCode) }}</h4>
                 @if (langCode !== 'en') {
                   <button 
                     type="button"
-                    class="btn-remove-lang" 
+                    class="btn btn-icon btn-sm btn-ghost text-danger" 
                     (click)="removeLanguage(langCode)"
                     title="Remove language">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -488,7 +441,7 @@
                 }
               </div>
               <div class="form-group">
-                <label>{{ 'errorCode.message' | translate }}</label>
+                <label class="form-label small">{{ 'errorCode.message' | translate }}</label>
                 <input 
                   type="text" 
                   class="form-control"
@@ -509,4 +462,3 @@
     </div>
   </div>
 }
-  </div> <!-- End main content wrapper -->

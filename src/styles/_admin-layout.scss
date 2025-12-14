@@ -1,0 +1,392 @@
+/* Admin Layout System */
+/* Reusable styles for admin pages (Error Codes, Apps, Users, etc.) */
+
+// ==================== PAGE HEADER ====================
+.admin-page-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 2rem 2.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+
+  // Subtle gradient overlay
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        var(--primary) 0%,
+        var(--secondary) 50%,
+        var(--accent-pink) 100%);
+    opacity: 0.5;
+  }
+}
+
+.admin-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.admin-title-section {
+  h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.admin-header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+// ==================== FILTERS SECTION ====================
+.admin-filters-section {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow);
+    border-color: var(--border-light);
+  }
+}
+
+.admin-filters-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+
+  .search-filter {
+    flex: 2;
+    min-width: 300px;
+    position: relative;
+
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      background: var(--background);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      }
+
+      &::placeholder {
+        color: var(--text-tertiary);
+      }
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .filter-item {
+    flex: 1;
+    min-width: 180px;
+
+    select,
+    input {
+      width: 100%;
+    }
+  }
+
+  .view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border);
+  }
+}
+
+// ==================== GRID LAYOUT ====================
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+// ==================== CARD STYLES ====================
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: transparent;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  // Gradient border effect on hover
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    background: var(--gradient-primary);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .admin-card-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .card-badge {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.813rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .admin-card-body {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .admin-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .admin-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem;
+
+      .label {
+        color: var(--text-tertiary);
+        font-weight: 500;
+      }
+
+      .value {
+        color: var(--text);
+        font-weight: 500;
+      }
+    }
+  }
+
+  .admin-card-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+// ==================== TABLE LAYOUT ====================
+.admin-table-container {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: var(--surface-hover);
+      border-bottom: 2px solid var(--border);
+
+      th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        font-weight: 700;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.2s ease;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background: var(--surface-hover);
+        }
+
+        td {
+          padding: 1rem 1.5rem;
+          color: var(--text);
+          font-size: 0.875rem;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+}
+
+// ==================== EMPTY STATES ====================
+.admin-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px dashed var(--border);
+
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
+    color: var(--primary-light);
+    opacity: 0.2;
+    transition: all 0.5s ease;
+  }
+
+  &:hover .empty-icon {
+    opacity: 0.4;
+    transform: scale(1.05);
+    color: var(--primary);
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin-bottom: 2rem;
+  }
+}
+
+// ==================== BADGES & TAGS ====================
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px; // Pill shape
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  &.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+
+  &.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+  }
+
+  &.info {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+  }
+
+  &.neutral {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+  }
+}

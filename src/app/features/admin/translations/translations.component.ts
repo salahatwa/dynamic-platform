@@ -28,14 +28,15 @@ import { ThemeSelectorComponent } from '../../../shared/components/theme-selecto
     ThemeSelectorComponent
   ],
   templateUrl: './translations.component.html',
-  styleUrls: ['./translations.component.css']
+  styleUrls: ['./translations.component.scss']
 })
 export class TranslationsComponent implements OnInit {
   // Services
   private appContext = inject(AppContextService);
   private themeService = inject(ThemeService);
-  
+
   // State
+  activeView = signal<'grid' | 'list'>('list');
   keys = signal<TranslationKey[]>([]);
   selectedLanguage = signal<string>('en');
   loading = signal(false);
@@ -71,7 +72,7 @@ export class TranslationsComponent implements OnInit {
   newLanguageCode = signal('');
   languageLoading = signal(false); // Loading state for language operations
   translationAppId = signal<number | null>(null); // ID of the TranslationApp entity
-  
+
   // Computed
   filteredKeys = computed(() => {
     const query = this.searchQuery().toLowerCase();
@@ -177,7 +178,7 @@ export class TranslationsComponent implements OnInit {
       next: (translationApp) => {
         console.log('TranslationApp created/found:', translationApp);
         this.translationAppId.set(translationApp.id);
-        
+
         // Now load languages from the TranslationApp
         this.translationService.getAppLanguages(translationApp.id).subscribe({
           next: (languages) => {
@@ -185,12 +186,12 @@ export class TranslationsComponent implements OnInit {
             // Ensure English is always included as default
             const appLanguages = languages.includes('en') ? languages : ['en', ...languages];
             this.appLanguages.set(appLanguages);
-            
+
             // Set selected language to first available if current selection is not supported
             if (!this.appLanguages().includes(this.selectedLanguage())) {
               this.selectedLanguage.set(this.appLanguages()[0]);
             }
-            
+
             // Now that we have the translationAppId, load the keys
             console.log('Loading translation keys for translationApp:', translationApp.id);
             this.loadKeys();
@@ -199,12 +200,12 @@ export class TranslationsComponent implements OnInit {
             console.error('Error loading app languages:', error);
             // Fallback to default languages
             this.appLanguages.set(['en', 'ar']);
-            
+
             // Set selected language to first available if current selection is not supported
             if (!this.appLanguages().includes(this.selectedLanguage())) {
               this.selectedLanguage.set(this.appLanguages()[0]);
             }
-            
+
             // Still try to load keys even if language loading failed
             console.log('Loading translation keys despite language error for translationApp:', translationApp.id);
             this.loadKeys();
@@ -225,12 +226,12 @@ export class TranslationsComponent implements OnInit {
         } else {
           this.appLanguages.set(['en', 'ar']); // Default languages
         }
-        
+
         // Set selected language to first available if current selection is not supported
         if (!this.appLanguages().includes(this.selectedLanguage())) {
           this.selectedLanguage.set(this.appLanguages()[0]);
         }
-        
+
         // Clear keys since we couldn't get the translation app
         this.keys.set([]);
       }
@@ -259,34 +260,34 @@ export class TranslationsComponent implements OnInit {
         // Update local state
         const updatedLanguages = [...this.appLanguages(), langCode];
         this.appLanguages.set(updatedLanguages);
-        
+
         // Also save to localStorage as backup
         const app = this.selectedApp();
         if (app) {
           localStorage.setItem(`app_${app.id}_languages`, JSON.stringify(updatedLanguages));
         }
-        
+
         this.languageLoading.set(false);
         this.closeLanguageModal();
-        
+
         // Show success message
         console.log(`Language ${langCode.toUpperCase()} added successfully`);
       },
       error: (error) => {
         console.error('Error adding language:', error);
-        
+
         // Fallback to local storage update if API fails
         const updatedLanguages = [...this.appLanguages(), langCode];
         this.appLanguages.set(updatedLanguages);
-        
+
         const app = this.selectedApp();
         if (app) {
           localStorage.setItem(`app_${app.id}_languages`, JSON.stringify(updatedLanguages));
         }
-        
+
         this.languageLoading.set(false);
         this.closeLanguageModal();
-        
+
         // Show warning that it's only saved locally
         alert('Language added locally. Backend sync failed - please check your connection.');
       }
@@ -316,44 +317,44 @@ export class TranslationsComponent implements OnInit {
         // Update local state
         const updatedLanguages = this.appLanguages().filter(lang => lang !== langCode);
         this.appLanguages.set(updatedLanguages);
-        
+
         // Also save to localStorage as backup
         const app = this.selectedApp();
         if (app) {
           localStorage.setItem(`app_${app.id}_languages`, JSON.stringify(updatedLanguages));
         }
-        
+
         // Switch to first available language if current selection was removed
         if (this.selectedLanguage() === langCode) {
           this.selectedLanguage.set(this.appLanguages()[0]);
         }
-        
+
         // Reload keys to refresh the translations
         this.loadKeys();
-        
+
         this.languageLoading.set(false);
         console.log(`Language ${langCode.toUpperCase()} removed successfully`);
       },
       error: (error) => {
         console.error('Error removing language:', error);
-        
+
         // Fallback to local storage update if API fails
         const updatedLanguages = this.appLanguages().filter(lang => lang !== langCode);
         this.appLanguages.set(updatedLanguages);
-        
+
         const app = this.selectedApp();
         if (app) {
           localStorage.setItem(`app_${app.id}_languages`, JSON.stringify(updatedLanguages));
         }
-        
+
         // Switch to first available language if current selection was removed
         if (this.selectedLanguage() === langCode) {
           this.selectedLanguage.set(this.appLanguages()[0]);
         }
-        
+
         // Reload keys to refresh the translations
         this.loadKeys();
-        
+
         this.languageLoading.set(false);
         // Show warning that it's only saved locally
         alert('Language removed locally. Backend sync failed - please check your connection.');
@@ -362,8 +363,8 @@ export class TranslationsComponent implements OnInit {
   }
 
   getLanguageInfo(langCode: string) {
-    return this.allLanguages.find(lang => lang.code === langCode) || 
-           { code: langCode, name: langCode.toUpperCase(), flag: '🌐' };
+    return this.allLanguages.find(lang => lang.code === langCode) ||
+      { code: langCode, name: langCode.toUpperCase(), flag: '🌐' };
   }
 
   getAvailableLanguagesToAdd() {
