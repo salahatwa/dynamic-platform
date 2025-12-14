@@ -6,7 +6,24 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    
+    "start:dev": "ng serve --configuration=development --open",
+    "start:uat": "ng serve --configuration=uat --open",
+    "start:prod": "ng serve --configuration=production --open",
+    
+    "build:dev": "ng build --configuration=development",
+    "build:uat": "ng build --configuration=uat",
+    "build:prod": "ng build --configuration=production",
+    
+    "watch:dev": "ng build --watch --configuration=development",
+    "watch:uat": "ng build --watch --configuration=uat",
+    
+    "lint": "ng lint",
+    "e2e": "ng e2e",
+    
+    "analyze": "ng build --configuration=production --stats-json && npx webpack-bundle-analyzer dist/dynamic-platform/stats.json",
+    "serve:dist": "npx http-server dist/dynamic-platform -p 4200 -o"
   },
   "private": true,
   "dependencies": {

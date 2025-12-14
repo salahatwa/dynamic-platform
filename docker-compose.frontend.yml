@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Development Frontend
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: development
+    profiles: ["dev"]
+    ports:
+      - "4200:80"
+    environment:
+      - ENVIRONMENT=development
+      - API_URL=http://localhost:8080/api
+    volumes:
+      - ./src:/app/src:ro  # Mount source for development
+    networks:
+      - frontend-network
+
+  # UAT Frontend
+  frontend-uat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: uat
+    profiles: ["uat"]
+    ports:
+      - "4200:80"
+    environment:
+      - ENVIRONMENT=uat
+      - API_URL=https://dynamic-platform-api-latest.onrender.com/api
+    networks:
+      - frontend-network
+    restart: unless-stopped
+
+  # Production Frontend
+  frontend-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: production
+    profiles: ["prod"]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ENVIRONMENT=production
+      - API_URL=${PROD_API_URL:-https://api.yourdomain.com/api}
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro  # SSL certificates
+    networks:
+      - frontend-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  frontend-network:
+    driver: bridge

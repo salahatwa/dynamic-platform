@@ -38,6 +38,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -50,12 +56,48 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false,
+              "extractLicenses": true,
+              "namedChunks": false,
+              "aot": true,
+              "buildOptimizer": true
+            },
+            "uat": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.uat.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": true,
+              "extractLicenses": true,
+              "namedChunks": false,
+              "aot": true,
+              "buildOptimizer": true
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "namedChunks": true,
+              "aot": false,
+              "buildOptimizer": false
             }
           },
           "defaultConfiguration": "production"
@@ -66,11 +108,31 @@
             "production": {
               "buildTarget": "dynamic-platform:build:production"
             },
+            "uat": {
+              "buildTarget": "dynamic-platform:build:uat"
+            },
             "development": {
               "buildTarget": "dynamic-platform:build:development"
             }
           },
           "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "dynamic-platform:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
+            "scripts": []
+          }
         }
       }
     }
