@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/kyc-frontend
+          path: dist/dynamic-platform/browser
 
   deploy:
     environment:
