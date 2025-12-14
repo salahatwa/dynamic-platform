@@ -1,0 +1,340 @@
+<div class="templates-page">
+  <div class="page-header">
+    <div>
+      <h1>{{ 'templates.title' | translate }}</h1>
+      <p>{{ 'templates.subtitle' | translate }}</p>
+    </div>
+    <app-button variant="primary" (click)="createNew()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      {{ 'templates.newTemplate' | translate }}
+    </app-button>
+  </div>
+
+  <div class="filters-container">
+    <div class="filters-row">
+      <div class="search-wrapper">
+        <div class="search-bar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" 
+                 placeholder="{{ 'templates.searchPlaceholder' | translate }}" 
+                 [(ngModel)]="searchQuery"
+                 (input)="onSearch()"
+                 class="search-input"/>
+          @if (searchQuery) {
+            <button class="clear-btn" (click)="clearSearch()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="filter-dropdown-wrapper">
+        <button class="filter-dropdown-btn" (click)="showFiltersDropdown.set(!showFiltersDropdown())">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+          </svg>
+          <span>{{ getSelectedTypeLabel() }}</span>
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" 
+               [class.rotate]="showFiltersDropdown()">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        
+        @if (showFiltersDropdown()) {
+          <div class="filter-dropdown-menu">
+            @for (type of templateTypes; track type.value) {
+              <button class="filter-dropdown-item" 
+                      [class.active]="selectedType() === type.value"
+                      (click)="selectTypeFromDropdown(type.value)">
+                <span class="filter-icon">{{ type.icon }}</span>
+                <span>{{ ('templates.type.' + type.value) | translate }}</span>
+                @if (selectedType() === type.value) {
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="check-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                }
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+   
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>{{ 'templates.loading' | translate }}</p>
+    </div>
+  } @else if (skeletonLoading()) {
+    <div class="templates-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-preview"></div>
+          <div class="skeleton-info">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-type"></div>
+            <div class="skeleton-date"></div>
+          </div>
+          <div class="skeleton-actions">
+            <div class="skeleton-btn"></div>
+            <div class="skeleton-btn"></div>
+            <div class="skeleton-btn"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (templates().length === 0) {
+    <div class="empty-state">
+      <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <h2>{{ 'templates.emptyTitle' | translate }}</h2>
+      <p>{{ 'templates.emptyDesc' | translate }}</p>
+      <app-button variant="primary" (click)="createNew()">{{ 'templates.createTemplate' | translate }}</app-button>
+    </div>
+  } @else {
+    <div class="templates-grid">
+      @for (template of templates(); track template.id) {
+        <app-card>
+          <div class="template-card">
+            <!-- <div class="template-preview">
+              <div class="preview-content" [innerHTML]="getPreview(template)"></div>
+            </div> -->
+            <div class="template-info">
+              <h3>{{ template.name }}</h3>
+              <div class="template-meta">
+                <span class="template-type">{{ template.type }}</span>
+                <button class="version-badge" (click)="openVersionsDialog(template)" title="{{ 'templates.viewVersions' | translate }}">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span>{{ getVersionCount(template.id) }} {{ 'templates.versionsWord' | translate }}</span>
+                </button>
+              </div>
+              <p class="template-date">{{ 'templates.updatedPrefix' | translate }} {{ formatDate(template.updatedAt) }}</p>
+            </div>
+            <div class="template-actions">
+              <button class="btn-icon btn-secondary" (click)="openAuditDialog(template)" title="{{ 'templates.auditHistory' | translate }}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </button>
+              <button class="btn-icon" (click)="editTemplate(template.id)" title="{{ 'common.edit' | translate }}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button class="btn-icon" (click)="openDuplicateDialog(template)" title="{{ 'common.duplicate' | translate }}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </button>
+              <button class="btn-icon btn-danger" (click)="openDeleteDialog(template)" title="{{ 'common.delete' | translate }}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </app-card>
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button class="page-btn" 
+                [disabled]="currentPage() === 0" 
+                (click)="goToPage(currentPage() - 1)">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+
+        @for (page of getPageNumbers(); track page) {
+          <button class="page-btn" 
+                  [class.active]="page === currentPage()" 
+                  (click)="goToPage(page)">
+            {{ page + 1 }}
+          </button>
+        }
+
+        <button class="page-btn" 
+                [disabled]="currentPage() === totalPages() - 1" 
+                (click)="goToPage(currentPage() + 1)">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    }
+  }
+
+  @if (dialog().show) {
+    <div class="dialog-overlay" (click)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        @if (dialog().type === 'delete') {
+          <div class="dialog-icon delete-icon">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </div>
+          <h2>{{ 'templates.dialog.deleteTitle' | translate }}</h2>
+          <p>{{ 'templates.dialog.deleteConfirmPrefix' | translate }} <strong>{{ dialog().template?.name }}</strong>? {{ 'templates.dialog.cannotUndo' | translate }}</p>
+        } @else if (dialog().type === 'duplicate') {
+          <div class="dialog-icon duplicate-icon">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <h2>{{ 'templates.dialog.duplicateTitle' | translate }}</h2>
+          <p>{{ 'templates.dialog.duplicateConfirmPrefix' | translate }} <strong>{{ dialog().template?.name }}</strong>?</p>
+        }
+        
+        <div class="dialog-actions">
+          <button class="dialog-btn btn-secondary" 
+                  (click)="closeDialog()"
+                  [disabled]="dialog().loading">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button class="dialog-btn" 
+                  [class.btn-danger]="dialog().type === 'delete'"
+                  [class.btn-primary]="dialog().type === 'duplicate'"
+                  (click)="confirmDialog()"
+                  [disabled]="dialog().loading">
+            @if (dialog().loading) {
+              <div class="btn-spinner"></div>
+              <span>{{ 'common.processing' | translate }}</span>
+            } @else {
+              <span>{{ dialog().type === 'delete' ? ( 'common.delete' | translate ) : ( 'common.duplicate' | translate ) }}</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (versionsDialog().show) {
+    <div class="dialog-overlay" (click)="closeVersionsDialog()">
+      <div class="dialog-content dialog-large" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>{{ 'templates.versionHistory' | translate }}</h2>
+          <button class="dialog-close" (click)="closeVersionsDialog()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="dialog-body">
+          <h3>{{ versionsDialog().template?.name }}</h3>
+          
+          @if (versionsDialog().loading) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>{{ 'templates.versionLoading' | translate }}</p>
+            </div>
+          } @else if (versionsDialog().versions.length === 0) {
+            <div class="empty-state-small">
+              <p>{{ 'templates.versionEmpty' | translate }}</p>
+            </div>
+          } @else {
+            <div class="versions-list">
+              @for (version of versionsDialog().versions; track version.id) {
+                <div class="version-item">
+                  <div class="version-header">
+                    <span class="version-number">{{ 'templates.versionWord' | translate }} {{ version.version }}</span>
+                    <span class="version-date">{{ formatTimestamp(version.createdAt) }}</span>
+                  </div>
+                  <p class="version-changelog">{{ version.changeLog || ( 'templates.noChangeLog' | translate ) }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (auditDialog().show) {
+    <div class="dialog-overlay" (click)="closeAuditDialog()">
+      <div class="dialog-content dialog-large" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>{{ 'templates.auditHistory' | translate }}</h2>
+          <button class="dialog-close" (click)="closeAuditDialog()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="dialog-body">
+          <h3>{{ auditDialog().template?.name }}</h3>
+          
+          @if (auditDialog().loading) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>{{ 'templates.auditLoading' | translate }}</p>
+            </div>
+          } @else if (auditDialog().logs.length === 0) {
+            <div class="empty-state-small">
+              <p>{{ 'templates.auditEmpty' | translate }}</p>
+            </div>
+          } @else {
+            <div class="audit-list">
+              @for (log of auditDialog().logs; track log.id) {
+                <div class="audit-item">
+                  <div class="audit-icon" [class]="log.action.toLowerCase()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      @if (log.action === 'CREATE') {
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                      } @else if (log.action === 'UPDATE') {
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      } @else if (log.action === 'DELETE') {
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      } @else {
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                      }
+                    </svg>
+                  </div>
+                  <div class="audit-content">
+                    <div class="audit-header">
+                      <span class="audit-action">{{ log.action }}</span>
+                      <span class="audit-time">{{ formatTimestamp(log.timestamp) }}</span>
+                    </div>
+                    <p class="audit-details">{{ log.details }}</p>
+                    <div class="audit-meta">
+                      <span class="audit-user">{{ log.userName }}</span>
+                      <span class="audit-ip">{{ log.ipAddress }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

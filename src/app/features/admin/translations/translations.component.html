@@ -1,0 +1,343 @@
+<div class="translations-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">{{ 'translationsMgmt.title' | translate }}</h1>
+        <p class="page-subtitle" *ngIf="selectedApp()">
+          {{ 'translationsMgmt.subtitlePrefix' | translate }} "{{ selectedApp()!.name }}"
+        </p>
+        <p class="page-subtitle" *ngIf="!selectedApp()">
+          {{ 'translationsMgmt.selectAppPrompt' | translate }}
+        </p>
+      </div>
+
+      <div class="header-actions" *ngIf="selectedApp()">
+        <button class="btn btn-outline" (click)="openLanguageModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+          </svg>
+          <span>{{ 'translationsMgmt.manageLanguages' | translate }}</span>
+        </button>
+
+        <button class="btn btn-outline" (click)="exportTranslations()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          <span>{{ 'common.export' | translate }}</span>
+        </button>
+
+        <button class="btn btn-primary" (click)="openKeyModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>{{ 'translationsMgmt.addTranslationKey' | translate }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="filters-bar" *ngIf="selectedApp()">
+      <div class="search-box">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+          placeholder="{{ 'translationsMgmt.searchPlaceholder' | translate }}">
+      </div>
+
+      <div class="filter-actions">
+        <!-- Language Tabs -->
+        <div class="language-tabs">
+          <button *ngFor="let lang of availableLanguages()" 
+                  class="language-tab"
+                  [class.active]="selectedLanguage() === lang" 
+                  (click)="selectedLanguage.set(lang)">
+            <span class="flag">{{ getLanguageInfo(lang).flag }}</span>
+            <span class="lang-code">{{ lang.toUpperCase() }}</span>
+            <button *ngIf="lang !== 'en' && availableLanguages().length > 1" 
+                    class="remove-lang-btn" 
+                    (click)="$event.stopPropagation(); removeLanguage(lang)"
+                    title="{{ 'translationsMgmt.langModal.remove' | translate }} {{ getLanguageInfo(lang).name }}">
+              ×
+            </button>
+          </button>
+          
+          <button class="language-tab add-language" (click)="openLanguageModal()" 
+                  title="{{ 'translationsMgmt.addLanguage' | translate }}">
+            <span class="add-icon">+</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No App Selected State -->
+  <div class="no-app-state" *ngIf="!selectedApp() && hasApps()">
+    <div class="empty-state-content">
+      <div class="empty-illustration">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <defs>
+            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--primary); stop-opacity: 0.1" />
+              <stop offset="100%" style="stop-color: var(--secondary); stop-opacity: 0.1" />
+            </linearGradient>
+          </defs>
+          <circle cx="12" cy="12" r="10" fill="url(#iconGradient)" stroke="none" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+            style="stroke: var(--primary)" />
+        </svg>
+      </div>
+      <h3>{{ 'translationsMgmt.noApp.title' | translate }}</h3>
+      <p>{{ 'translationsMgmt.noApp.desc' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- No Apps State -->
+  <div class="no-apps-state" *ngIf="!hasApps()">
+    <div class="empty-state-content">
+      <div class="empty-illustration">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <defs>
+            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--primary); stop-opacity: 0.1" />
+              <stop offset="100%" style="stop-color: var(--secondary); stop-opacity: 0.1" />
+            </linearGradient>
+          </defs>
+          <circle cx="12" cy="12" r="10" fill="url(#iconGradient)" stroke="none" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+            style="stroke: var(--primary)" />
+        </svg>
+      </div>
+      <h3>{{ 'translationsMgmt.noApps.title' | translate }}</h3>
+      <p>{{ 'translationsMgmt.noApps.desc' | translate }}</p>
+      <div class="empty-actions">
+        <a href="/admin/apps/create" class="btn btn-primary btn-lg">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          {{ 'apps.createNew' | translate }}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" *ngIf="selectedApp()">
+
+    <!-- Translations Table -->
+    <div class="translations-table-wrapper">
+      <table class="translations-table">
+        <thead>
+          <tr>
+            <th class="col-key">{{ 'translationsMgmt.table.key' | translate }}</th>
+            <th class="col-value">{{ selectedLanguage().toUpperCase() }} {{ 'translationsMgmt.table.translation' | translate }}</th>
+            <th class="col-description">{{ 'translationsMgmt.table.description' | translate }}</th>
+            <th class="col-actions">{{ 'common.actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let key of filteredKeys()">
+            <td class="col-key">
+              <code class="key-name">{{ key.keyName }}</code>
+              <span class="context-badge" *ngIf="key.context">{{ key.context }}</span>
+            </td>
+            <td class="col-value">
+              <input type="text" class="translation-input"
+                [value]="(key.translations[selectedLanguage()] && key.translations[selectedLanguage()].value) || ''"
+                (blur)="updateTranslation(key, selectedLanguage(), $any($event.target).value)"
+                placeholder="{{ 'translationsMgmt.enterTranslation' | translate }}">
+            </td>
+            <td class="col-description">
+              <span class="description">{{ key.description || '-' }}</span>
+            </td>
+            <td class="col-actions">
+              <button class="icon-btn" (click)="openKeyModal(key)" title="{{ 'common.edit' | translate }}">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button class="icon-btn danger" (click)="confirmDelete(key)" title="{{ 'common.delete' | translate }}">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredKeys().length === 0 && !loading() && selectedApp()">
+            <td colspan="4" class="empty-row">
+              <div class="empty-state-small">
+                <p>{{ 'translationsMgmt.emptyKeysPrefix' | translate }} "{{ selectedApp()!.name }}"</p>
+                <button class="btn btn-sm btn-primary" (click)="openKeyModal()">{{ 'translationsMgmt.addFirstKey' | translate }}</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages() > 1">
+      <button class="btn btn-sm" (click)="previousPage()" [disabled]="currentPage() === 0">
+        {{ 'common.previous' | translate }}
+      </button>
+      <span class="page-info">{{ 'translationsMgmt.pagination.page' | translate }} {{ currentPage() + 1 }} {{ 'translationsMgmt.pagination.of' | translate }} {{ totalPages() }}</span>
+      <button class="btn btn-sm" (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1">
+        {{ 'common.next' | translate }}
+      </button>
+    </div>
+  </div>
+
+
+
+  <!-- Key Modal -->
+  <div *ngIf="showKeyModal"
+    style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.8) !important; z-index: 999999 !important; display: flex !important; align-items: center !important; justify-content: center !important; pointer-events: auto !important;">
+    <div
+      style="background: white !important; border-radius: 12px; padding: 0; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; z-index: 1000000 !important; pointer-events: auto !important;">
+      <div class="modal-header">
+        <h2>{{ editingKey ? ( 'translationsMgmt.modal.key.editTitle' | translate ) : ( ( 'translationsMgmt.modal.key.createPrefix' | translate ) + ' "' + selectedApp()?.name + '"' ) }}</h2>
+        <button class="close-btn" (click)="closeKeyModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>{{ 'translationsMgmt.form.keyName' | translate }}</label>
+          <input type="text" [value]="keyForm().keyName"
+            (input)="updateKeyFormField('keyName', $any($event.target).value)" placeholder="welcome.message">
+          <small>{{ 'translationsMgmt.form.keyNameHelp' | translate }}</small>
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'translationsMgmt.form.description' | translate }}</label>
+          <input type="text" [value]="keyForm().description"
+            (input)="updateKeyFormField('description', $any($event.target).value)"
+            placeholder="{{ 'translationsMgmt.form.descriptionPlaceholder' | translate }}">
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'translationsMgmt.form.context' | translate }}</label>
+          <input type="text" [value]="keyForm().context"
+            (input)="updateKeyFormField('context', $any($event.target).value)" placeholder="{{ 'translationsMgmt.form.contextPlaceholder' | translate }}">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeKeyModal()">{{ 'common.cancel' | translate }}</button>
+        <button class="btn btn-primary" (click)="saveKey()">
+          {{ editingKey ? ( 'common.update' | translate ) : ( 'common.add' | translate ) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language Management Modal -->
+  <div *ngIf="showLanguageModal"
+    style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.8) !important; z-index: 999999 !important; display: flex !important; align-items: center !important; justify-content: center !important; pointer-events: auto !important;">
+    <div
+      style="background: white !important; border-radius: 12px; padding: 0; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; z-index: 1000000 !important; pointer-events: auto !important;">
+      <div class="modal-header">
+        <h2>{{ 'translationsMgmt.langModal.titlePrefix' | translate }} "{{ selectedApp()?.name }}"</h2>
+        <button class="close-btn" (click)="closeLanguageModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Current Languages -->
+        <div class="section">
+          <h3>{{ 'translationsMgmt.langModal.current' | translate }}</h3>
+          <div class="current-languages">
+            <div *ngFor="let lang of appLanguages()" class="language-item">
+              <span class="language-flag">{{ getLanguageInfo(lang).flag }}</span>
+              <span class="language-name">{{ getLanguageInfo(lang).name }}</span>
+              <span class="language-code">({{ lang.toUpperCase() }})</span>
+              <button *ngIf="lang !== 'en' && appLanguages().length > 1" 
+                      class="btn btn-sm btn-danger remove-btn" 
+                      [disabled]="languageLoading()"
+                      (click)="removeLanguage(lang)"
+                      title="{{ 'translationsMgmt.langModal.remove' | translate }}">
+                <span *ngIf="languageLoading()" class="spinner-sm"></span>
+                {{ languageLoading() ? ( 'translationsMgmt.langModal.removing' | translate ) : ( 'translationsMgmt.langModal.remove' | translate ) }}
+              </button>
+              <span *ngIf="lang === 'en'" class="default-badge">{{ 'translationsMgmt.langModal.default' | translate }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add New Language -->
+        <div class="section">
+          <h3>{{ 'translationsMgmt.langModal.addNew' | translate }}</h3>
+          <div class="add-language-form">
+            <select class="form-control" [value]="newLanguageCode()" 
+                    (change)="newLanguageCode.set($any($event.target).value)">
+              <option value="">{{ 'translationsMgmt.langModal.selectPlaceholder' | translate }}</option>
+              <option *ngFor="let lang of getAvailableLanguagesToAdd()" [value]="lang.code">
+                {{ lang.flag }} {{ lang.name }} ({{ lang.code.toUpperCase() }})
+              </option>
+            </select>
+              <button class="btn btn-primary" 
+                      [disabled]="!newLanguageCode() || languageLoading()" 
+                      (click)="addLanguage()">
+              <span *ngIf="languageLoading()" class="spinner-sm"></span>
+              {{ languageLoading() ? ( 'translationsMgmt.langModal.adding' | translate ) : ( 'translationsMgmt.langModal.addLanguage' | translate ) }}
+              </button>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="info-section">
+          <div class="info-box">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+              <p><strong>{{ 'translationsMgmt.langModal.noteLabel' | translate }}</strong> {{ 'translationsMgmt.langModal.infoAddRemove' | translate }}</p>
+              <p>{{ 'translationsMgmt.langModal.infoDefault' | translate }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeLanguageModal()">{{ 'common.close' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation -->
+  <div *ngIf="showDeleteConfirm"
+    style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.8) !important; z-index: 999999 !important; display: flex !important; align-items: center !important; justify-content: center !important; pointer-events: auto !important;">
+    <div
+      style="background: white !important; border-radius: 12px; padding: 0; max-width: 400px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; z-index: 1000000 !important; pointer-events: auto !important;">
+      <div class="modal-header">
+        <h2>{{ 'translationsMgmt.deleteConfirm.title' | translate }}</h2>
+        <button class="close-btn" (click)="closeDeleteModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ 'translationsMgmt.deleteConfirm.message' | translate }}</p>
+        <p class="warning-text">{{ 'common.cannotUndo' | translate }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDeleteModal()">{{ 'common.cancel' | translate }}</button>
+        <button class="btn btn-danger" (click)="deleteItem()">{{ 'common.delete' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading()">
+    <div class="spinner"></div>
+  </div>

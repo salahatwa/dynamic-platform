@@ -1,0 +1,161 @@
+<div class="app-create-container">
+  <div class="page-header">
+    <div class="header-breadcrumb">
+      <a routerLink="/admin/apps" class="breadcrumb-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        {{ 'apps.title' | translate }}
+      </a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">{{ 'apps.create' | translate }}</span>
+    </div>
+    
+    <h1 class="page-title">{{ 'apps.create' | translate }}</h1>
+    <p class="page-subtitle">Create a new application to manage translations, templates, and more</p>
+  </div>
+
+  <!-- Limit Warning -->
+  @if (limits(); as lim) {
+    @if (lim.appsUsed >= lim.maxApps && lim.maxApps !== -1) {
+      <div class="alert alert-danger">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div>
+          <strong>{{ 'apps.limitReached' | translate }}</strong>
+          <p>{{ 'apps.upgradePrompt' | translate }}</p>
+        </div>
+        <a routerLink="/pricing" class="btn btn-sm btn-primary">
+          {{ 'subscription.upgrade' | translate }}
+        </a>
+      </div>
+    } @else {
+      <div class="limit-info">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>{{ lim.appsUsed }} / {{ lim.maxApps === -1 ? ('subscription.unlimited' | translate) : lim.maxApps }} apps used</span>
+      </div>
+    }
+  }
+
+  <!-- Error Alert -->
+  @if (error()) {
+    <div class="alert alert-danger">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Form -->
+  <form (ngSubmit)="onSubmit()" class="app-form">
+    <div class="form-card">
+      <h2 class="form-section-title">Basic Information</h2>
+      
+      <div class="form-group">
+        <label class="form-label required">
+          {{ 'apps.name' | translate }}
+        </label>
+        <input 
+          type="text" 
+          class="form-input"
+          [value]="formData().name"
+          (input)="updateField('name', $any($event.target).value)"
+          placeholder="My Mobile App"
+          required
+          maxlength="255">
+        <p class="form-help">Choose a descriptive name for your application</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          {{ 'apps.description' | translate }}
+        </label>
+        <textarea 
+          class="form-textarea"
+          [value]="formData().description || ''"
+          (input)="updateField('description', $any($event.target).value)"
+          placeholder="A brief description of your application..."
+          rows="4"
+          maxlength="1000"></textarea>
+        <p class="form-help">Optional description to help identify this app</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          {{ 'apps.iconUrl' | translate }}
+        </label>
+        <input 
+          type="url" 
+          class="form-input"
+          [value]="formData().iconUrl || ''"
+          (input)="updateField('iconUrl', $any($event.target).value)"
+          placeholder="https://example.com/icon.png">
+        <p class="form-help">Optional URL to an icon image for this app</p>
+      </div>
+
+      <!-- Icon Preview -->
+      @if (formData().iconUrl) {
+        <div class="icon-preview">
+          <label class="form-label">Icon Preview</label>
+          <div class="preview-container">
+            <img 
+              [src]="formData().iconUrl" 
+              alt="App icon preview"
+              (error)="updateField('iconUrl', '')"
+              class="preview-image">
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Info Card -->
+    <div class="info-card">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div>
+        <h3>What happens next?</h3>
+        <ul>
+          <li>A unique app key will be automatically generated</li>
+          <li>You can start adding translations, templates, and configurations</li>
+          <li>The app will be immediately available in the app selector</li>
+          <li>All data will be isolated to this app</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="cancel()"
+        [disabled]="loading()">
+        {{ 'common.cancel' | translate }}
+      </button>
+      
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="!canSubmit()">
+        @if (loading()) {
+          <div class="btn-spinner"></div>
+          <span>Creating...</span>
+        } @else {
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>{{ 'apps.create' | translate }}</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

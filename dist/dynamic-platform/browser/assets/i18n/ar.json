@@ -1,0 +1,843 @@
+{
+  "common": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "pricing": "الأسعار",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "search": "بحث",
+    "loading": "جاري التحميل...",
+    "actions": "الإجراءات",
+    "duplicate": "تكرار",
+    "processing": "جاري المعالجة...",
+    "export": "تصدير",
+    "update": "تحديث",
+    "add": "إضافة",
+    "close": "إغلاق",
+    "previous": "السابق",
+    "next": "التالي",
+    "cannotUndo": "لا يمكن التراجع عن هذا الإجراء."
+  },
+  "landing": {
+    "title": "المنصة الديناميكية",
+    "subtitle": "منصة SaaS متعددة المستأجرين قوية مع إدارة المحتوى الديناميكي",
+    "getStarted": "ابدأ الآن",
+    "signIn": "تسجيل الدخول",
+    "features": "المميزات الرئيسية",
+    "translations": "الترجمات الديناميكية",
+    "translationsDesc": "إدارة الترجمات لتطبيقات ولغات متعددة في الوقت الفعلي",
+    "surveys": "إدارة الاستبيانات",
+    "surveysDesc": "إنشاء وإدارة استبيانات ديناميكية بأنواع أسئلة متعددة",
+    "templates": "محرك القوالب",
+    "templatesDesc": "تصميم قوالب HTML وتحويلها إلى PDF بسلاسة",
+    "tickets": "نظام التذاكر",
+    "ticketsDesc": "نظام شامل لإدارة تذاكر الدعم",
+    "apiManagement": "إدارة API",
+    "apiManagementDesc": "إنشاء وإدارة مفاتيح API لتكامل الخدمات",
+    "multiTenant": "متعدد المستأجرين",
+    "multiTenantDesc": "حسابات الشركات مع إدارة الموظفين والصلاحيات",
+    "hero": {
+      "badge": "مدعوم بـ Angular وSpring Boot",
+      "titlePrefix": "إنتاجية المطور",
+      "titleEmphasis": "إدارة التطبيقات",
+      "titleSuffix": "منصة",
+      "subtitle": "منصة شاملة لبناء تطبيقات متعددة اللغات مع ترجمات وقوالب وتكوينات وإدارة المستخدمين. كل ما تحتاجه لتسريع التطوير وإدارة تطبيقاتك بكفاءة.",
+      "getStarted": "ابدأ مجانًا",
+      "viewPricing": "عرض الأسعار",
+      "features": {
+        "noCard": "لا يلزم بطاقة ائتمان",
+        "freeForever": "خطة مجانية للأبد",
+        "apiIncluded": "وصول API مُدرج"
+      },
+      "windowTitle": "محرر القوالب",
+      "tabs": { "visual": "بصري", "html": "HTML", "css": "CSS" },
+      "badges": { "translations": "الترجمات", "config": "التكوين", "lov": "قائمة القيم" }
+    },
+    "features": {
+      "badge": "مميزات المنتج",
+      "title": "كل ما تحتاجه لبناء التطبيقات",
+      "subtitle": "ترجمات وقوالب وتكوين وقت التشغيل وLOV والمستخدمون ومفاتيح API والمزيد."
+    },
+    "cards": {
+      "translation": {
+        "title": "إدارة الترجمات",
+        "desc": "حل i18n كامل لتطبيقات ولغات متعددة مع الإصدارات والتصدير.",
+        "tags": { "multiLanguage": "متعدد اللغات", "rtl": "دعم RTL", "version": "إدارة الإصدارات" }
+      },
+      "template": {
+        "title": "إدارة القوالب",
+        "desc": "محرر بصري مع معاينة مباشرة، HTML/CSS، FreeMarker وتصدير PDF.",
+        "tags": { "visual": "محرر بصري", "pdf": "تصدير PDF", "dynamic": "محتوى ديناميكي" }
+      },
+      "config": {
+        "title": "تكوين التطبيق",
+        "desc": "تكوين مركزي وقت التشغيل مع إدارة الإصدارات وسجل التدقيق.",
+        "tags": { "runtime": "وقت التشغيل", "version": "الإصدارات", "audit": "تدقيق" }
+      },
+      "lov": {
+        "title": "قائمة القيم (LOV)",
+        "desc": "بيانات مرجعية مع ترجمات وعمليات مجمعة.",
+        "tags": { "centralized": "مركزي", "translations": "ترجمات", "bulk": "عمليات مجمعة" }
+      },
+      "error": {
+        "title": "رموز الأخطاء",
+        "desc": "فهرس أخطاء قياسي مع رسائل متعددة اللغات وإصدارات.",
+        "tags": { "standard": "قياسي", "multiLanguage": "متعدد اللغات", "categorized": "مصنّف" }
+      },
+      "users": {
+        "title": "إدارة المستخدمين",
+        "desc": "صلاحيات مبنية على الأدوار، دعوات، ودعم متعدد المستأجرين.",
+        "tags": { "rbac": "صلاحيات الأدوار", "multiTenant": "متعدد المستأجرين", "invitations": "دعوات" }
+      },
+      "apiKeys": {
+        "title": "مفاتيح API",
+        "desc": "وصول آمن إلى REST مع توثيق وتدوير المفاتيح.",
+        "tags": { "rest": "REST", "secure": "آمن", "docs": "توثيق" }
+      },
+      "ui": {
+        "title": "الواجهة وتجربة المستخدم",
+        "desc": "تصميم متجاوب مع الوضع الداكن ودعم RTL.",
+        "tags": { "responsive": "متجاوب", "dark": "وضع داكن", "rtl": "RTL" }
+      },
+      "security": {
+        "title": "الأمان",
+        "desc": "مصادقة JWT، عزل المستأجر، وتسجيل التدقيق.",
+        "tags": { "jwt": "JWT", "isolation": "عزل", "audit": "تدقيق" }
+      }
+    },
+    "useCases": {
+      "badge": "حالات الاستخدام",
+      "title": "مصمم للتطبيقات الحديثة",
+      "saas": { "title": "منصات SaaS", "desc": "تطبيقات متعددة المستأجرين مع أدوات إدارة قوية" },
+      "global": { "title": "منتجات عالمية", "desc": "تجارب متعددة اللغات تشمل RTL" },
+      "mobile": { "title": "موبايل والويب", "desc": "i18n متسق عبر جميع العملاء" },
+      "enterprise": { "title": "مؤسسي", "desc": "أمان وتدقيق وأدوار وصلاحيات" },
+      "email": { "title": "رسائل بريد ديناميكية", "desc": "محرر قوالب بصري مع تصدير PDF" },
+      "config": { "title": "تكوين وقت التشغيل", "desc": "أعلام الميزات وإعدادات مركزية" }
+    },
+    "cta": {
+      "title": "جاهز للبناء بسرعة؟",
+      "subtitle": "ابدأ مجانًا وتوسع مع نموك",
+      "button": "ابدأ مجانًا",
+      "note": "لا يلزم بطاقة ائتمان"
+    }
+  },
+  "auth": {
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "loginTitle": "مرحباً بعودتك",
+    "registerTitle": "إنشاء حساب جديد",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "loginWithGoogle": "تسجيل الدخول بواسطة Google",
+    "minPassword": "6 أحرف على الأقل"
+  },
+  "admin": {
+    "dashboard": "لوحة التحكم",
+    "translations": "الترجمات",
+    "surveys": "الاستبيانات",
+    "templates": "القوالب",
+    "tickets": "التذاكر",
+    "users": "المستخدمين",
+    "apiKeys": "مفاتيح API",
+    "settings": "الإعدادات",
+    "invitations": "الدعوات"
+  },
+  "errorCode": {
+    "title": "إدارة رموز الأخطاء",
+    "subtitle": "إدارة رموز أخطاء التطبيق مع دعم متعدد اللغات",
+    "create": "إنشاء رمز خطأ",
+    "edit": "تعديل رمز الخطأ",
+    "delete": "حذف رمز الخطأ",
+    "search": "البحث عن رموز الأخطاء...",
+    "allApps": "جميع التطبيقات",
+    "allCategories": "جميع الفئات",
+    "allSeverities": "جميع مستويات الخطورة",
+    "allStatuses": "جميع الحالات",
+    "clearFilters": "مسح الفلاتر",
+    "noResults": "لم يتم العثور على رموز أخطاء",
+    "noResultsDesc": "حاول تعديل الفلاتر أو إنشاء رمز خطأ جديد",
+    "code": "الرمز",
+    "message": "الرسالة",
+    "app": "التطبيق",
+    "category": "الفئة",
+    "severity": "الخطورة",
+    "status": "الحالة",
+    "httpCode": "رمز HTTP",
+    "actions": "الإجراءات",
+    "appName": "اسم التطبيق",
+    "moduleName": "اسم الوحدة",
+    "defaultMessage": "الرسالة الافتراضية",
+    "technicalDetails": "التفاصيل التقنية",
+    "resolutionSteps": "خطوات الحل",
+    "documentationUrl": "رابط التوثيق",
+    "isPublic": "عام (مرئي للعملاء)",
+    "isRetryable": "قابل لإعادة المحاولة",
+    "translations": "الترجمات",
+    "english": "الإنجليزية (EN)",
+    "arabic": "العربية (AR)",
+    "versionHistory": "سجل الإصدارات",
+    "auditLog": "سجل التدقيق",
+    "restore": "استعادة",
+    "public": "عام",
+    "retryable": "قابل للمحاولة",
+    "none": "لا يوجد",
+    "required": "حقل مطلوب"
+  },
+  "pricing": {
+    "title": "اختر الخطة المثالية لفريقك",
+    "subtitle": "ابدأ مجانًا، وتوسع مع نموك. لا رسوم خفية، لا مفاجآت.",
+    "badge": "أسعار بسيطة وشفافة",
+    "period": "/شهر",
+    "enterprisePriceLabel": "مخصص",
+    "free": {
+      "name": "مجاني",
+      "description": "مثالي للاختبار والمشاريع الشخصية",
+      "cta": "ابدأ مجانًا"
+    },
+    "pro": {
+      "name": "احترافي",
+      "description": "للفرق والشركات النامية",
+      "cta": "ابدأ تجربة احترافية",
+      "badge": "الأكثر شعبية"
+    },
+    "team": {
+      "name": "فريق",
+      "description": "ميزات متقدمة للفرق الكبيرة",
+      "cta": "ابدأ تجربة الفريق"
+    },
+    "enterprise": {
+      "name": "مؤسسي",
+      "description": "حلول مخصصة للمؤسسات الكبيرة",
+      "cta": "اتصل بالمبيعات"
+    },
+    "features": {
+      "free": {
+        "application": "تطبيق واحد",
+        "users": "مستخدمان",
+        "apiRequests": "1,000 طلب API/شهر",
+        "basicTranslations": "ترجمات أساسية",
+        "basicTemplates": "قوالب أساسية",
+        "communitySupport": "دعم المجتمع",
+        "limitedExport": "تصدير محدود",
+        "noSSO": "بدون SSO",
+        "noApiKeys": "بدون مفاتيح API"
+      },
+      "pro": {
+        "upToApplications": "حتى 10 تطبيقات",
+        "unlimitedLanguages": "لغات غير محدودة",
+        "unlimitedTemplates": "قوالب غير محدودة",
+        "apiKeys": "مفاتيح API",
+        "errorCodes": "إدارة رموز الأخطاء",
+        "appConfig": "تكوين التطبيق",
+        "lov": "إدارة LOV",
+        "priorityEmailSupport": "دعم بريد إلكتروني أولوية",
+        "exportJson": "تصدير إلى JSON",
+        "apiRequests50k": "50,000 طلب API/شهر"
+      },
+      "team": {
+        "everythingInPro": "كل ما في احترافي",
+        "users10to50": "10-50 مستخدمًا",
+        "rolesPermissions": "أدوار وصلاحيات",
+        "activityLogging": "تسجيل النشاط",
+        "customDomains": "نطاقات مخصصة",
+        "multiEnvironment": "بيئات متعددة (تطوير/اختبار/إنتاج)",
+        "advancedAnalytics": "تحليلات متقدمة",
+        "webhooks": "تكاملات Webhook",
+        "prioritySupport": "دعم أولوية",
+        "apiRequests500k": "500,000 طلب API/شهر"
+      },
+      "enterprise": {
+        "unlimitedEverything": "كل شيء غير محدود",
+        "ssoSaml": "SSO / SAML",
+        "dedicatedManager": "مدير حساب مخصص",
+        "onPremise": "نشر داخل المؤسسة",
+        "enhancedSecurity": "أمان معزز",
+        "sla99": "ضمان خدمة 99.9%",
+        "customIntegrations": "تكاملات مخصصة",
+        "trainingOnboarding": "تدريب وتأهيل",
+        "phoneSupport247": "دعم هاتفي 24/7",
+        "unlimitedApiRequests": "طلبات API غير محدودة"
+      }
+    },
+    "faq": {
+      "title": "الأسئلة الشائعة",
+      "q1": "هل يمكنني تغيير الخطة لاحقًا؟",
+      "a1": "نعم! يمكنك الترقية أو التخفيض في أي وقت. تسري التغييرات فورًا، وسنقوم بحساب الرسوم بالتناسب.",
+      "q2": "ما طرق الدفع المتاحة؟",
+      "a2": "نقبل جميع بطاقات الائتمان الرئيسية (Visa وMasterCard وAmerican Express) وPayPal. يمكن لعملاء المؤسسات الدفع عبر الفاتورة.",
+      "q3": "هل توجد تجربة مجانية؟",
+      "a3": "نعم! جميع الخطط المدفوعة تأتي مع تجربة مجانية لمدة 14 يومًا. لا حاجة لبطاقة ائتمان للبدء.",
+      "q4": "ماذا يحدث عند تجاوز حدود API؟",
+      "a4": "سنخطرك عند الوصول إلى 80% من الحد. يمكنك ترقية خطتك أو شراء طلبات إضافية حسب الحاجة.",
+      "q5": "هل تقدمون خصومات للمنظمات غير الربحية؟",
+      "a5": "نعم! نقدم خصمًا بنسبة 50% للمنظمات غير الربحية المسجلة والمؤسسات التعليمية. اتصل بنا للتفاصيل.",
+      "q6": "هل يمكنني الإلغاء في أي وقت؟",
+      "a6": "نعم، يمكنك إلغاء الاشتراك في أي وقت. سيبقى حسابك نشطًا حتى نهاية فترة الفوترة."
+    },
+    "cta": {
+      "title": "هل أنت مستعد للبدء؟",
+      "subtitle": "انضم إلى آلاف المطورين الذين يبنون تطبيقات أفضل",
+      "button": "ابدأ تجربة مجانية"
+    }
+  },
+  "apps": {
+    "title": "التطبيقات",
+    "apps": "تطبيقات",
+    "selectApp": "اختر التطبيق",
+    "selectFromList": "اختر من القائمة",
+    "manageApps": "إدارة التطبيقات",
+    "createNew": "إنشاء تطبيق جديد",
+    "createFirst": "أنشئ تطبيقك الأول",
+    "noApps": "لا توجد تطبيقات بعد",
+    "noAppsDesc": "أنشئ تطبيقك الأول للبدء في استخدام الترجمات والقوالب والمزيد.",
+    "name": "اسم التطبيق",
+    "description": "الوصف",
+    "appKey": "مفتاح التطبيق",
+    "iconUrl": "رابط الأيقونة",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "archived": "مؤرشف",
+    "create": "إنشاء تطبيق",
+    "edit": "تعديل التطبيق",
+    "archive": "أرشفة التطبيق",
+    "restore": "استعادة التطبيق",
+    "delete": "حذف التطبيق",
+    "confirmArchive": "هل أنت متأكد من أرشفة هذا التطبيق؟",
+    "confirmDelete": "هل أنت متأكد من حذف هذا التطبيق نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.",
+    "limitReached": "تم الوصول إلى حد التطبيقات",
+    "upgradePrompt": "قم بترقية خطتك لإنشاء المزيد من التطبيقات",
+    "createdAt": "تاريخ الإنشاء",
+    "updatedAt": "تاريخ التحديث"
+  },
+  "subscription": {
+    "title": "الاشتراك",
+    "tier": "الخطة",
+    "free": "مجاني",
+    "pro": "احترافي",
+    "team": "فريق",
+    "enterprise": "مؤسسي",
+    "limits": "الحدود",
+    "usage": "الاستخدام",
+    "upgrade": "ترقية الخطة",
+    "appsUsed": "التطبيقات المستخدمة",
+    "usersUsed": "المستخدمون",
+    "apiRequestsUsed": "طلبات API",
+    "unlimited": "غير محدود",
+    "currentPlan": "الخطة الحالية",
+    "maxApps": "الحد الأقصى للتطبيقات",
+    "maxUsers": "الحد الأقصى للمستخدمين",
+    "maxApiRequests": "طلبات API/شهر"
+  }
+  ,
+  "lov": {
+    "title": "قائمة القيم (LOV)",
+    "subtitle": "إدارة بيانات المرجع والقيم التعريفية للنظام",
+    "selectedApp": "التطبيق المختار",
+    "export": "تصدير",
+    "newLov": "إنشاء LOV",
+    "searchPlaceholder": "ابحث في LOV...",
+    "allLovCodes": "جميع رموز LOV",
+    "activeOnly": "النشط فقط",
+    "gridView": "عرض شبكي",
+    "listView": "عرض قائم",
+    "loading": "جاري تحميل LOV...",
+    "emptyTitle": "لا توجد LOV",
+    "emptyDesc": "ابدأ بإنشاء أول عنصر في قائمة القيم",
+    "createFirst": "إنشاء أول LOV",
+    "card": {
+      "noDescription": "لا يوجد وصف",
+      "valuesZero": "0 قيم",
+      "updated": "محدّث"
+    },
+    "table": {
+      "code": "رمز LOV",
+      "name": "الاسم",
+      "description": "الوصف",
+      "values": "القيم",
+      "status": "الحالة",
+      "updated": "التحديث",
+      "actions": "الإجراءات"
+    },
+    "modal": {
+      "createTitle": "إنشاء نوع LOV جديد",
+      "lovCode": "رمز LOV *",
+      "lovCodeHelp": "معرّف فريد لهذا النوع (مثل COUNTRY, CURRENCY, STATUS)",
+      "name": "الاسم *",
+      "nameHelp": "اسم العرض لهذا النوع",
+      "description": "الوصف",
+      "descriptionHelp": "وصف موجز لما يمثله هذا النوع",
+      "active": "نشط",
+      "cancel": "إلغاء",
+      "createAddValues": "إنشاء وإضافة قيم",
+      "selectAppWarning": "يرجى اختيار تطبيق لإنشاء LOV."
+    },
+    "deleteModal": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد من حذف",
+      "cannotUndo": "لا يمكن التراجع عن هذا الإجراء.",
+      "cancel": "إلغاء",
+      "delete": "حذف"
+    }
+  },
+  "lovEditor": {
+    "back": "الرجوع إلى LOV",
+    "titlePrefix": "تعديل قيم LOV:",
+    "subtitle": "إدارة قيم متعددة لهذا النوع",
+    "exportCsv": "تصدير CSV",
+    "addRow": "إضافة صف",
+    "saveAll": "حفظ الكل",
+    "info": {
+      "lovType": "نوع LOV:",
+      "selectedApp": "التطبيق المختار:",
+      "translationApp": "تطبيق الترجمة:",
+      "totalValues": "إجمالي القيم:",
+      "showInactiveOnly": "إظهار غير النشطة فقط"
+    },
+    "table": {
+      "orderCol": "#",
+      "lovValue": "قيمة LOV *",
+      "attr1": "السمة 1",
+      "attr2": "السمة 2",
+      "attr3": "السمة 3",
+      "translationKey": "مفتاح الترجمة",
+      "displayOrder": "الترتيب",
+      "active": "نشط",
+      "actions": "الإجراءات",
+      "badgeNew": "جديد",
+      "badgeModified": "معدّل",
+      "empty": "لا توجد قيم. انقر \"إضافة صف\" لإنشاء قيم جديدة."
+    },
+    "placeholders": {
+      "lovValue": "مثال: 2",
+      "attr1": "مثال: EG",
+      "attr2": "مثال: EGY",
+      "attr3": "مثال: +20",
+      "translationKey": "مثال: country.egypt"
+    },
+    "alerts": {
+      "confirmDelete": "هل أنت متأكد من حذف قيمة LOV هذه؟",
+      "deleteFailed": "فشل حذف قيمة LOV",
+      "noChanges": "لا توجد تغييرات للحفظ",
+      "lovTypeMissing": "نوع LOV غير محدد. يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى.",
+      "selectAppBeforeCreate": "يرجى اختيار تطبيق قبل إنشاء قيم LOV.",
+      "selectAppBeforeUpdate": "يرجى اختيار تطبيق قبل تعديل قيم LOV.",
+      "savedSuccessPrefix": "تم حفظ",
+      "valuesWord": "قيم",
+      "savedPartialPrefix": "تم حفظ",
+      "failedSuffix": "فشل"
+    },
+    "csv": {
+      "yes": "نعم",
+      "no": "لا"
+    }
+  },
+  "templates": {
+    "title": "إدارة القوالب",
+    "subtitle": "إدارة قوالبك",
+    "newTemplate": "قالب جديد",
+    "searchPlaceholder": "ابحث في القوالب...",
+    "loading": "جاري تحميل القوالب...",
+    "emptyTitle": "لا توجد قوالب بعد",
+    "emptyDesc": "أنشئ أول قالب للبدء",
+    "createTemplate": "إنشاء قالب",
+    "viewVersions": "عرض الإصدارات",
+    "versionsWord": "إصدارات",
+    "updatedPrefix": "تم التحديث",
+    "auditHistory": "سجل التدقيق",
+    "versionHistory": "سجل الإصدارات",
+    "versionLoading": "جاري تحميل الإصدارات...",
+    "versionEmpty": "لا توجد إصدارات",
+    "versionWord": "الإصدار",
+    "noChangeLog": "لا يوجد سجل تغييرات",
+    "auditLoading": "جاري تحميل سجلات التدقيق...",
+    "auditEmpty": "لا توجد سجلات تدقيق",
+    "dialog": {
+      "deleteTitle": "حذف القالب",
+      "deleteConfirmPrefix": "هل أنت متأكد من حذف",
+      "cannotUndo": "لا يمكن التراجع عن هذا الإجراء.",
+      "duplicateTitle": "تكرار القالب",
+      "duplicateConfirmPrefix": "إنشاء نسخة من"
+    },
+    "type": {
+      "ALL": "الكل",
+      "EMAIL": "البريد",
+      "REPORT": "تقرير",
+      "INVOICE": "فاتورة",
+      "CERTIFICATE": "شهادة",
+      "CUSTOM": "مخصص"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "مراقبة نشاط النظام وسجلات التدقيق وإدارة منصتك",
+    "newTemplate": "قالب جديد",
+    "stats": {
+      "totalApps": "إجمالي التطبيقات",
+      "totalUsers": "إجمالي المستخدمين",
+      "totalApiKeys": "إجمالي مفاتيح API",
+      "templates": "القوالب",
+      "totalTemplates": "إجمالي القوالب",
+      "pdfsGenerated": "ملفات PDF المُولّدة",
+      "activeUsers": "المستخدمون النشطون",
+      "apiKeys": "مفاتيح API"
+    },
+    "tabs": {
+      "recent": "النشاط الأخير",
+      "audit": "سجلات التدقيق"
+    },
+    "table": {
+      "timestamp": "الطابع الزمني",
+      "action": "الإجراء",
+      "entity": "الكيان",
+      "user": "المستخدم",
+      "details": "التفاصيل",
+      "ipAddress": "عنوان IP"
+    },
+    "quick": {
+      "title": "إجراءات سريعة",
+      "createTemplate": "إنشاء قالب",
+      "browseTemplates": "استعراض القوالب",
+      "manageUsers": "إدارة المستخدمين",
+      "apiKeys": "مفاتيح API"
+    }
+  },
+  "appConfig": {
+    "title": "إعدادات التطبيق",
+    "subtitlePrefix": "إدارة إعدادات التطبيق",
+    "selectAppPrompt": "اختر تطبيقًا لإدارة الإعدادات",
+    "actions": {
+      "createGroupPrefix": "إنشاء مجموعة جديدة لـ",
+      "createConfigPrefix": "إنشاء إعداد جديد لـ"
+    },
+    "noApp": {
+      "selectAppTitle": "اختر تطبيقًا",
+      "selectAppDesc": "اختر تطبيقًا من شريط الأعلى لإدارة إعداداته."
+    },
+    "noApps": {
+      "welcomeTitle": "مرحبًا بك في إعدادات التطبيق",
+      "welcomeDesc": "ابدأ بإنشاء أول تطبيق لإدارة إعدادات ديناميكية.",
+      "createNewApp": "إنشاء تطبيق جديد"
+    },
+    "filters": {
+      "searchPlaceholder": "ابحث في الإعدادات...",
+      "allGroups": "جميع المجموعات",
+      "allTypes": "جميع الأنواع",
+      "activeOnly": "النشط فقط",
+      "gridView": "عرض شبكي",
+      "listView": "عرض قائم"
+    },
+    "loading": "جاري تحميل الإعدادات...",
+    "empty": {
+      "title": "لا توجد إعدادات",
+      "desc": "ابدأ بإنشاء أول إعداد",
+      "createFirst": "إنشاء أول إعداد"
+    },
+    "card": {
+      "actions": {
+        "details": "تفاصيل",
+        "edit": "تعديل",
+        "duplicate": "تكرار",
+        "delete": "حذف"
+      },
+      "trueLabel": "صحيح",
+      "falseLabel": "خاطئ",
+      "notSet": "(غير مضبوط)",
+      "public": "عام"
+    },
+    "table": {
+      "type": "النوع",
+      "key": "مفتاح الإعداد",
+      "name": "الاسم",
+      "value": "القيمة",
+      "app": "التطبيق",
+      "group": "المجموعة",
+      "status": "الحالة",
+      "version": "الإصدار",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "public": "عام"
+    },
+    "pagination": {
+      "showing": "عرض",
+      "to": "إلى",
+      "of": "من",
+      "configurationsWord": "إعدادات"
+    },
+    "modal": {
+      "config": {
+        "editTitle": "تعديل إعداد",
+        "createPrefix": "إنشاء إعداد جديد لـ",
+        "configKeyLabel": "مفتاح الإعداد *",
+        "configKeyPlaceholder": "مثال: MAX_UPLOAD_SIZE",
+        "configKeyHelp": "معرّف فريد (أحرف كبيرة مع شرطات سفلية)",
+        "configNameLabel": "اسم الإعداد *",
+        "configNamePlaceholder": "مثال: الحد الأقصى لحجم الرفع",
+        "configNameHelp": "اسم العرض لهذا الإعداد",
+        "descriptionLabel": "الوصف",
+        "descriptionPlaceholder": "وصف موجز لهذا الإعداد",
+        "typeLabel": "النوع *",
+        "configValueLabel": "قيمة الإعداد",
+        "numberPlaceholder": "أدخل رقمًا",
+        "jsonTemplatePlaceholder": "أدخل المحتوى",
+        "textPlaceholder": "أدخل القيمة",
+        "defaultValueLabel": "القيمة الافتراضية",
+        "defaultValuePlaceholder": "قيمة احتياطية",
+        "enumValuesLabel": "قيم التعداد (JSON)",
+        "enumValuesPlaceholder": "[\"option1\", \"option2\", \"option3\"]",
+        "enumValuesHelp": "مصفوفة JSON للقيم المسموح بها",
+        "groupLabel": "المجموعة",
+        "noGroup": "بدون مجموعة",
+        "displayOrderLabel": "ترتيب العرض",
+        "validationRulesLabel": "قواعد التحقق (JSON)",
+        "validationRulesPlaceholder": "{\"min\": 0, \"max\": 100}",
+        "validationRulesHelp": "كائن JSON لقواعد التحقق",
+        "publicDesc": "عام (متاح دون مصادقة)",
+        "requiredDesc": "مطلوب (يجب تحديد قيمة)",
+        "activeLabel": "نشط"
+      },
+      "group": {
+        "editTitle": "تعديل مجموعة",
+        "createPrefix": "إنشاء مجموعة جديدة لـ",
+        "groupKeyLabel": "مفتاح المجموعة *",
+        "groupKeyPlaceholder": "مثال: GENERAL",
+        "groupKeyHelp": "معرّف فريد (أحرف كبيرة)",
+        "groupNameLabel": "اسم المجموعة *",
+        "groupNamePlaceholder": "مثال: الإعدادات العامة",
+        "descriptionLabel": "الوصف",
+        "descriptionPlaceholder": "وصف موجز لهذه المجموعة",
+        "displayOrderLabel": "ترتيب العرض",
+        "activeLabel": "نشط"
+      },
+      "delete": {
+        "title": "تأكيد الحذف",
+        "messagePrefix": "هل أنت متأكد من حذف"
+      },
+      "tabs": {
+        "details": "تفاصيل",
+        "versions": "سجل الإصدارات",
+        "audit": "سجل التدقيق"
+      }
+    }
+  },
+  "translationsMgmt": {
+    "title": "إدارة الترجمات",
+    "subtitlePrefix": "الترجمات لتطبيق",
+    "selectAppPrompt": "اختر تطبيقًا لإدارة الترجمات",
+    "manageLanguages": "إدارة اللغات",
+    "createNewPrefix": "إنشاء مفتاح ترجمة لـ",
+    "addLanguage": "إضافة لغة",
+    "searchPlaceholder": "ابحث عن مفاتيح الترجمة...",
+    "addTranslationKey": "إضافة مفتاح ترجمة",
+    "table": {
+      "key": "المفتاح",
+      "translation": "الترجمة",
+      "description": "الوصف"
+    },
+    "enterTranslation": "أدخل الترجمة",
+    "emptyKeysPrefix": "لا توجد مفاتيح ترجمة لتطبيق",
+    "addFirstKey": "أضف أول مفتاح",
+    "modal": {
+      "key": {
+        "editTitle": "تعديل مفتاح الترجمة",
+        "createPrefix": "إنشاء مفتاح ترجمة لـ"
+      }
+    },
+    "form": {
+      "keyName": "اسم المفتاح",
+      "keyNameHelp": "استخدم تنسيق النقاط، مثال: auth.login.title",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري لهذا المفتاح",
+      "context": "السياق",
+      "contextPlaceholder": "سياق اختياري (مكان استخدام المفتاح)"
+    },
+    "langModal": {
+      "titlePrefix": "إدارة اللغات لـ",
+      "current": "اللغات الحالية",
+      "remove": "إزالة",
+      "removing": "جاري الإزالة...",
+      "default": "افتراضي",
+      "addNew": "إضافة لغة جديدة",
+      "selectPlaceholder": "اختر لغة",
+      "adding": "جاري الإضافة...",
+      "addLanguage": "إضافة لغة",
+      "noteLabel": "ملاحظة:",
+      "infoAddRemove": "يمكنك إضافة أو إزالة اللغات المدعومة لهذا التطبيق.",
+      "infoDefault": "الإنجليزية (EN) هي اللغة الافتراضية ولا يمكن إزالتها."
+    },
+    "deleteConfirm": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد من حذف مفتاح الترجمة هذا؟"
+    },
+    "pagination": {
+      "page": "الصفحة",
+      "of": "من"
+    },
+    "tableHeaders": {
+      "actions": "الإجراءات"
+    }
+  }
+  ,
+  "apiKeys": {
+    "title": "مفاتيح API",
+    "subtitle": "إدارة مفاتيح API للوصول البرمجي",
+    "generate": "إنشاء مفتاح API",
+    "guide": {
+      "title": "كيفية استخدام مفاتيح API",
+      "headerHelp": "قم بإضافة مفتاح API في ترويسة Authorization:",
+      "quickExamples": "أمثلة سريعة"
+    },
+    "examples": {
+      "curl": "cURL:",
+      "javascript": "JavaScript:",
+      "python": "Python:"
+    },
+    "loading": "جاري تحميل مفاتيح API...",
+    "empty": {
+      "title": "لا توجد مفاتيح API",
+      "desc": "أنشئ أول مفتاح API للبدء"
+    },
+    "copy": "نسخ",
+    "meta": {
+      "created": "تم الإنشاء:",
+      "expires": "ينتهي:",
+      "lastUsed": "آخر استخدام:"
+    },
+    "status": {
+      "active": "نشط",
+      "revoked": "تم الإلغاء"
+    },
+    "actions": {
+      "revoke": "إلغاء"
+    },
+    "dialog": {
+      "create": {
+        "title": "إنشاء مفتاح API",
+        "name": "الاسم *",
+        "namePlaceholder": "مفتاح API للإنتاج",
+        "description": "الوصف",
+        "descriptionPlaceholder": "مستخدم لدمج خادم الإنتاج",
+        "expiryDays": "مدة الصلاحية (أيام)",
+        "expiryPlaceholder": "اتركه فارغًا بدون انتهاء",
+        "generating": "جاري الإنشاء...",
+        "generate": "إنشاء"
+      },
+      "delete": {
+        "title": "حذف مفتاح API",
+        "messagePrefix": "هل أنت متأكد من حذف",
+        "deleting": "جاري الحذف..."
+      }
+    },
+    "revokeConfirmPrefix": "إلغاء مفتاح API",
+    "copied": "تم نسخ مفتاح API إلى الحافظة!"
+  }
+  ,
+  "users": {
+    "title": "المستخدمون",
+    "subtitle": "إدارة حسابات المستخدمين والصلاحيات",
+    "searchPlaceholder": "ابحث عن المستخدمين بالاسم أو البريد...",
+    "loading": "جاري تحميل المستخدمين...",
+    "empty": {
+      "title": "لا يوجد مستخدمون",
+      "desc": "لا توجد نتائج مطابقة لبحثك"
+    },
+    "table": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "status": "الحالة",
+      "joined": "تاريخ الانضمام",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "actions": {
+      "activate": "تفعيل",
+      "deactivate": "إلغاء التفعيل",
+      "delete": "حذف"
+    },
+    "confirmActivatePrefix": "تفعيل المستخدم",
+    "confirmDeactivatePrefix": "إلغاء تفعيل المستخدم",
+    "confirmDeletePrefix": "حذف المستخدم",
+    "date": {
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "daysAgoSuffix": " أيام مضت",
+      "weeksAgoSuffix": " أسابيع مضت"
+    }
+  }
+  ,
+  "invitations": {
+    "title": "الدعوات",
+    "subtitle": "إدارة دعوات المستخدمين لمؤسستك",
+    "send": "إرسال دعوة",
+    "tabs": {
+      "all": "الكل",
+      "pending": "قيد الانتظار",
+      "accepted": "تم القبول",
+      "expired": "منتهية"
+    },
+    "loading": "جاري تحميل الدعوات...",
+    "error": {
+      "loadFailed": "فشل تحميل الدعوات. يرجى المحاولة مرة أخرى."
+    },
+    "status": {
+      "PENDING": "قيد الانتظار",
+      "ACCEPTED": "تم القبول",
+      "EXPIRED": "منتهية",
+      "CANCELLED": "ملغاة"
+    },
+    "details": {
+      "invitedBy": "مدعو بواسطة:",
+      "roles": "الأدوار:",
+      "expires": "ينتهي:",
+      "accepted": "تاريخ القبول:",
+      "acceptedBy": "قَبِل بواسطة:",
+      "created": "تم الإنشاء:"
+    },
+    "actions": {
+      "resend": "إعادة الإرسال",
+      "cancel": "إلغاء"
+    },
+    "empty": {
+      "title": "لا توجد دعوات",
+      "descAll": "أرسل أول دعوة للبدء",
+      "filteredPrefix": "لا توجد",
+      "filteredSuffix": " دعوات"
+    },
+    "dialog": {
+      "create": {
+        "title": "إرسال دعوة",
+        "email": "البريد الإلكتروني *",
+        "emailPlaceholder": "user@example.com",
+        "roles": "الأدوار * (اختر على الأقل واحدًا)",
+        "loadingRoles": "جاري تحميل الأدوار...",
+        "cancel": "إلغاء",
+        "send": "إرسال دعوة"
+      }
+    },
+    "form": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "rolesRequired": "يرجى اختيار دور واحد على الأقل"
+    },
+    "confirm": {
+      "cancel": "هل أنت متأكد من إلغاء هذه الدعوة؟"
+    },
+    "alerts": {
+      "cancelFailed": "فشل إلغاء الدعوة",
+      "resendFailed": "فشل إعادة إرسال الدعوة",
+      "createFailed": "فشل إنشاء الدعوة"
+    }
+  }
+}

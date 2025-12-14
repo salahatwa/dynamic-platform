@@ -1,0 +1,250 @@
+<div class="api-keys-page">
+  <div class="page-header">
+    <div>
+      <h1>{{ 'apiKeys.title' | translate }}</h1>
+      <p>{{ 'apiKeys.subtitle' | translate }}</p>
+    </div>
+    <div class="header-actions">
+      <app-button variant="outline" (click)="viewDocumentation()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        API Documentation
+      </app-button>
+      <app-button variant="primary" (click)="openCreateDialog()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        {{ 'apiKeys.generate' | translate }}
+      </app-button>
+    </div>
+  </div>
+
+  <!-- Quick Guide Banner -->
+  <div class="info-banner">
+    <div class="info-icon">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <div class="info-content">
+      <h3>{{ 'apiKeys.guide.title' | translate }}</h3>
+      <p>{{ 'apiKeys.guide.headerHelp' | translate }} <code>Authorization: Bearer tms_your_key</code></p>
+      
+      <!-- Always show API endpoints preview -->
+      <div class="api-endpoints-preview">
+        <h4>Available Content APIs:</h4>
+        @if (apiGuide()) {
+          <div class="api-status success">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Live documentation loaded from backend
+          </div>
+        } @else {
+          <div class="api-status warning">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            Using static endpoints (backend documentation unavailable)
+          </div>
+        }
+        <div class="endpoints-grid">
+          @for (endpoint of getEndpointsList(); track endpoint.key) {
+            <div class="endpoint-item">
+              <span class="endpoint-name">{{ endpoint.name }}</span>
+              <code class="endpoint-url">{{ endpoint.url }}</code>
+            </div>
+          }
+        </div>
+        <button class="view-full-docs-btn" (click)="viewDocumentation()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+          View Complete API Documentation
+        </button>
+      </div>
+      
+      @if (!apiGuide()) {
+        <div class="info-examples">
+          <details>
+            <summary>{{ 'apiKeys.guide.quickExamples' | translate }}</summary>
+            <div class="example-content">
+              <div class="example-item">
+                <strong>{{ 'apiKeys.examples.curl' | translate }}</strong>
+                <code>curl -H "Authorization: Bearer tms_your_key" http://localhost:8080/api/content/error-codes</code>
+              </div>
+              <div class="example-item">
+                <strong>{{ 'apiKeys.examples.javascript' | translate }}</strong>
+                <code>fetch('/api/content/templates', {{ '{' }} headers: {{ '{' }} 'Authorization': 'Bearer tms_your_key' {{ '}' }} {{ '}' }})</code>
+              </div>
+              <div class="example-item">
+                <strong>{{ 'apiKeys.examples.python' | translate }}</strong>
+                <code>requests.get('/api/content/translations', headers={{ '{' }}'Authorization': 'Bearer tms_your_key'{{ '}' }})</code>
+              </div>
+            </div>
+          </details>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>{{ 'apiKeys.loading' | translate }}</p>
+    </div>
+  } @else if (apiKeys().length === 0) {
+    <div class="empty-state">
+      <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+      </svg>
+      <h2>{{ 'apiKeys.empty.title' | translate }}</h2>
+      <p>{{ 'apiKeys.empty.desc' | translate }}</p>
+      <app-button variant="primary" (click)="openCreateDialog()">{{ 'apiKeys.generate' | translate }}</app-button>
+    </div>
+  } @else {
+    <div class="api-keys-grid">
+      @for (key of apiKeys(); track key.id) {
+        <app-card>
+          <div class="api-key-card">
+            <div class="key-header">
+              <div class="key-title">
+                <h3>{{ key.name }}</h3>
+                <span class="app-badge">{{ key.appName }}</span>
+              </div>
+              <span class="status-badge" [class.active]="key.active" [class.inactive]="!key.active">
+                {{ key.active ? ('apiKeys.status.active' | translate) : ('apiKeys.status.revoked' | translate) }}
+              </span>
+            </div>
+            
+            @if (key.description) {
+              <p class="key-description">{{ key.description }}</p>
+            }
+            
+            <div class="key-value">
+              <code>{{ key.keyValue }}</code>
+              <button class="copy-btn" (click)="copyToClipboard(key.keyValue)" [attr.title]="('apiKeys.copy' | translate)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="key-meta">
+              <div class="meta-item">
+                <span class="meta-label">{{ 'apiKeys.meta.created' | translate }}</span>
+                <span>{{ formatDate(key.createdAt) }}</span>
+              </div>
+              @if (key.expiresAt) {
+                <div class="meta-item">
+                  <span class="meta-label">{{ 'apiKeys.meta.expires' | translate }}</span>
+                  <span>{{ formatDate(key.expiresAt) }}</span>
+                </div>
+              }
+              @if (key.lastUsedAt) {
+                <div class="meta-item">
+                  <span class="meta-label">{{ 'apiKeys.meta.lastUsed' | translate }}</span>
+                  <span>{{ formatDate(key.lastUsedAt) }}</span>
+                </div>
+              }
+            </div>
+            
+            <div class="key-actions">
+              @if (key.active) {
+                <button class="btn-action btn-warning" (click)="revokeKey(key)">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                  </svg>
+                  {{ 'apiKeys.actions.revoke' | translate }}
+                </button>
+              }
+              <button class="btn-action btn-danger" (click)="openDeleteDialog(key)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                {{ 'common.delete' | translate }}
+              </button>
+            </div>
+          </div>
+        </app-card>
+      }
+    </div>
+  }
+
+  <!-- Create/Delete Dialog -->
+  @if (dialog().show) {
+    <div class="dialog-overlay" (click)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        @if (dialog().type === 'create') {
+          <h2>{{ 'apiKeys.dialog.create.title' | translate }}</h2>
+          <form (submit)="createApiKey($event)">
+            <div class="form-group">
+              <label>{{ 'apiKeys.dialog.create.name' | translate }}</label>
+              <input type="text" [(ngModel)]="newKey.name" name="name" required 
+                     [placeholder]="('apiKeys.dialog.create.namePlaceholder' | translate)" class="form-input"/>
+            </div>
+            <div class="form-group">
+              <label>{{ 'apiKeys.dialog.create.description' | translate }}</label>
+              <textarea [(ngModel)]="newKey.description" name="description" 
+                        [placeholder]="('apiKeys.dialog.create.descriptionPlaceholder' | translate)" 
+                        class="form-input" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>{{ 'apiKeys.dialog.create.expiryDays' | translate }}</label>
+              <input type="number" [(ngModel)]="newKey.expiryDays" name="expiryDays" 
+                     [placeholder]="('apiKeys.dialog.create.expiryPlaceholder' | translate)" class="form-input"/>
+            </div>
+            <div class="dialog-actions">
+              <button type="button" class="dialog-btn btn-secondary" 
+                      (click)="closeDialog()" [disabled]="dialog().loading">
+                {{ 'common.cancel' | translate }}
+              </button>
+              <button type="submit" class="dialog-btn btn-primary" 
+                      [disabled]="dialog().loading">
+                @if (dialog().loading) {
+                  <div class="btn-spinner"></div>
+                  <span>{{ 'apiKeys.dialog.create.generating' | translate }}</span>
+                } @else {
+                  <span>{{ 'apiKeys.dialog.create.generate' | translate }}</span>
+                }
+              </button>
+            </div>
+          </form>
+        } @else if (dialog().type === 'delete') {
+          <div class="dialog-icon delete-icon">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </div>
+          <h2>{{ 'apiKeys.dialog.delete.title' | translate }}</h2>
+          <p>{{ 'apiKeys.dialog.delete.messagePrefix' | translate }} <strong>{{ dialog().apiKey?.name }}</strong>? {{ 'common.cannotUndo' | translate }}</p>
+          <div class="dialog-actions">
+            <button class="dialog-btn btn-secondary" 
+                    (click)="closeDialog()" [disabled]="dialog().loading">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button class="dialog-btn btn-danger" 
+                    (click)="confirmDelete()" [disabled]="dialog().loading">
+              @if (dialog().loading) {
+                <div class="btn-spinner"></div>
+                <span>{{ 'apiKeys.dialog.delete.deleting' | translate }}</span>
+              } @else {
+                <span>{{ 'common.delete' | translate }}</span>
+              }
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

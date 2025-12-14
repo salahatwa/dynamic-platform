@@ -1,0 +1,234 @@
+@if (show) {
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content pdf-params-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-title">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h2>PDF Export Parameters</h2>
+      </div>
+      <button class="btn-close" (click)="onClose()">×</button>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="params-mode-selector">
+      <button class="mode-btn" [class.active]="mode() === 'form'" (click)="mode.set('form')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        Form Mode
+      </button>
+      <button class="mode-btn" [class.active]="mode() === 'json'" (click)="mode.set('json')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        JSON Mode
+      </button>
+    </div>
+
+    <div class="modal-body params-body">
+      @if (detecting()) {
+        <div class="detecting-params">
+          <div class="spinner-container">
+            <div class="spinner"></div>
+          </div>
+          <p>Detecting FreeMarker parameters...</p>
+        </div>
+      } @else {
+        @if (mode() === 'form') {
+          <!-- Form Mode -->
+          <div class="params-form-mode">
+            @if (detectedParameters().length === 0) {
+              <div class="no-params-message">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3>No Parameters Detected</h3>
+                <p>No FreeMarker variables found in your template. You can generate the PDF without parameters.</p>
+              </div>
+            } @else {
+              <div class="params-header">
+                <h3>Detected Parameters ({{ detectedParameters().length }})</h3>
+                <button class="btn btn-sm btn-secondary" (click)="generateFakeData()" title="Generate sample data">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generate Sample Data
+                </button>
+              </div>
+
+              <div class="params-list">
+                @for (param of detectedParameters(); track param.name) {
+                  <div class="param-group">
+                    <div class="param-header">
+                      <label class="param-label">
+                        {{ param.name }}
+                        <span class="param-type">{{ param.type }}</span>
+                        @if (param.required) {
+                          <span class="required">*</span>
+                        }
+                      </label>
+                      @if (param.description) {
+                        <span class="param-description">{{ param.description }}</span>
+                      }
+                    </div>
+
+                    @if (param.type === 'string') {
+                      <input 
+                        type="text"
+                        class="form-control"
+                        [value]="parameterValues()[param.name]"
+                        (input)="updateParameterValue(param.name, $any($event.target).value)"
+                        [placeholder]="'Enter ' + param.name">
+                    }
+
+                    @if (param.type === 'number') {
+                      <input 
+                        type="number"
+                        class="form-control"
+                        [value]="parameterValues()[param.name]"
+                        (input)="updateParameterValue(param.name, +$any($event.target).value)"
+                        [placeholder]="'Enter ' + param.name">
+                    }
+
+                    @if (param.type === 'boolean') {
+                      <label class="checkbox-label">
+                        <input 
+                          type="checkbox"
+                          [checked]="parameterValues()[param.name]"
+                          (change)="updateParameterValue(param.name, $any($event.target).checked)">
+                        <span class="checkbox-text">{{ param.name }}</span>
+                      </label>
+                    }
+
+                    @if (param.type === 'array') {
+                      <div class="array-param">
+                        <div class="array-header">
+                          <span>Array Items ({{ parameterValues()[param.name]?.length || 0 }})</span>
+                          <button class="btn btn-xs btn-primary" (click)="addArrayItem(param.name)">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Item
+                          </button>
+                        </div>
+                        
+                        @for (item of parameterValues()[param.name]; track i; let i = $index) {
+                          <div class="array-item">
+                            <div class="array-item-header">
+                              <span>Item {{ i + 1 }}</span>
+                              <button class="btn btn-xs btn-danger" (click)="removeArrayItem(param.name, i)">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                            
+                            @if (param.arrayItemType === 'object' && param.objectProperties) {
+                              <div class="object-properties">
+                                @for (prop of param.objectProperties; track prop.name) {
+                                  <div class="property-field">
+                                    <label>{{ prop.name }}</label>
+                                    <input 
+                                      type="text"
+                                      class="form-control form-control-sm"
+                                      [value]="item[prop.name]"
+                                      (input)="updateArrayItemProperty(param.name, i, prop.name, $any($event.target).value)">
+                                  </div>
+                                }
+                              </div>
+                            } @else {
+                              <input 
+                                type="text"
+                                class="form-control form-control-sm"
+                                [value]="item"
+                                (input)="parameterValues()[param.name][i] = $any($event.target).value">
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    @if (param.type === 'object' && param.objectProperties) {
+                      <div class="object-param">
+                        @for (prop of param.objectProperties; track prop.name) {
+                          <div class="property-field">
+                            <label>{{ prop.name }}</label>
+                            <input 
+                              type="text"
+                              class="form-control"
+                              [value]="parameterValues()[param.name]?.[prop.name]"
+                              (input)="updateObjectProperty(param.name, prop.name, $any($event.target).value)">
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- JSON Mode -->
+          <div class="params-json-mode">
+            <div class="json-header">
+              <h3>JSON Parameters</h3>
+              <div class="json-actions">
+                <button class="btn btn-sm btn-secondary" (click)="generateFakeData()" title="Generate sample JSON">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generate Sample
+                </button>
+              </div>
+            </div>
+
+            <div class="json-editor">
+              <textarea 
+                class="json-textarea"
+                [(ngModel)]="jsonParameters"
+                placeholder='Enter JSON parameters, e.g.:
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "items": [
+    {"title": "Item 1", "price": 100},
+    {"title": "Item 2", "price": 200}
+  ]
+}'
+                rows="12"></textarea>
+              
+              @if (jsonError()) {
+                <div class="json-error">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {{ jsonError() }}
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="modal-footer params-footer">
+      <div class="footer-actions">
+        <button class="btn btn-outline" (click)="onClose()">Cancel</button>
+        <button class="btn btn-secondary" (click)="onSkipParameters()" title="Generate PDF without parameters">
+          Skip & Generate
+        </button>
+        <button class="btn btn-primary" (click)="onGeneratePdf()" [disabled]="detecting()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Generate PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}

@@ -1,0 +1,213 @@
+<div class="lov-values-editor">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="btn-back" (click)="goBack()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          {{ 'lovEditor.back' | translate }}
+        </button>
+        <h1 class="page-title">
+          <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          {{ 'lovEditor.titlePrefix' | translate }} {{ lovType() }}
+        </h1>
+        <p class="page-subtitle">{{ 'lovEditor.subtitle' | translate }}</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="exportToCSV()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          {{ 'lovEditor.exportCsv' | translate }}
+        </button>
+        <button class="btn btn-primary" (click)="addNewRow()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          {{ 'lovEditor.addRow' | translate }}
+        </button>
+        <button class="btn btn-success" (click)="saveAll()" [disabled]="saving() || !hasSelectedApp()">
+          @if (saving()) {
+            <span class="spinner-sm"></span>
+          }
+          @if (!saving()) {
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          }
+          {{ 'lovEditor.saveAll' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Bar -->
+  <div class="info-bar">
+    <div class="info-item">
+      <span class="info-label">{{ 'lovEditor.info.lovType' | translate }}</span>
+      <span class="info-value">{{ lovType() }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">{{ 'lovEditor.info.selectedApp' | translate }}</span>
+      <span class="info-value">{{ hasSelectedApp() ? selectedAppName() : 'None' }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">{{ 'lovEditor.info.translationApp' | translate }}</span>
+      <span class="info-value">{{ translationApp() }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">{{ 'lovEditor.info.totalValues' | translate }}</span>
+      <span class="info-value">{{ values().length }}</span>
+    </div>
+    <div class="info-item">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="showInactiveOnly">
+        <span>{{ 'lovEditor.info.showInactiveOnly' | translate }}</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>{{ 'lovEditor.loading' | translate }}</p>
+    </div>
+  }
+
+  <!-- Values Table -->
+  @if (!loading()) {
+    <div class="values-container">
+      <div class="table-wrapper">
+        <table class="values-table">
+          <thead>
+            <tr>
+              <th class="col-order">{{ 'lovEditor.table.orderCol' | translate }}</th>
+              <th class="col-value">{{ 'lovEditor.table.lovValue' | translate }}</th>
+              <th class="col-attr">{{ 'lovEditor.table.attr1' | translate }}</th>
+              <th class="col-attr">{{ 'lovEditor.table.attr2' | translate }}</th>
+              <th class="col-attr">{{ 'lovEditor.table.attr3' | translate }}</th>
+              <th class="col-translation">{{ 'lovEditor.table.translationKey' | translate }}</th>
+              <th class="col-order-num">{{ 'lovEditor.table.displayOrder' | translate }}</th>
+              <th class="col-status">{{ 'lovEditor.table.active' | translate }}</th>
+              <th class="col-actions">{{ 'lovEditor.table.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredValues(); track $index) {
+              <tr [class.new-row]="row.isNew" [class.modified-row]="row.isModified" [class.inactive-row]="!row.active">
+                <td class="col-order">
+                  @if (row.isNew) {
+                    <span class="badge badge-new">{{ 'lovEditor.table.badgeNew' | translate }}</span>
+                  }
+                  @if (!row.isNew && row.isModified) {
+                    <span class="badge badge-modified">{{ 'lovEditor.table.badgeModified' | translate }}</span>
+                  }
+                  @if (!row.isNew && !row.isModified) {
+                    <span class="row-number">{{ $index + 1 }}</span>
+                  }
+                </td>
+                <td class="col-value">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    [(ngModel)]="row.lovValue"
+                    (ngModelChange)="markAsModified($index)"
+                    placeholder="{{ 'lovEditor.placeholders.lovValue' | translate }}">
+                </td>
+                <td class="col-attr">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    [(ngModel)]="row.attribute1"
+                    (ngModelChange)="markAsModified($index)"
+                    placeholder="{{ 'lovEditor.placeholders.attr1' | translate }}">
+                </td>
+                <td class="col-attr">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    [(ngModel)]="row.attribute2"
+                    (ngModelChange)="markAsModified($index)"
+                    placeholder="{{ 'lovEditor.placeholders.attr2' | translate }}">
+                </td>
+                <td class="col-attr">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    [(ngModel)]="row.attribute3"
+                    (ngModelChange)="markAsModified($index)"
+                    placeholder="{{ 'lovEditor.placeholders.attr3' | translate }}">
+                </td>
+                <td class="col-translation">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    [(ngModel)]="row.translationKey"
+                    (ngModelChange)="markAsModified($index)"
+                    placeholder="{{ 'lovEditor.placeholders.translationKey' | translate }}">
+                </td>
+                <td class="col-order-num">
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    [(ngModel)]="row.displayOrder"
+                    (ngModelChange)="markAsModified($index)"
+                    min="0">
+                </td>
+                <td class="col-status">
+                  <label class="checkbox-inline">
+                    <input 
+                      type="checkbox" 
+                      [(ngModel)]="row.active"
+                      (ngModelChange)="markAsModified($index)">
+                  </label>
+                </td>
+                <td class="col-actions">
+                  <button class="btn-icon btn-danger" (click)="removeRow($index)" [attr.title]="('common.delete' | translate)">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (filteredValues().length === 0) {
+              <tr>
+                <td colspan="9" class="empty-message">
+                  {{ 'lovEditor.table.empty' | translate }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Help Text -->
+  <div class="help-section">
+    <h3>Quick Guide:</h3>
+    <ul>
+      <li><strong>LOV Value:</strong> The actual value for this LOV entry (required)</li>
+      <li><strong>Attributes 1-3:</strong> Additional flexible data (e.g., ISO codes, phone codes)</li>
+      <li><strong>Translation Key:</strong> Key to fetch descriptions from translation system</li>
+      <li><strong>Display Order:</strong> Sort order for displaying values</li>
+      <li><strong>Active:</strong> Whether this value is currently active</li>
+    </ul>
+    <p class="help-note">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      Changes are marked with badges. Click "Save All" to persist all changes.
+    </p>
+  </div>
+</div>

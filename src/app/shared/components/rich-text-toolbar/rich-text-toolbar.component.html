@@ -1,0 +1,141 @@
+<div class="rich-text-toolbar">
+  <!-- Text Formatting -->
+  <div class="toolbar-group">
+    <button class="rt-btn" (click)="formatText('bold')" title="Bold">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6V4zm0 8h9a4 4 0 014 4 4 4 0 01-4 4H6v-8z"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="formatText('italic')" title="Italic">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l8 0M6 16l-4 0M14 4l-4 0M10 20l-4 0"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="formatText('underline')" title="Underline">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 3v7a6 6 0 006 6 6 6 0 006-6V3M4 21h16"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="formatText('strike')" title="Strikethrough">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 12h16M4 10h16M10 3v4m4-4v4m0 10v4m-4-4v4"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12a7 7 0 1014 0 7 7 0 10-14 0z" style="display:none"/> <!-- Custom icon -->
+        <text x="6" y="18" font-size="20" font-weight="bold" fill="currentColor" style="text-decoration: line-through;">S</text>
+      </svg>
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Headings -->
+  <div class="toolbar-group">
+    <button class="rt-btn" (click)="formatText('h1')" title="Heading 1">
+      <span class="btn-text">H1</span>
+    </button>
+    <button class="rt-btn" (click)="formatText('h2')" title="Heading 2">
+      <span class="btn-text">H2</span>
+    </button>
+    <button class="rt-btn" (click)="formatText('h3')" title="Heading 3">
+      <span class="btn-text">H3</span>
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Lists & Block -->
+  <div class="toolbar-group">
+    <button class="rt-btn" (click)="formatText('ul')" title="Bulleted List">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16M8 6h.01M8 12h.01M8 18h.01M3 6h.01M3 12h.01M3 18h.01"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="formatText('ol')" title="Numbered List">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h12M7 13h12M7 19h12M4 7h.01M4 13h.01M4 19h.01"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="formatText('quote')" title="Quote">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="formatText('code')" title="Code">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l8 0M6 16l-4 0M14 4l-4 0M10 20l-4 0"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Insert -->
+  <div class="toolbar-group">
+    <button class="rt-btn" (click)="openLinkDialog()" title="Insert Link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="openImageDialog()" title="Insert Image">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+    </button>
+    <button class="rt-btn" (click)="formatText('hr')" title="Horizontal Line">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Link Dialog -->
+@if (showLinkDialog()) {
+  <div class="rt-modal-overlay" (click)="closeDialog('link')">
+    <div class="rt-modal" (click)="$event.stopPropagation()">
+      <div class="rt-modal-header">
+        <h3>Insert Link</h3>
+        <button class="rt-close" (click)="closeDialog('link')">×</button>
+      </div>
+      <div class="rt-modal-body">
+        <div class="rt-form-group">
+          <label>URL</label>
+          <input type="text" class="rt-input" [(ngModel)]="linkUrl" placeholder="https://example.com">
+        </div>
+        <div class="rt-form-group">
+          <label>Text to display</label>
+          <input type="text" class="rt-input" [(ngModel)]="linkText" placeholder="Link text">
+        </div>
+      </div>
+      <div class="rt-modal-footer">
+        <button class="rt-btn-secondary" (click)="closeDialog('link')">Cancel</button>
+        <button class="rt-btn-primary" (click)="insertLink()">Insert</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Image Dialog -->
+@if (showImageDialog()) {
+  <div class="rt-modal-overlay" (click)="closeDialog('image')">
+    <div class="rt-modal" (click)="$event.stopPropagation()">
+      <div class="rt-modal-header">
+        <h3>Insert Image</h3>
+        <button class="rt-close" (click)="closeDialog('image')">×</button>
+      </div>
+      <div class="rt-modal-body">
+        <div class="rt-form-group">
+          <label>Image URL</label>
+          <input type="text" class="rt-input" [(ngModel)]="imageUrl" placeholder="https://example.com/image.jpg">
+        </div>
+        <div class="rt-form-group">
+          <label>Alt Text</label>
+          <input type="text" class="rt-input" [(ngModel)]="imageAlt" placeholder="Image description">
+        </div>
+      </div>
+      <div class="rt-modal-footer">
+        <button class="rt-btn-secondary" (click)="closeDialog('image')">Cancel</button>
+        <button class="rt-btn-primary" (click)="insertImage()">Insert</button>
+      </div>
+    </div>
+  </div>
+}

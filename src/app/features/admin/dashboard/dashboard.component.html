@@ -1,0 +1,48 @@
+<div class="dashboard-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">{{ 'dashboard.title' | translate }}</h1>
+      <p class="page-subtitle">{{ 'dashboard.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    @if (isLoading()) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+      <div class="stats-grid">
+        @if (stats(); as statsData) {
+          <div class="stat-card">
+            <div class="stat-header">
+              <h3>{{ 'dashboard.stats.templates' | translate }}</h3>
+            </div>
+            <p class="stat-value">{{ statsData.templates.total || 0 }}</p>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <h3>{{ 'dashboard.stats.totalApps' | translate }}</h3>
+            </div>
+            <p class="stat-value">{{ statsData.totalApps }}</p>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <h3>{{ 'dashboard.stats.totalUsers' | translate }}</h3>
+            </div>
+            <p class="stat-value">{{ statsData.totalUsers }}</p>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <h3>{{ 'dashboard.stats.totalApiKeys' | translate }}</h3>
+            </div>
+            <p class="stat-value">{{ statsData.totalApiKeys }}</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,209 @@
+<div class="invitations-container">
+  <div class="page-header">
+    <div>
+      <h1>{{ 'invitations.title' | translate }}</h1>
+      <p>{{ 'invitations.subtitle' | translate }}</p>
+    </div>
+    <button class="btn-primary" (click)="openCreateDialog()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      {{ 'invitations.send' | translate }}
+    </button>
+  </div>
+
+  <div class="filter-tabs">
+    <button 
+      class="tab" 
+      [class.active]="filterStatus() === 'ALL'"
+      (click)="filterStatus.set('ALL')">
+      {{ 'invitations.tabs.all' | translate }} ({{ invitations().length }})
+    </button>
+    <button 
+      class="tab" 
+      [class.active]="filterStatus() === InvitationStatus.PENDING"
+      (click)="filterStatus.set(InvitationStatus.PENDING)">
+      {{ 'invitations.tabs.pending' | translate }} ({{ countByStatus(InvitationStatus.PENDING) }})
+    </button>
+    <button 
+      class="tab" 
+      [class.active]="filterStatus() === InvitationStatus.ACCEPTED"
+      (click)="filterStatus.set(InvitationStatus.ACCEPTED)">
+      {{ 'invitations.tabs.accepted' | translate }} ({{ countByStatus(InvitationStatus.ACCEPTED) }})
+    </button>
+    <button 
+      class="tab" 
+      [class.active]="filterStatus() === InvitationStatus.EXPIRED"
+      (click)="filterStatus.set(InvitationStatus.EXPIRED)">
+      {{ 'invitations.tabs.expired' | translate }} ({{ countByStatus(InvitationStatus.EXPIRED) }})
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>{{ 'invitations.loading' | translate }}</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-banner">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  @if (!loading() && filteredInvitations().length > 0) {
+    <div class="invitations-grid">
+      @for (invitation of filteredInvitations(); track invitation.id) {
+        <div class="invitation-card" [class]="'status-' + invitation.status.toLowerCase()">
+          <div class="invitation-header">
+            <div class="invitation-email">{{ invitation.email }}</div>
+            <span class="status-badge" [class]="'badge-' + invitation.status.toLowerCase()">
+              {{ ('invitations.status.' + invitation.status) | translate }}
+            </span>
+          </div>
+          
+          <div class="invitation-details">
+            <div class="detail-row">
+              <span class="label">{{ 'invitations.details.invitedBy' | translate }}</span>
+              <span>{{ invitation.inviterName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">{{ 'invitations.details.roles' | translate }}</span>
+              <span>{{ invitation.roles.join(', ') }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">{{ 'invitations.details.expires' | translate }}</span>
+              <span>{{ formatDate(invitation.expiresAt) }}</span>
+            </div>
+            @if (invitation.acceptedAt) {
+              <div class="detail-row">
+                <span class="label">{{ 'invitations.details.accepted' | translate }}</span>
+                <span>{{ formatDate(invitation.acceptedAt) }}</span>
+              </div>
+            }
+            @if (invitation.acceptedByName) {
+              <div class="detail-row">
+                <span class="label">{{ 'invitations.details.acceptedBy' | translate }}</span>
+                <span>{{ invitation.acceptedByName }}</span>
+              </div>
+            }
+            <div class="detail-row">
+              <span class="label">{{ 'invitations.details.created' | translate }}</span>
+              <span>{{ formatDate(invitation.createdAt) }}</span>
+            </div>
+          </div>
+          
+          @if (invitation.status === InvitationStatus.PENDING) {
+            <div class="invitation-actions">
+              <button class="btn-secondary" (click)="resendInvitation(invitation.id)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                {{ 'invitations.actions.resend' | translate }}
+              </button>
+              <button class="btn-danger" (click)="cancelInvitation(invitation.id)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                {{ 'invitations.actions.cancel' | translate }}
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (!loading() && filteredInvitations().length === 0) {
+    <div class="empty-state">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </svg>
+      <h3>{{ 'invitations.empty.title' | translate }}</h3>
+      <p>
+        @if (filterStatus() === 'ALL') {
+          {{ 'invitations.empty.descAll' | translate }}
+        } @else {
+          {{ ('invitations.empty.filteredPrefix' | translate) }} {{ ('invitations.status.' + filterStatus()) | translate }} {{ ('invitations.empty.filteredSuffix' | translate) }}
+        }
+      </p>
+    </div>
+  }
+
+  @if (createDialog()) {
+    <div class="dialog-overlay" (click)="closeCreateDialog()">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>{{ 'invitations.dialog.create.title' | translate }}</h2>
+          <button class="btn-icon" (click)="closeCreateDialog()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <form (submit)="submitInvitation($event)">
+          <div class="form-group">
+            <label>{{ 'invitations.dialog.create.email' | translate }}</label>
+            <input 
+              type="email" 
+              [(ngModel)]="invitationForm.email" 
+              name="email"
+              [placeholder]="('invitations.dialog.create.emailPlaceholder' | translate)"
+              required 
+            />
+          </div>
+          
+          <div class="form-group">
+            <label>{{ 'invitations.dialog.create.roles' | translate }}</label>
+            <div class="roles-list">
+              @for (role of availableRoles(); track role.id) {
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    [checked]="invitationForm.roleIds.includes(role.id)"
+                    (change)="toggleRole(role.id)" 
+                  />
+                  <span>{{ role.name }}</span>
+                </label>
+              }
+            </div>
+            @if (availableRoles().length === 0) {
+              <p class="text-muted">{{ 'invitations.dialog.create.loadingRoles' | translate }}</p>
+            }
+          </div>
+          
+          @if (formError()) {
+            <div class="error-message">
+              {{ formError() }}
+            </div>
+          }
+          
+          <div class="dialog-actions">
+            <button type="button" class="btn-secondary" (click)="closeCreateDialog()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="submitting()">
+              @if (submitting()) {
+                <span class="spinner-small"></span>
+              }
+              {{ 'invitations.dialog.create.send' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
+

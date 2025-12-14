@@ -1,0 +1,246 @@
+<div class="freemarker-toolbar">
+  <button class="fm-btn" (click)="openVariableDialog()" title="Insert Variable">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+    </svg>
+    <span>Variable</span>
+  </button>
+
+  <button class="fm-btn" (click)="openIfDialog()" title="Insert If Statement">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    <span>If</span>
+  </button>
+
+  <button class="fm-btn" (click)="openForDialog()" title="Insert For Loop">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+    </svg>
+    <span>For Loop</span>
+  </button>
+
+  <button class="fm-btn" (click)="openAssignDialog()" title="Assign Variable">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+    </svg>
+    <span>Assign</span>
+  </button>
+
+  <button class="fm-btn" (click)="openCommentDialog()" title="Insert Comment">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+    </svg>
+    <span>Comment</span>
+  </button>
+</div>
+
+<!-- Variable Dialog -->
+@if (showVariableDialog()) {
+  <div class="fm-modal-overlay" (click)="closeDialog('variable')">
+    <div class="fm-modal" (click)="$event.stopPropagation()">
+      <div class="fm-modal-header">
+        <h3>Insert Variable</h3>
+        <button class="fm-close" (click)="closeDialog('variable')">×</button>
+      </div>
+      <div class="fm-modal-body">
+        @if (selectedText().trim()) {
+          <div class="fm-form-group fm-selected-text">
+            <strong>Selected Text:</strong>
+            <div class="fm-selected-preview">{{ selectedText() }}</div>
+            <label>
+              <input type="checkbox" [(ngModel)]="replaceWithVariable">
+              Replace selected text with variable
+            </label>
+          </div>
+        }
+
+        <div class="fm-form-group">
+          <label>
+            <input type="radio" [checked]="!useCustomVariable()" (change)="useCustomVariable.set(false)">
+            Select from attributes
+          </label>
+          @if (!useCustomVariable()) {
+            <select class="fm-select" [(ngModel)]="selectedVariable">
+              <option value="">-- Select Variable --</option>
+              @for (variable of availableVariables; track variable.name) {
+                <option [value]="variable.name">{{ variable.name }}</option>
+              }
+            </select>
+          }
+        </div>
+
+        <div class="fm-form-group">
+          <label>
+            <input type="radio" [checked]="useCustomVariable()" (change)="useCustomVariable.set(true)">
+            Custom variable name
+          </label>
+          @if (useCustomVariable()) {
+            <input type="text" class="fm-input" [(ngModel)]="customVariableName" placeholder="variableName">
+          }
+        </div>
+
+        <div class="fm-preview">
+          <strong>Preview:</strong>
+          <code>\${{ '{' }}{{ useCustomVariable() ? customVariableName() : selectedVariable() }}{{ '}' }}</code>
+        </div>
+      </div>
+      <div class="fm-modal-footer">
+        <button class="fm-btn-secondary" (click)="closeDialog('variable')">Cancel</button>
+        <button class="fm-btn-primary" (click)="insertVariable()">Insert</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- If Dialog -->
+@if (showIfDialog()) {
+  <div class="fm-modal-overlay" (click)="closeDialog('if')">
+    <div class="fm-modal" (click)="$event.stopPropagation()">
+      <div class="fm-modal-header">
+        <h3>Insert If Statement</h3>
+        <button class="fm-close" (click)="closeDialog('if')">×</button>
+      </div>
+      <div class="fm-modal-body">
+        <div class="fm-form-group">
+          <label>Variable</label>
+          <input type="text" class="fm-input" [(ngModel)]="ifConditionVariable" placeholder="variableName">
+        </div>
+
+        <div class="fm-form-group">
+          <label>Operator</label>
+          <select class="fm-select" [(ngModel)]="ifConditionOperator">
+            @for (op of operators; track op.value) {
+              <option [value]="op.value">{{ op.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="fm-form-group">
+          <label>Value</label>
+          <input type="text" class="fm-input" [(ngModel)]="ifConditionValue" placeholder="value">
+        </div>
+
+        <div class="fm-form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="includeElse">
+            Include else block
+          </label>
+        </div>
+
+        <div class="fm-preview">
+          <strong>Preview:</strong>
+          <pre><code>&lt;#if {{ ifConditionVariable() }} {{ ifConditionOperator() }} {{ ifConditionValue() }}&gt;
+  Content here
+@if (includeElse()) {
+&lt;#else&gt;
+  Alternative content
+}
+&lt;/#if&gt;</code></pre>
+        </div>
+      </div>
+      <div class="fm-modal-footer">
+        <button class="fm-btn-secondary" (click)="closeDialog('if')">Cancel</button>
+        <button class="fm-btn-primary" (click)="insertIf()">Insert</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- For Loop Dialog -->
+@if (showForDialog()) {
+  <div class="fm-modal-overlay" (click)="closeDialog('for')">
+    <div class="fm-modal" (click)="$event.stopPropagation()">
+      <div class="fm-modal-header">
+        <h3>Insert For Loop</h3>
+        <button class="fm-close" (click)="closeDialog('for')">×</button>
+      </div>
+      <div class="fm-modal-body">
+        <div class="fm-form-group">
+          <label>List Variable</label>
+          <input type="text" class="fm-input" [(ngModel)]="forListVariable" placeholder="items">
+        </div>
+
+        <div class="fm-form-group">
+          <label>Item Name</label>
+          <input type="text" class="fm-input" [(ngModel)]="forItemName" placeholder="item">
+        </div>
+
+        <div class="fm-preview">
+          <strong>Preview:</strong>
+          <pre><code>&lt;#list {{ forListVariable() }} as {{ forItemName() }}&gt;
+  \${{ '{' }}{{ forItemName() }}{{ '}' }}
+&lt;/#list&gt;</code></pre>
+        </div>
+      </div>
+      <div class="fm-modal-footer">
+        <button class="fm-btn-secondary" (click)="closeDialog('for')">Cancel</button>
+        <button class="fm-btn-primary" (click)="insertFor()">Insert</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Assign Dialog -->
+@if (showAssignDialog()) {
+  <div class="fm-modal-overlay" (click)="closeDialog('assign')">
+    <div class="fm-modal" (click)="$event.stopPropagation()">
+      <div class="fm-modal-header">
+        <h3>Assign Variable</h3>
+        <button class="fm-close" (click)="closeDialog('assign')">×</button>
+      </div>
+      <div class="fm-modal-body">
+        <div class="fm-form-group">
+          <label>Variable Name</label>
+          <input type="text" class="fm-input" [(ngModel)]="assignName" placeholder="myVariable">
+        </div>
+
+        <div class="fm-form-group">
+          <label>Value</label>
+          <input type="text" class="fm-input" [(ngModel)]="assignValue" placeholder="value">
+        </div>
+
+        <div class="fm-preview">
+          <strong>Preview:</strong>
+          <code>&lt;#assign {{ assignName() }} = {{ assignValue() }}&gt;</code>
+        </div>
+      </div>
+      <div class="fm-modal-footer">
+        <button class="fm-btn-secondary" (click)="closeDialog('assign')">Cancel</button>
+        <button class="fm-btn-primary" (click)="insertAssign()">Insert</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Comment Dialog -->
+@if (showCommentDialog()) {
+  <div class="fm-modal-overlay" (click)="closeDialog('comment')">
+    <div class="fm-modal" (click)="$event.stopPropagation()">
+      <div class="fm-modal-header">
+        <h3>Insert Comment</h3>
+        <button class="fm-close" (click)="closeDialog('comment')">×</button>
+      </div>
+      <div class="fm-modal-body">
+        <div class="fm-form-group">
+          <label>Comment Text</label>
+          <textarea class="fm-textarea" [(ngModel)]="commentText" placeholder="Your comment here" rows="3"></textarea>
+        </div>
+
+        <div class="fm-preview">
+          <strong>Preview:</strong>
+          <code>&lt;#-- {{ commentText() }} --&gt;</code>
+        </div>
+      </div>
+      <div class="fm-modal-footer">
+        <button class="fm-btn-secondary" (click)="closeDialog('comment')">Cancel</button>
+        <button class="fm-btn-primary" (click)="insertComment()">Insert</button>
+      </div>
+    </div>
+  </div>
+}

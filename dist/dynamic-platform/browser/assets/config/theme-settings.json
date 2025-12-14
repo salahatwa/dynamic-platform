@@ -1,0 +1,123 @@
+{
+  "themes": {
+    "modern-saas": {
+      "name": "Modern SaaS",
+      "description": "Clean, professional, techy colors for modern web applications",
+      "colors": {
+        "primary": "#6C63FF",
+        "primaryHover": "#5A52E6",
+        "secondary": "#0A2540",
+        "success": "#3DFAAF",
+        "danger": "#FF6B6B",
+        "warning": "#FFB800",
+        "accent": "#3DFAAF",
+        "light": {
+          "background": "#E9F1FA",
+          "surface": "#ffffff",
+          "surfaceHover": "#F8FBFE",
+          "surfaceElevated": "#ffffff",
+          "border": "#D5DDE5",
+          "borderLight": "#E9F1FA",
+          "borderFocus": "#6C63FF",
+          "text": "#0A2540",
+          "textSecondary": "#5A6B7D",
+          "textMuted": "#8B9AAB",
+          "textInverse": "#ffffff"
+        },
+        "dark": {
+          "background": "#0A1628",
+          "surface": "#1A2B42",
+          "surfaceHover": "#243550",
+          "surfaceElevated": "#1A2B42",
+          "border": "#2D3E55",
+          "borderLight": "#1A2B42",
+          "borderFocus": "#8B82FF",
+          "text": "#E9F1FA",
+          "textSecondary": "#D5DDE5",
+          "textMuted": "#8B9AAB",
+          "textInverse": "#0A2540"
+        }
+      }
+    },
+    "classic-blue": {
+      "name": "Classic Blue",
+      "description": "Traditional blue theme with professional appearance",
+      "colors": {
+        "primary": "#2563eb",
+        "primaryHover": "#1d4ed8",
+        "secondary": "#64748b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "warning": "#f59e0b",
+        "accent": "#06b6d4",
+        "light": {
+          "background": "#f8fafc",
+          "surface": "#ffffff",
+          "surfaceHover": "#f1f5f9",
+          "surfaceElevated": "#ffffff",
+          "border": "#e2e8f0",
+          "borderLight": "#f1f5f9",
+          "borderFocus": "#2563eb",
+          "text": "#1e293b",
+          "textSecondary": "#64748b",
+          "textMuted": "#94a3b8",
+          "textInverse": "#ffffff"
+        },
+        "dark": {
+          "background": "#0f172a",
+          "surface": "#1e293b",
+          "surfaceHover": "#334155",
+          "surfaceElevated": "#1e293b",
+          "border": "#334155",
+          "borderLight": "#475569",
+          "borderFocus": "#3b82f6",
+          "text": "#f8fafc",
+          "textSecondary": "#cbd5e1",
+          "textMuted": "#94a3b8",
+          "textInverse": "#0f172a"
+        }
+      }
+    },
+    "emerald-green": {
+      "name": "Emerald Green",
+      "description": "Fresh green theme with natural feel",
+      "colors": {
+        "primary": "#10b981",
+        "primaryHover": "#059669",
+        "secondary": "#6b7280",
+        "success": "#22c55e",
+        "danger": "#ef4444",
+        "warning": "#f59e0b",
+        "accent": "#14b8a6",
+        "light": {
+          "background": "#f0fdf4",
+          "surface": "#ffffff",
+          "surfaceHover": "#f7fee7",
+          "surfaceElevated": "#ffffff",
+          "border": "#d1fae5",
+          "borderLight": "#f0fdf4",
+          "borderFocus": "#10b981",
+          "text": "#064e3b",
+          "textSecondary": "#374151",
+          "textMuted": "#6b7280",
+          "textInverse": "#ffffff"
+        },
+        "dark": {
+          "background": "#022c22",
+          "surface": "#064e3b",
+          "surfaceHover": "#065f46",
+          "surfaceElevated": "#064e3b",
+          "border": "#047857",
+          "borderLight": "#065f46",
+          "borderFocus": "#34d399",
+          "text": "#d1fae5",
+          "textSecondary": "#a7f3d0",
+          "textMuted": "#6ee7b7",
+          "textInverse": "#022c22"
+        }
+      }
+    }
+  },
+  "activeTheme": "modern-saas",
+  "defaultMode": "light"
+}
