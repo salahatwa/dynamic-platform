@@ -152,7 +152,7 @@
     "invitations": "Invitations"
   },
   "errorCode": {
-    "title": "Error Code Management",
+    "title": "Error Codes",
     "subtitle": "Manage application error codes with multi-language support",
     "create": "Create Error Code",
     "edit": "Edit Error Code",
