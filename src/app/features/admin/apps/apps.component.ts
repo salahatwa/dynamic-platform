@@ -34,7 +34,8 @@ export class AppsComponent implements OnInit {
   canCreateMore = computed(() => {
     const lim = this.limits();
     if (!lim) return false;
-    return lim.appsUsed < lim.maxApps || lim.maxApps === -1;
+    // Use the backend-calculated canCreateApp field
+    return lim.canCreateApp;
   });
 
   // Filtered apps

@@ -7,7 +7,7 @@
         <p class="page-subtitle">
           @if (limits(); as lim) {
             <span class="limit-badge" [class.limit-warning]="!canCreateMore()">
-              {{ lim.appsUsed }} / {{ lim.maxApps === -1 ? ('subscription.unlimited' | translate) : lim.maxApps }} {{ 'apps.apps' | translate }}
+              {{ lim.currentApps }} / {{ lim.subscription.maxApps === -1 ? ('subscription.unlimited' | translate) : lim.subscription.maxApps }} {{ 'apps.apps' | translate }}
             </span>
           }
         </p>
