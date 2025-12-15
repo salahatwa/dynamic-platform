@@ -30,6 +30,7 @@
               "src/favicon.svg",
               "src/favicon-16x16.svg",
               "src/manifest.json",
+              "src/404.html",
               "src/assets",
               "src/assets/config",
               "src/assets/i18n"
