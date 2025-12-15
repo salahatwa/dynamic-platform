@@ -42,7 +42,7 @@ export class AppCreateComponent {
         this.limits.set(limits);
         
         // Check if user can create more apps
-        if (limits.appsUsed >= limits.maxApps && limits.maxApps !== -1) {
+        if (!limits.canCreateApp) {
           this.error.set('You have reached your app limit. Please upgrade your plan.');
         }
       },
@@ -69,7 +69,7 @@ export class AppCreateComponent {
     if (!this.canSubmit()) return;
 
     const limits = this.limits();
-    if (limits && limits.appsUsed >= limits.maxApps && limits.maxApps !== -1) {
+    if (limits && !limits.canCreateApp) {
       this.error.set('You have reached your app limit. Please upgrade your plan.');
       return;
     }
