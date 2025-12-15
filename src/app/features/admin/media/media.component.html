@@ -26,10 +26,10 @@
       </div>
       <!-- Header Actions - Always show when app is selected -->
       <div class="header-actions">
-        <!-- Upload Button - Always visible -->
+        <!-- Single Upload Button -->
         <button 
-          id="header-upload-btn"
-          class="btn btn-primary header-upload-button"
+          id="single-upload-btn"
+          class="btn btn-primary upload-files-btn"
           *hasPermission="'media:create'"
           (click)="openUploadDialog()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +38,7 @@
           <span>{{ 'media.upload' | translate }}</span>
         </button>
         
-        <!-- Storage Settings Button - Beside upload button -->
+        <!-- Storage Settings Button -->
         <button 
           id="storage-settings-btn"
           class="btn btn-secondary storage-settings-button"

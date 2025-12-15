@@ -1,0 +1,227 @@
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 400px;
+  width: 100%;
+  pointer-events: none;
+
+  @media (max-width: 640px) {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: none;
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: currentColor;
+  }
+}
+
+.toast-success {
+  --toast-color: #059669;
+  --toast-bg: #ecfdf5;
+  --toast-border: #a7f3d0;
+  color: var(--toast-color);
+  border-color: var(--toast-border);
+  background: var(--toast-bg);
+
+  .toast-icon {
+    color: var(--toast-color);
+  }
+
+  [data-theme="dark"] & {
+    --toast-color: #10b981;
+    --toast-bg: rgba(16, 185, 129, 0.1);
+    --toast-border: rgba(16, 185, 129, 0.3);
+  }
+}
+
+.toast-error {
+  --toast-color: #dc2626;
+  --toast-bg: #fef2f2;
+  --toast-border: #fecaca;
+  color: var(--toast-color);
+  border-color: var(--toast-border);
+  background: var(--toast-bg);
+
+  .toast-icon {
+    color: var(--toast-color);
+  }
+
+  [data-theme="dark"] & {
+    --toast-color: #ef4444;
+    --toast-bg: rgba(239, 68, 68, 0.1);
+    --toast-border: rgba(239, 68, 68, 0.3);
+  }
+}
+
+.toast-warning {
+  --toast-color: #d97706;
+  --toast-bg: #fffbeb;
+  --toast-border: #fed7aa;
+  color: var(--toast-color);
+  border-color: var(--toast-border);
+  background: var(--toast-bg);
+
+  .toast-icon {
+    color: var(--toast-color);
+  }
+
+  [data-theme="dark"] & {
+    --toast-color: #f59e0b;
+    --toast-bg: rgba(245, 158, 11, 0.1);
+    --toast-border: rgba(245, 158, 11, 0.3);
+  }
+}
+
+.toast-info {
+  --toast-color: #2563eb;
+  --toast-bg: #eff6ff;
+  --toast-border: #bfdbfe;
+  color: var(--toast-color);
+  border-color: var(--toast-border);
+  background: var(--toast-bg);
+
+  .toast-icon {
+    color: var(--toast-color);
+  }
+
+  [data-theme="dark"] & {
+    --toast-color: #3b82f6;
+    --toast-bg: rgba(59, 130, 246, 0.1);
+    --toast-border: rgba(59, 130, 246, 0.3);
+  }
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: var(--toast-color, var(--text));
+  margin-bottom: 0.25rem;
+}
+
+.toast-message {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--toast-color, var(--text-secondary));
+  opacity: 0.8;
+}
+
+.toast-action {
+  flex-shrink: 0;
+  padding: 0.375rem 0.75rem;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-md);
+  color: currentColor;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: currentColor;
+    color: var(--surface);
+  }
+}
+
+.toast-close {
+  flex-shrink: 0;
+  padding: 0.25rem;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  margin-top: -0.125rem;
+  margin-right: -0.25rem;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+  }
+}
+
+// RTL Support
+[dir="rtl"] {
+  .toast-container {
+    right: auto;
+    left: 1rem;
+
+    @media (max-width: 640px) {
+      left: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+
+  .toast {
+    &::before {
+      left: auto;
+      right: 0;
+    }
+  }
+
+  .toast-close {
+    margin-right: auto;
+    margin-left: -0.25rem;
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .toast {
+    backdrop-filter: blur(12px);
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: none;
+  }
+}

@@ -47,9 +47,21 @@
 }
 
 .header-actions {
-  display: flex;
+  display: flex !important;
   gap: 1rem;
   flex-shrink: 0;
+  
+  .btn {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  
+  .header-upload-button,
+  .storage-settings-button {
+    display: flex !important;
+  }
 }
 
 // Filters Section
@@ -552,10 +564,7 @@
       display: none !important;
     }
     
-    // Limit to exactly one button
-    > .media-upload-first-button:nth-child(n+2) {
-      display: none !important;
-    }
+    // Allow buttons normally
   }
   
   // Prevent any external empty states from interfering
@@ -1291,15 +1300,7 @@
     }
   }
   
-  // Global duplicate button prevention
-  button[class*="upload"]:not(.media-upload-first-button) {
-    display: none !important;
-  }
-  
-  // Ensure only one upload button exists globally in media context
-  .media-container .btn:contains("Upload Your First File"):not(.media-upload-first-button) {
-    display: none !important;
-  }
+  // Let Angular template logic handle visibility
   
   // Ensure buttons are unique
   .btn {
@@ -1308,12 +1309,10 @@
     
     // Remove any potential duplicate styling
     &:not(:first-of-type) {
-      // Allow multiple different buttons, but prevent exact duplicates
-      &[class*="header-upload-button"] {
-        display: none !important;
-      }
+      // Allow header buttons to be visible
+      &[class*="header-upload-button"],
       &[class*="breadcrumb-create-folder-button"] {
-        display: none !important;
+        display: flex !important;
       }
     }
   }
@@ -1321,17 +1320,19 @@
 
 // Specific fixes for the highlighted duplicate buttons
 .page-header .header-actions {
-  // Ensure only one upload button in header
-  .btn:nth-child(n+2) {
+  // Ensure only one upload button exists
+  #single-upload-btn:not(:first-of-type) {
+    display: none !important;
+  }
+  
+  // Hide any other upload buttons that might be duplicated
+  .upload-files-btn:not(#single-upload-btn) {
     display: none !important;
   }
 }
 
 .breadcrumb-section .breadcrumb-actions {
-  // Ensure only one create folder button in breadcrumb
-  .btn:nth-child(n+2) {
-    display: none !important;
-  }
+  // Allow buttons normally
 }
 // Storage Settings Dialog Styles
 .large-modal {
