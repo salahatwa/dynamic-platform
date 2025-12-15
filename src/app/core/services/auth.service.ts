@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { StorageService } from './storage.service';
 import { AppContextService } from './app-context.service';
+import { environment } from '../../../environments/environment';
 
 export interface LoginRequest {
   email: string;
@@ -30,8 +31,7 @@ export class AuthService {
   private router = inject(Router);
   private storageService = inject(StorageService);
   private appContextService = inject(AppContextService);
-  private baseUrl = 'http://localhost:8080';
-  private apiUrl = `${this.baseUrl}/api/auth`;
+  private apiUrl = `${environment.apiUrl}/auth`;
   
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();

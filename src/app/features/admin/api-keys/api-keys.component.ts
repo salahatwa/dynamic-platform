@@ -249,12 +249,13 @@ export class ApiKeysComponent implements OnInit {
 
   getEndpointsList() {
     // Always return the endpoints list, regardless of API guide status
+    const baseUrl = environment.apiUrl.replace('/api', '');
     return [
-      { key: 'errorCodes', name: 'Error Codes', url: '/api/content/error-codes' },
-      { key: 'templates', name: 'Templates', url: '/api/content/templates' },
-      { key: 'translations', name: 'Translations', url: '/api/content/translations' },
-      { key: 'lov', name: 'List of Values', url: '/api/content/lov' },
-      { key: 'appConfig', name: 'App Configuration', url: '/api/content/app-config' }
+      { key: 'errorCodes', name: 'Error Codes', url: `${baseUrl}/api/content/error-codes` },
+      { key: 'templates', name: 'Templates', url: `${baseUrl}/api/content/templates` },
+      { key: 'translations', name: 'Translations', url: `${baseUrl}/api/content/translations` },
+      { key: 'lov', name: 'List of Values', url: `${baseUrl}/api/content/lov` },
+      { key: 'appConfig', name: 'App Configuration', url: `${baseUrl}/api/content/app-config` }
     ];
   }
 }

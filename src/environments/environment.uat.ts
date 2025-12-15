@@ -9,6 +9,9 @@ export const environment = {
   name: 'uat',
   apiUrl: 'https://dynamic-platform-api-latest.onrender.com/api',
   
+  // GitHub Pages deployment configuration
+  deploymentUrl: 'https://salahatwa.github.io/dynamic-platform',
+  
   // Feature flags for UAT
   features: {
     enableDebugMode: true,

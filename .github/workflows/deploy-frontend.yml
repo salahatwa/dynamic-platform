@@ -42,12 +42,12 @@ jobs:
         run: npm ci
 
       - name: Build Angular app
-        run: npm run build -- --configuration uat --base-href=/dynamic-platform/
+        run: npm run build:uat:deploy
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/kyc-frontend
+          path: dist/dynamic-platform/browser
 
   deploy:
     environment:

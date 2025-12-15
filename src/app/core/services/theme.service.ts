@@ -65,7 +65,7 @@ export class ThemeService {
 
   private async loadThemeConfig(): Promise<void> {
     try {
-      const config = await this.http.get<ThemeConfig>('/assets/config/theme-settings.json').toPromise();
+      const config = await this.http.get<ThemeConfig>('./assets/config/theme-settings.json').toPromise();
       this.themeConfig = config || null;
       if (this.themeConfig) {
         // Check for saved preferences first, then fall back to config defaults

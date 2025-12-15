@@ -29,7 +29,7 @@ export class TranslationService {
   
   private async loadTranslations(lang: Language) {
     try {
-      this.translations = await firstValueFrom(this.http.get(`/assets/i18n/${lang}.json`));
+      this.translations = await firstValueFrom(this.http.get(`./assets/i18n/${lang}.json`));
     } catch (error) {
       console.error('Failed to load translations', error);
     }
