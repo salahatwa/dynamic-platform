@@ -96,6 +96,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/error-code-management/error-code-management.component').then(m => m.ErrorCodeManagementComponent)
       },
       {
+        path: 'media',
+        loadComponent: () => import('./features/admin/media/media.component').then(m => m.MediaComponent)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

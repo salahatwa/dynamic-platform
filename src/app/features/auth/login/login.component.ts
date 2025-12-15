@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
@@ -209,18 +209,34 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
     }
   `]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   
   loading = false;
   errorMessage = '';
+  invitationToken: string | null = null;
   
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required]
   });
+
+  ngOnInit() {
+    // Check if there's an invitation token in query params
+    this.route.queryParams.subscribe(params => {
+      this.invitationToken = params['invitation'] || null;
+      
+      // Pre-fill email if provided
+      if (params['email']) {
+        this.loginForm.patchValue({
+          email: params['email']
+        });
+      }
+    });
+  }
   
   onSubmit(): void {
     if (this.loginForm.valid) {
@@ -229,7 +245,12 @@ export class LoginComponent {
       
       this.authService.login(this.loginForm.value as any).subscribe({
         next: () => {
-          this.router.navigate(['/admin']);
+          // If there's an invitation token, redirect to accept invitation
+          if (this.invitationToken) {
+            this.router.navigate(['/accept-invitation', this.invitationToken]);
+          } else {
+            this.router.navigate(['/admin']);
+          }
         },
         error: (error) => {
           this.errorMessage = 'Invalid credentials';

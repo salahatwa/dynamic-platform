@@ -258,40 +258,25 @@ export class RegisterComponent implements OnInit {
         email: formData.email!,
         firstName: formData.firstName!,
         lastName: formData.lastName!,
-        password: formData.password!
+        password: formData.password!,
+        invitationToken: this.invitationToken || undefined
       };
       
       this.authService.register(registerData).subscribe({
         next: (response) => {
-          // If there's an invitation token, accept it after registration
+          // If there's an invitation token, the user is already assigned to the correct corporate
           if (this.invitationToken) {
-            this.authService.login({ 
-              email: registerData.email, 
-              password: registerData.password 
-            }).subscribe({
-              next: () => {
-                this.invitationService.acceptInvitation(this.invitationToken!).subscribe({
-                  next: () => {
-                    this.successMessage = 'Registration successful! Invitation accepted. Redirecting...';
-                    setTimeout(() => this.router.navigate(['/admin/dashboard']), 2000);
-                  },
-                  error: (err) => {
-                    console.error('Error accepting invitation:', err);
-                    this.successMessage = 'Registration successful! Redirecting to login...';
-                    setTimeout(() => this.router.navigate(['/login']), 2000);
-                  }
-                });
-              },
-              error: (err) => {
-                console.error('Auto-login error:', err);
-                this.successMessage = 'Registration successful! Redirecting to login...';
-                setTimeout(() => this.router.navigate(['/login']), 2000);
-              }
-            });
+            this.successMessage = 'Registration successful! You have been added to the organization. Redirecting to login...';
+            setTimeout(() => {
+              this.router.navigate(['/login'], {
+                queryParams: { email: registerData.email }
+              });
+            }, 2000);
           } else {
             this.successMessage = 'Registration successful! Redirecting to login...';
             setTimeout(() => this.router.navigate(['/login']), 2000);
           }
+          this.loading = false;
         },
         error: (error) => {
           console.error('Registration error:', error);

@@ -131,9 +131,21 @@ export class InvitationsComponent implements OnInit {
         this.submitting.set(false);
       },
       error: (err) => {
-        this.formError.set(err.error?.error || err.error?.message || this.t.translate('invitations.alerts.createFailed'));
-        this.submitting.set(false);
         console.error('Error creating invitation:', err);
+        
+        // Extract user-friendly error message
+        let errorMessage = this.t.translate('invitations.alerts.createFailed');
+        
+        if (err.error?.message) {
+          errorMessage = err.error.message;
+        } else if (err.error?.error) {
+          errorMessage = err.error.error;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        this.formError.set(errorMessage);
+        this.submitting.set(false);
       }
     });
   }

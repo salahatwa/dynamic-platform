@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { StorageService } from './storage.service';
 import { AppContextService } from './app-context.service';
+import { PermissionService } from './permission.service';
 import { environment } from '../../../environments/environment';
 
 export interface LoginRequest {
@@ -19,8 +20,20 @@ export interface RegisterRequest {
   invitationToken?: string;
 }
 
+export interface UserInfo {
+  id: number;
+  email: string;
+  name: string;
+  firstName: string;
+  lastName: string;
+  corporateId: number | null;
+  corporateName: string | null;
+}
+
 export interface AuthResponse {
   token: string;
+  permissions: string[];
+  user: UserInfo;
 }
 
 @Injectable({
@@ -31,6 +44,7 @@ export class AuthService {
   private router = inject(Router);
   private storageService = inject(StorageService);
   private appContextService = inject(AppContextService);
+  private permissionService = inject(PermissionService);
   private apiUrl = `${environment.apiUrl}/auth`;
   
   private currentUserSubject = new BehaviorSubject<any>(null);
@@ -53,8 +67,20 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         console.log('User logged in successfully');
+        
+        // Store token and user info
         localStorage.setItem('token', response.token);
-        this.currentUserSubject.next({ token: response.token });
+        localStorage.setItem('userInfo', JSON.stringify(response.user));
+        
+        // Set permissions in permission service
+        this.permissionService.setPermissions(response.permissions);
+        
+        // Update current user subject
+        this.currentUserSubject.next({ 
+          token: response.token, 
+          user: response.user,
+          permissions: response.permissions 
+        });
         
         // Reset and reload app context for the new user
         this.appContextService.reset();
@@ -82,8 +108,14 @@ export class AuthService {
     // Reset app context to clear any cached app data
     this.appContextService.reset();
     
+    // Clear permissions
+    this.permissionService.clearPermissions();
+    
     // Clear user-specific data while preserving UI preferences
     this.storageService.clearUserData();
+    
+    // Remove user info
+    localStorage.removeItem('userInfo');
     
     // Update authentication state
     this.currentUserSubject.next(null);

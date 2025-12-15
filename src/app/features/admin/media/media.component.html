@@ -1,0 +1,731 @@
+<div class="media-container">
+  <!-- No App Selected State -->
+  @if (!appContext.hasSelectedApp()) {
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+        </svg>
+      </div>
+      <h2 class="empty-state-title">{{ 'apps.noApps' | translate }}</h2>
+      <p class="empty-state-desc">{{ 'media.selectAppDesc' | translate }}</p>
+      <a routerLink="/admin/apps/create" class="btn btn-primary btn-lg">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        <span>{{ 'apps.createFirst' | translate }}</span>
+      </a>
+    </div>
+  } @else {
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">{{ 'media.title' | translate }}</h1>
+        <p class="page-subtitle">{{ 'media.subtitle' | translate }}</p>
+      </div>
+      <!-- Header Actions - Always show when app is selected -->
+      <div class="header-actions">
+        <!-- Upload Button - Always visible -->
+        <button 
+          id="header-upload-btn"
+          class="btn btn-primary header-upload-button"
+          *hasPermission="'media:create'"
+          (click)="openUploadDialog()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+          <span>{{ 'media.upload' | translate }}</span>
+        </button>
+        
+        <!-- Storage Settings Button - Beside upload button -->
+        <button 
+          id="storage-settings-btn"
+          class="btn btn-secondary storage-settings-button"
+          (click)="openStorageSettingsDialog()"
+          [title]="'media.storageSettings' | translate">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.79 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.79 4 8 4s8-1.79 8-4M4 7c0-2.21 3.79-4 8-4s8 1.79 8 4m0 5c0 2.21-3.79 4-8 4s-8-1.79-8-4"/>
+          </svg>
+          <span>{{ 'media.storageSettings' | translate }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="filters-section">
+      <div class="search-box">
+        <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          [placeholder]="'media.searchPlaceholder' | translate"
+          class="search-input">
+      </div>
+      
+      <div class="filter-controls">
+        <select [(ngModel)]="selectedFileType" (change)="onFilterChange()" class="filter-select">
+          <option value="">{{ 'media.allTypes' | translate }}</option>
+          <option value="image/*">{{ 'media.images' | translate }}</option>
+          <option value="video/*">{{ 'media.videos' | translate }}</option>
+          <option value="application/pdf">{{ 'media.documents' | translate }}</option>
+        </select>
+        
+        <div class="view-toggle">
+          <button 
+            [class.active]="viewMode() === 'grid'"
+            (click)="setViewMode('grid')"
+            class="view-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            </svg>
+          </button>
+          <button 
+            [class.active]="viewMode() === 'list'"
+            (click)="setViewMode('list')"
+            class="view-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-section">
+      <div class="breadcrumb-nav">
+        <button class="breadcrumb-item root" (click)="navigateToRoot()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21l4-4 4 4"/>
+          </svg>
+          <span>{{ 'media.rootFolder' | translate }}</span>
+        </button>
+        
+        @for (folder of breadcrumbs(); track folder.id) {
+          <svg class="breadcrumb-separator" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <button class="breadcrumb-item" (click)="navigateToFolder(folder)">
+            {{ folder.name }}
+          </button>
+        }
+        
+        @if (currentFolder()) {
+          <svg class="breadcrumb-separator" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <span class="breadcrumb-current">{{ currentFolder()!.name }}</span>
+        }
+      </div>
+      
+      <div class="breadcrumb-actions">
+        <button 
+          id="breadcrumb-create-folder-btn"
+          class="btn btn-secondary btn-sm breadcrumb-create-folder-button"
+          *hasPermission="'media:create'"
+          (click)="openCreateFolderDialog()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          <span>{{ 'media.createFolder' | translate }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Folders Grid -->
+    @if (folders().length > 0) {
+      <div class="folders-section">
+        <h3 class="section-title">{{ 'media.folders' | translate }}</h3>
+        <div class="folders-grid">
+          @for (folder of folders(); track folder.id) {
+            <div class="folder-item" (dblclick)="navigateToFolder(folder)">
+              <div class="folder-icon">
+                <svg width="48" height="48" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                </svg>
+              </div>
+              <div class="folder-info">
+                <h4 class="folder-name" [title]="folder.name" [attr.data-debug-name]="folder.name">{{ folder.name }}</h4>
+                <p class="folder-meta">
+                  {{ folder.fileCount }} {{ 'media.files' | translate }}, 
+                  {{ folder.childFolderCount }} {{ 'media.subfolders' | translate }}
+                </p>
+              </div>
+              <div class="folder-actions">
+                <button 
+                  class="action-btn"
+                  (click)="navigateToFolder(folder); $event.stopPropagation()"
+                  [title]="'media.openFolder' | translate">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+                <button 
+                  class="action-btn delete-btn"
+                  *hasPermission="'media:delete'"
+                  (click)="deleteFolder(folder); $event.stopPropagation()"
+                  [title]="'media.deleteFolder' | translate">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p>{{ 'common.loading' | translate }}</p>
+      </div>
+    } @else if (files().content.length > 0) {
+      <div class="files-container" [class.grid-view]="viewMode() === 'grid'" [class.list-view]="viewMode() === 'list'">
+        @for (file of files().content; track file.id) {
+          <div class="file-item" (click)="selectFile(file)" [class.selected]="selectedFile()?.id === file.id">
+            <!-- Grid View -->
+            @if (viewMode() === 'grid') {
+              <div class="file-preview">
+                @if (file.isImage && file.previewUrl) {
+                  <img [src]="file.previewUrl" [alt]="file.filename" class="preview-image">
+                } @else {
+                  <div class="file-icon" [ngClass]="getFileTypeColor(file)">
+                    <svg width="48" height="48" fill="currentColor" viewBox="0 0 24 24">
+                      @switch (getFileIcon(file)) {
+                        @case ('image') {
+                          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        }
+                        @case ('video_file') {
+                          <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+                        }
+                        @case ('description') {
+                          <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        }
+                        @default {
+                          <path d="M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"/>
+                        }
+                      }
+                    </svg>
+                  </div>
+                }
+                <!-- Grid Action Buttons Overlay -->
+                <div class="grid-actions-overlay" [attr.data-file-id]="file.id">
+                  <button 
+                    class="grid-action-btn open-btn"
+                    (click)="openFileInNewTab(file); $event.stopPropagation()"
+                    [title]="'media.openInNewTab' | translate"
+                    type="button">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                  </button>
+                  <button 
+                    class="grid-action-btn download-btn"
+                    (click)="downloadFile(file); $event.stopPropagation()"
+                    [title]="'media.download' | translate"
+                    type="button">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-4-4m4 4l4-4m5-5v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2m10 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v3"/>
+                    </svg>
+                  </button>
+                  <button 
+                    class="grid-action-btn delete-btn"
+                    *hasPermission="'media:delete'"
+                    (click)="deleteFile(file); $event.stopPropagation()"
+                    [title]="'media.delete' | translate"
+                    [attr.data-file-id]="file.id"
+                    type="button">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="file-info">
+                <h3 class="file-name" [title]="file.originalFilename">{{ file.originalFilename }}</h3>
+                <p class="file-meta">{{ file.fileSizeFormatted }}</p>
+              </div>
+            } @else {
+              <div class="file-icon-small" [ngClass]="getFileTypeColor(file)">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                  @switch (getFileIcon(file)) {
+                    @case ('image') {
+                      <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                    }
+                    @case ('video_file') {
+                      <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+                    }
+                    @case ('description') {
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    }
+                    @default {
+                      <path d="M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"/>
+                    }
+                  }
+                </svg>
+              </div>
+              <div class="file-details">
+                <h3 class="file-name">{{ file.originalFilename }}</h3>
+                <div class="file-meta-row">
+                  <span class="file-size">{{ file.fileSizeFormatted }}</span>
+                  <span class="file-date">{{ formatDate(file.updatedAt) }}</span>
+                  <span class="file-type">{{ file.mimeType }}</span>
+                </div>
+              </div>
+              <div class="file-actions">
+                <button 
+                  class="action-btn"
+                  (click)="openFileInNewTab(file); $event.stopPropagation()"
+                  [title]="'media.openInNewTab' | translate">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                </button>
+                <button 
+                  class="action-btn"
+                  (click)="downloadFile(file); $event.stopPropagation()"
+                  [title]="'media.download' | translate">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-4-4m4 4l4-4m5-5v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2m10 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v3"/>
+                  </svg>
+                </button>
+                <button 
+                  class="action-btn delete-btn"
+                  *hasPermission="'media:delete'"
+                  (click)="deleteFile(file); $event.stopPropagation()"
+                  [title]="'media.delete' | translate"
+                  data-debug="list-delete">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (files().totalPages > 1) {
+        <div class="pagination">
+          <button 
+            class="pagination-btn"
+            [disabled]="files().first"
+            (click)="goToPage(files().number - 1)">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          
+          <span class="pagination-info">
+            {{ 'common.page' | translate }} {{ files().number + 1 }} {{ 'common.of' | translate }} {{ files().totalPages }}
+          </span>
+          
+          <button 
+            class="pagination-btn"
+            [disabled]="files().last"
+            (click)="goToPage(files().number + 1)">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      }
+    } @else {
+      <div class="empty-state" data-component="media-empty-state">
+        <div class="empty-state-icon">
+          <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+        </div>
+        <h2 class="empty-state-title">{{ 'media.noFiles' | translate }}</h2>
+        <p class="empty-state-desc">{{ 'media.noFilesDesc' | translate }}</p>
+        <div class="empty-state-actions" data-component="media-empty-state">
+          <button 
+            id="media-upload-first-btn"
+            class="btn btn-primary btn-lg media-upload-first-button"
+            *hasPermission="'media:create'"
+            (click)="openUploadDialog()"
+            type="button">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <span>{{ 'media.uploadFirst' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Create Folder Dialog -->
+    @if (showCreateFolderDialog()) {
+      <div class="modal-overlay" (click)="closeCreateFolderDialog()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>{{ 'media.createFolder' | translate }}</h2>
+            <button class="modal-close" (click)="closeCreateFolderDialog()">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="folderName">{{ 'media.folderName' | translate }}</label>
+              <input 
+                id="folderName"
+                type="text" 
+                [(ngModel)]="newFolderName"
+                [placeholder]="'media.folderNamePlaceholder' | translate"
+                class="form-input"
+                (keyup.enter)="createFolder()">
+            </div>
+            @if (currentFolder()) {
+              <p class="folder-location">
+                {{ 'media.createIn' | translate }}: {{ currentFolder()!.name }}
+              </p>
+            } @else {
+              <p class="folder-location">
+                {{ 'media.createInRoot' | translate }}
+              </p>
+            }
+          </div>
+          
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeCreateFolderDialog()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button 
+              class="btn btn-primary"
+              [disabled]="!newFolderName().trim()"
+              (click)="createFolder()">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              <span>{{ 'media.createFolder' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Storage Settings Dialog -->
+    @if (showStorageSettingsDialog()) {
+      <div class="modal-overlay" (click)="closeStorageSettingsDialog()">
+        <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>{{ 'media.storageSettings' | translate }}</h2>
+            <button class="modal-close" (click)="closeStorageSettingsDialog()">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="storage-providers-section">
+              <h3>{{ 'media.storageProviders' | translate }}</h3>
+              <p class="section-description">{{ 'media.storageProvidersDesc' | translate }}</p>
+              
+              <!-- Current Provider Display -->
+              @if (currentStorageProvider()) {
+                <div class="current-provider-card">
+                  <div class="provider-info">
+                    <div class="provider-icon">
+                      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        @switch (currentStorageProvider()!.providerType) {
+                          @case ('LOCAL') {
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2z"/>
+                          }
+                          @case ('AWS_S3') {
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                          }
+                          @case ('GOOGLE_DRIVE') {
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"/>
+                          }
+                          @default {
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.79 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.79 4 8 4s8-1.79 8-4M4 7c0-2.21 3.79-4 8-4s8 1.79 8 4"/>
+                          }
+                        }
+                      </svg>
+                    </div>
+                    <div class="provider-details">
+                      <h4>{{ getProviderDisplayName(currentStorageProvider()!.providerType) }}</h4>
+                      <p>{{ 'media.currentProvider' | translate }}</p>
+                      @if (currentStorageProvider()!.description) {
+                        <p class="provider-description">{{ currentStorageProvider()!.description }}</p>
+                      }
+                    </div>
+                  </div>
+                  <div class="provider-status">
+                    <button 
+                      class="btn btn-sm btn-outline"
+                      (click)="selectProvider(currentStorageProvider()!.providerType)">
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                      <span>{{ 'common.edit' | translate }}</span>
+                    </button>
+                    <span class="status-badge active">{{ 'media.active' | translate }}</span>
+                  </div>
+                </div>
+              } @else {
+                <div class="no-provider-card">
+                  <div class="provider-info">
+                    <div class="provider-icon">
+                      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                      </svg>
+                    </div>
+                    <div class="provider-details">
+                      <h4>{{ 'media.noProviderConfigured' | translate }}</h4>
+                      <p>{{ 'media.noProviderDesc' | translate }}</p>
+                    </div>
+                  </div>
+                </div>
+              }
+              
+              <!-- Available Providers -->
+              <div class="available-providers">
+                <h4>{{ 'media.availableProviders' | translate }}</h4>
+                <div class="providers-grid">
+                  @for (provider of availableProviders; track provider.type) {
+                    <div class="provider-card" 
+                         [class.selected]="selectedProviderType() === provider.type"
+                         (click)="selectProvider(provider.type)">
+                      <div class="provider-icon">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          @switch (provider.type) {
+                            @case ('LOCAL') {
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2z"/>
+                            }
+                            @case ('AWS_S3') {
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                            }
+                            @case ('GOOGLE_DRIVE') {
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"/>
+                            }
+                          }
+                        </svg>
+                      </div>
+                      <div class="provider-info">
+                        <h5>{{ provider.name }}</h5>
+                        <p>{{ provider.description }}</p>
+                      </div>
+                      @if (selectedProviderType() === provider.type) {
+                        <div class="selected-indicator">
+                          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                          </svg>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              
+              <!-- Provider Configuration Form -->
+              @if (selectedProviderType() && selectedProviderType() !== 'LOCAL') {
+                <div class="provider-config-form">
+                  <h4>{{ 'media.configureProvider' | translate }}: {{ getProviderDisplayName(selectedProviderType()!) }}</h4>
+                  
+                  @switch (selectedProviderType()) {
+                    @case ('AWS_S3') {
+                      <div class="form-grid">
+                        <div class="form-group">
+                          <label for="awsAccessKey">{{ 'media.awsAccessKey' | translate }}</label>
+                          <input 
+                            id="awsAccessKey"
+                            type="text" 
+                            [(ngModel)]="providerConfig.accessKey"
+                            [placeholder]="'media.awsAccessKeyPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="awsSecretKey">{{ 'media.awsSecretKey' | translate }}</label>
+                          <input 
+                            id="awsSecretKey"
+                            type="password" 
+                            [(ngModel)]="providerConfig.secretKey"
+                            [placeholder]="'media.awsSecretKeyPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="awsBucket">{{ 'media.awsBucket' | translate }}</label>
+                          <input 
+                            id="awsBucket"
+                            type="text" 
+                            [(ngModel)]="providerConfig.bucketName"
+                            [placeholder]="'media.awsBucketPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="awsRegion">{{ 'media.awsRegion' | translate }}</label>
+                          <select 
+                            id="awsRegion"
+                            [(ngModel)]="providerConfig.region"
+                            class="form-select">
+                            <option value="">{{ 'media.selectRegion' | translate }}</option>
+                            <option value="us-east-1">US East (N. Virginia)</option>
+                            <option value="us-west-2">US West (Oregon)</option>
+                            <option value="eu-west-1">Europe (Ireland)</option>
+                            <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                          </select>
+                        </div>
+                      </div>
+                    }
+                    @case ('GOOGLE_DRIVE') {
+                      <div class="form-grid">
+                        <div class="form-group full-width">
+                          <label for="googleCredentials">{{ 'media.googleCredentials' | translate }}</label>
+                          <textarea 
+                            id="googleCredentials"
+                            [(ngModel)]="providerConfig.credentials"
+                            [placeholder]="'media.googleCredentialsPlaceholder' | translate"
+                            class="form-textarea"
+                            rows="6"></textarea>
+                        </div>
+                        <div class="form-group">
+                          <label for="googleFolderId">{{ 'media.googleFolderId' | translate }}</label>
+                          <input 
+                            id="googleFolderId"
+                            type="text" 
+                            [(ngModel)]="providerConfig.folderId"
+                            [placeholder]="'media.googleFolderIdPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                      </div>
+                    }
+                  }
+                  
+                  <div class="form-group">
+                    <label for="providerDescription">{{ 'media.description' | translate }}</label>
+                    <input 
+                      id="providerDescription"
+                      type="text" 
+                      [(ngModel)]="providerConfig.description"
+                      [placeholder]="'media.descriptionPlaceholder' | translate"
+                      class="form-input">
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeStorageSettingsDialog()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            @if (selectedProviderType() && selectedProviderType() !== 'LOCAL') {
+              <button 
+                class="btn btn-outline"
+                [disabled]="!isProviderConfigValid()"
+                (click)="testProviderConnection()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>{{ 'media.testConnection' | translate }}</span>
+              </button>
+            }
+            @if (selectedProviderType()) {
+              <button 
+                class="btn btn-primary"
+                [disabled]="!isProviderConfigValid() || isSavingProvider()"
+                (click)="saveProviderConfig()">
+                @if (isSavingProvider()) {
+                  <div class="spinner-small"></div>
+                } @else {
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                }
+                <span>{{ 'media.saveProvider' | translate }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Upload Dialog -->
+    @if (showUploadDialog()) {
+      <div class="modal-overlay" (click)="closeUploadDialog()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>{{ 'media.uploadFiles' | translate }}</h2>
+            <button class="modal-close" (click)="closeUploadDialog()">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="upload-area" 
+                 [class.dragover]="isDragOver()"
+                 (dragover)="onDragOver($event)"
+                 (dragleave)="onDragLeave($event)"
+                 (drop)="onDrop($event)"
+                 (click)="fileInput.click()">
+              <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              <h3>{{ 'media.dragDropFiles' | translate }}</h3>
+              <p>{{ 'media.orClickToSelect' | translate }}</p>
+              <input 
+                #fileInput
+                type="file" 
+                multiple 
+                (change)="onFilesSelected($event)"
+                style="display: none;">
+            </div>
+            
+            @if (selectedFiles().length > 0) {
+              <div class="selected-files">
+                <h4>{{ 'media.selectedFiles' | translate }} ({{ selectedFiles().length }})</h4>
+                @for (file of selectedFiles(); track file.name) {
+                  <div class="selected-file">
+                    <span class="file-name">{{ file.name }}</span>
+                    <span class="file-size">{{ formatFileSize(file.size) }}</span>
+                    <button class="remove-file" (click)="removeFile(file)">
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeUploadDialog()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button 
+              class="btn btn-primary"
+              [disabled]="selectedFiles().length === 0 || isUploading()"
+              (click)="uploadFiles()">
+              @if (isUploading()) {
+                <div class="spinner-small"></div>
+              } @else {
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+              }
+              <span>{{ 'media.upload' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

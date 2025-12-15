@@ -1,0 +1,1747 @@
+// Media Management Component Styles
+.media-container {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+  
+  // Ensure this component is isolated from other empty states
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  // Hide any external empty states that might interfere
+  ~ .empty-state,
+  + .empty-state {
+    display: none !important;
+  }
+}
+
+// Header Section
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.header-content h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.header-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+// Filters Section
+.filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary);
+  }
+}
+
+.filter-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  min-width: 150px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+}
+
+.view-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.view-btn {
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+
+  &.active {
+    background: var(--primary);
+    color: white;
+  }
+}
+
+// Files Container
+.files-container {
+  margin-bottom: 2rem;
+}
+
+.files-container.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.files-container.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+// File Items
+.file-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+}
+
+// Grid View Styles
+.grid-view .file-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  text-align: center;
+}
+
+.file-preview {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: var(--background);
+  overflow: hidden;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+// Grid Action Buttons Overlay
+.grid-actions-overlay {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+  
+  // Only show in grid view
+  .files-container.list-view & {
+    display: none !important;
+  }
+  
+  // Ensure exactly 3 buttons maximum
+  > .grid-action-btn {
+    &:nth-child(n+4) {
+      display: none !important;
+    }
+  }
+  
+  // Prevent any duplication
+  &::before,
+  &::after {
+    display: none !important;
+    content: none !important;
+  }
+}
+
+.file-item:hover .grid-actions-overlay {
+  opacity: 1;
+}
+
+.grid-action-btn {
+  padding: 0.5rem;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    background: var(--primary);
+    transform: scale(1.1);
+  }
+
+  &.delete-btn:hover {
+    background: #ef4444;
+  }
+  
+  // Prevent button duplication
+  &::before,
+  &::after {
+    display: none !important;
+    content: none !important;
+  }
+  
+  // Ensure unique buttons
+  &.open-btn {
+    order: 1;
+  }
+  
+  &.download-btn {
+    order: 2;
+  }
+  
+  &.delete-btn {
+    order: 3;
+  }
+}
+
+.file-info {
+  text-align: center;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+// List View Styles
+.list-view .file-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  gap: 1rem;
+}
+
+.file-icon-small {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--background);
+}
+
+.file-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-view .file-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-meta-row {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  
+  // Only show in list view
+  .files-container.grid-view & {
+    display: none !important;
+  }
+  
+  // Prevent duplication
+  &::before,
+  &::after {
+    display: none !important;
+    content: none !important;
+  }
+}
+
+.action-btn {
+  padding: 0.5rem;
+  border: none;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: var(--primary);
+    color: white;
+  }
+
+  &.delete-btn:hover {
+    background: #ef4444;
+    color: white;
+  }
+}
+
+// File Type Colors
+.text-green-600 { color: #059669; }
+.text-blue-600 { color: #2563eb; }
+.text-red-600 { color: #dc2626; }
+.text-gray-600 { color: #6b7280; }
+
+// Pagination
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination-btn {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.empty-state-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+// Media Upload First Button - Unique styling
+.media-upload-first-button {
+  position: relative;
+  z-index: 1;
+  
+  // Ensure no pseudo-elements or duplicates
+  &::before,
+  &::after {
+    display: none !important;
+    content: none !important;
+  }
+  
+  // Ensure this is the only upload button in media empty state
+  &:not(:first-child) {
+    display: none !important;
+  }
+}
+
+// Hide any other upload buttons that might interfere
+.media-container {
+  // Ensure only one upload button in empty state
+  .empty-state-actions {
+    > button:not(.media-upload-first-button) {
+      display: none !important;
+    }
+    
+    // Limit to exactly one button
+    > .media-upload-first-button:nth-child(n+2) {
+      display: none !important;
+    }
+  }
+  
+  // Prevent any external empty states from interfering
+  .empty-state:not([data-component="media-empty-state"]) {
+    display: none !important;
+  }
+}
+
+// Prevent button duplication with unique IDs
+#header-upload-btn,
+#breadcrumb-create-folder-btn {
+  position: relative;
+  z-index: 1;
+  
+  // Ensure no pseudo-elements or duplicates
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+// Ensure header actions only show one button
+.header-actions {
+  .header-upload-button {
+    display: flex !important;
+    
+    // Hide any duplicate instances
+    &:not(:first-child) {
+      display: none !important;
+    }
+  }
+}
+
+// Ensure breadcrumb actions only show one button
+.breadcrumb-actions {
+  .breadcrumb-create-folder-button {
+    display: flex !important;
+    
+    // Hide any duplicate instances
+    &:not(:first-child) {
+      display: none !important;
+    }
+  }
+}
+
+// Modal Styles
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.modal-content {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+}
+
+.modal-close {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
+
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border);
+  justify-content: flex-end;
+}
+
+// Upload Area
+.upload-area {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--background);
+
+  &:hover, &.dragover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  svg {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+}
+
+// Selected Files
+.selected-files {
+  margin-top: 2rem;
+
+  h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+
+  .file-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .file-size {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .remove-file {
+    padding: 0.25rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #ef4444;
+      color: white;
+    }
+  }
+}
+
+// Button Styles
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  font-size: 0.95rem;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+  }
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+  }
+}
+
+// Breadcrumb Navigation
+.breadcrumb-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+
+  &.root {
+    color: var(--primary);
+    font-weight: 600;
+  }
+}
+
+.breadcrumb-current {
+  padding: 0.5rem 0.75rem;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breadcrumb-separator {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.breadcrumb-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+// Folders Section
+.folders-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.folders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  
+  // Ensure proper grid behavior
+  width: 100%;
+  
+  // Professional responsive breakpoints
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+.folder-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 0;
+  width: 100%;
+  position: relative;
+  
+  // Ensure proper layout flow
+  flex-direction: row;
+  flex-wrap: nowrap;
+  
+  // Professional spacing and alignment
+  min-height: 80px;
+  
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  // Ensure responsive behavior
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+    gap: 0.75rem;
+    min-height: 70px;
+  }
+}
+
+.folder-icon {
+  flex-shrink: 0;
+  color: #fbbf24; // Folder yellow color
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.folder-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.25rem 0;
+  
+  // Ensure proper text display
+  display: block;
+  width: 100%;
+  
+  // Professional text handling
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.3;
+  
+  // Allow text to wrap naturally
+  white-space: normal;
+  
+  // Remove any problematic overflow settings
+  overflow: visible;
+  text-overflow: unset;
+  
+  // Prevent any CSS inheritance issues
+  writing-mode: initial;
+  text-orientation: initial;
+  direction: ltr;
+  
+  // Ensure responsive behavior
+  max-width: 100%;
+  min-height: 1.2em;
+  
+  // Professional spacing
+  letter-spacing: 0.01em;
+  
+  // Ensure text flows horizontally
+  flex-direction: row;
+  
+  // Debug helper (remove in production)
+  &[data-debug-name] {
+    position: relative;
+    
+    &::after {
+      content: attr(data-debug-name);
+      position: absolute;
+      top: -20px;
+      left: 0;
+      font-size: 10px;
+      color: #999;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2px 4px;
+      border-radius: 2px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    
+    &:hover::after {
+      opacity: 1;
+    }
+  }
+}
+
+.folder-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.folder-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.folder-item:hover .folder-actions {
+  opacity: 1;
+}
+
+// Form Styles
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary);
+  }
+}
+
+.folder-location {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .media-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .search-box {
+    min-width: auto;
+  }
+
+  .filter-controls {
+    justify-content: space-between;
+  }
+
+  .files-container.grid-view {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .list-view .file-item {
+    padding: 1rem;
+  }
+
+  .file-meta-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .modal-overlay {
+    padding: 1rem;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem 1.5rem;
+  }
+
+  .upload-area {
+    padding: 2rem 1rem;
+  }
+
+  .breadcrumb-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .breadcrumb-nav {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .folders-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .folder-item {
+    padding: 0.75rem;
+  }
+
+  .folder-actions {
+    opacity: 1; // Always show on mobile
+  }
+}
+
+// RTL Support
+[dir="rtl"] {
+  .search-icon {
+    left: auto;
+    right: 1rem;
+  }
+
+  .search-input {
+    padding: 0.75rem 3rem 0.75rem 1rem;
+  }
+
+  .file-meta-row {
+    direction: rtl;
+  }
+
+  .pagination {
+    direction: rtl;
+  }
+
+  .modal-header {
+    direction: rtl;
+  }
+
+  .modal-footer {
+    direction: rtl;
+    justify-content: flex-start;
+  }
+
+  .selected-file {
+    direction: rtl;
+  }
+  
+  // RTL folder name support
+  .folder-name {
+    direction: rtl;
+    text-align: right;
+  }
+  
+  .folder-item {
+    direction: rtl;
+  }
+}
+
+// Global text display fixes
+* {
+  // Prevent any CSS inheritance that might cause vertical text
+  writing-mode: initial !important;
+  text-orientation: initial !important;
+}
+
+// Specific folder name display fixes
+.folder-name,
+.folder-name * {
+  // Force horizontal text display
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  direction: ltr;
+  
+  // Ensure no CSS transforms that might rotate text
+  transform: none !important;
+  
+  // Prevent any flex column behavior on text
+  display: block !important;
+  flex-direction: row !important;
+}
+
+// Additional professional folder styling
+.folder-item {
+  // Prevent any layout issues
+  contain: layout style;
+  
+  .folder-name {
+    // Professional text rendering
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
+    // Ensure proper text selection
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    
+    // Professional typography
+    font-variant-ligatures: common-ligatures;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+}
+
+// Dark Mode Adjustments
+@media (prefers-color-scheme: dark) {
+  .file-icon,
+  .file-icon-small {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .upload-area {
+    background: rgba(255, 255, 255, 0.02);
+
+    &:hover, &.dragover {
+      background: rgba(99, 102, 241, 0.1);
+    }
+  }
+
+  .selected-file {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+// Global duplication prevention for media component
+.media-container {
+  // Ensure component is rendered only once
+  position: relative;
+  
+  // Prevent any CSS-based duplication
+  * {
+    &::before,
+    &::after {
+      content: none !important;
+    }
+  }
+  
+  // Global duplicate button prevention
+  button[class*="upload"]:not(.media-upload-first-button) {
+    display: none !important;
+  }
+  
+  // Ensure only one upload button exists globally in media context
+  .media-container .btn:contains("Upload Your First File"):not(.media-upload-first-button) {
+    display: none !important;
+  }
+  
+  // Ensure buttons are unique
+  .btn {
+    position: relative;
+    z-index: 1;
+    
+    // Remove any potential duplicate styling
+    &:not(:first-of-type) {
+      // Allow multiple different buttons, but prevent exact duplicates
+      &[class*="header-upload-button"] {
+        display: none !important;
+      }
+      &[class*="breadcrumb-create-folder-button"] {
+        display: none !important;
+      }
+    }
+  }
+}
+
+// Specific fixes for the highlighted duplicate buttons
+.page-header .header-actions {
+  // Ensure only one upload button in header
+  .btn:nth-child(n+2) {
+    display: none !important;
+  }
+}
+
+.breadcrumb-section .breadcrumb-actions {
+  // Ensure only one create folder button in breadcrumb
+  .btn:nth-child(n+2) {
+    display: none !important;
+  }
+}
+// Storage Settings Dialog Styles
+.large-modal {
+  max-width: 800px;
+  max-height: 95vh;
+}
+
+.storage-providers-section {
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .section-description {
+    margin: 0 0 2rem 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+}
+
+// Current Provider Card
+.current-provider-card,
+.no-provider-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  
+  .provider-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+  
+  .provider-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 12px;
+    color: white;
+  }
+  
+  .provider-details {
+    h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      
+      &.provider-description {
+        margin-top: 0.5rem;
+        font-style: italic;
+      }
+    }
+  }
+  
+  .provider-status {
+    .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      &.active {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+      }
+    }
+  }
+}
+
+.no-provider-card {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.05);
+  
+  .provider-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+}
+
+// Available Providers
+.available-providers {
+  margin-top: 2rem;
+  
+  h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+}
+
+.providers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.provider-card {
+  position: relative;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  }
+  
+  &.selected {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  }
+  
+  .provider-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+  }
+  
+  .provider-info {
+    h5 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+  }
+  
+  .selected-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 24px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+}
+
+// Provider Configuration Form
+.provider-config-form {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  
+  h4 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  
+  .full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  label {
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+  
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    &::placeholder {
+      color: var(--text-secondary);
+    }
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+  }
+}
+
+// Storage Settings Button
+.storage-settings-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .large-modal {
+    max-width: 95vw;
+    margin: 1rem;
+  }
+  
+  .providers-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .current-provider-card,
+  .no-provider-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    
+    .provider-status {
+      align-self: flex-end;
+    }
+  }
+  
+  .storage-settings-button {
+    span {
+      display: none;
+    }
+  }
+}
+
+// RTL Support
+[dir="rtl"] {
+  .provider-card .selected-indicator {
+    right: auto;
+    left: 1rem;
+  }
+  
+  .current-provider-card,
+  .no-provider-card {
+    .provider-info {
+      flex-direction: row-reverse;
+    }
+  }
+}
+// Empty State Actions with Multiple Buttons
+.empty-state-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    .btn {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+}
+
+// Ensure storage settings button is always visible
+#storage-settings-btn,
+#storage-settings-empty-btn {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// Header actions layout - Upload and Storage Settings side by side
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  
+  .header-upload-button {
+    order: 1; // Upload button first
+  }
+  
+  .storage-settings-button {
+    order: 2; // Storage settings button second
+  }
+  
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+    
+    .btn span {
+      display: none; // Hide text on mobile, keep icons
+    }
+  }
+}
+// Additional button styles for storage settings
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  
+  &:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+  }
+}
+
+.btn-sm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+// Provider status area
+.provider-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &.active {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+  }
+}
+
+// Spinner for buttons
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

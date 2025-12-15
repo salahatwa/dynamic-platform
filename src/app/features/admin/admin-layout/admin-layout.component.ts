@@ -163,6 +163,24 @@ import { ThemeService } from '../../../core/services/theme.service';
             }
           </a>
           
+          <a routerLink="/admin/media" 
+             routerLinkActive="active" 
+             class="nav-item"
+             [class.disabled]="!appContext.hasSelectedApp()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+             @if (!sidebarCollapsed()) {
+              <span>{{ 'media.title' | translate }}</span>
+            }
+            @if (!appContext.hasSelectedApp() && !sidebarCollapsed()) {
+              <svg class="lock-icon" width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V7c0-2.757-2.243-5-5-5zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7z"/>
+              </svg>
+            }
+          </a>
+          
           <div class="nav-divider"></div>
           
           <!-- Always Accessible -->
@@ -240,8 +258,8 @@ import { ThemeService } from '../../../core/services/theme.service';
         </div>
 
         <div class="content-wrapper">
-          <!-- Empty State: No Apps (only show on non-app-management routes) -->
-          @if (!appContext.hasApps() && !appContext.loading() && !isAppManagementRoute()) {
+          <!-- Empty State: No Apps (only show on dashboard route) -->
+          @if (!appContext.hasApps() && !appContext.loading() && isDashboardRoute()) {
             <div class="empty-state">
               <div class="empty-state-icon">
                 <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -654,6 +672,11 @@ export class AdminLayoutComponent {
   isAppManagementRoute = computed(() => {
     const url = this.currentUrl();
     return url.includes('/admin/apps');
+  });
+
+  isDashboardRoute = computed(() => {
+    const url = this.currentUrl();
+    return url === '/admin/dashboard' || url === '/admin' || url === '/admin/';
   });
 
   constructor() {
