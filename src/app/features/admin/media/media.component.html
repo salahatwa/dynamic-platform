@@ -125,11 +125,12 @@
       
       <div class="breadcrumb-actions">
         <button 
-          id="breadcrumb-create-folder-btn"
-          class="btn btn-secondary btn-sm breadcrumb-create-folder-button"
+          id="breadcrumb-create-folder-btn-unique"
+          class="btn btn-secondary btn-sm breadcrumb-create-folder-button-single"
           *hasPermission="'media:create'"
           (click)="openCreateFolderDialog()"
-          [attr.data-instance]="componentId">
+          [attr.data-instance]="componentId"
+          data-debug="single-create-folder-btn">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
           </svg>

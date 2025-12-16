@@ -575,7 +575,7 @@
 
 // Prevent button duplication with unique IDs
 #header-upload-btn,
-#breadcrumb-create-folder-btn {
+#breadcrumb-create-folder-btn-unique {
   position: relative;
   z-index: 1;
   
@@ -604,10 +604,21 @@
   align-items: center;
   gap: 0.5rem;
   
-  .breadcrumb-create-folder-button {
+  // Ensure only one button is rendered
+  .breadcrumb-create-folder-button-single {
     display: flex !important;
     align-items: center;
     gap: 0.5rem;
+    
+    // Prevent any duplication
+    &:not(:first-child) {
+      display: none !important;
+    }
+  }
+  
+  // Hide any old class references
+  .breadcrumb-create-folder-button {
+    display: none !important;
   }
 }
 
@@ -1301,6 +1312,15 @@
     }
   }
   
+  // Ensure only one Create Folder button exists
+  .breadcrumb-actions {
+    button[data-debug="single-create-folder-btn"] {
+      &:nth-child(n+2) {
+        display: none !important;
+      }
+    }
+  }
+  
   // Let Angular template logic handle visibility
   
   // Ensure buttons are unique
@@ -1312,8 +1332,13 @@
     &:not(:first-of-type) {
       // Allow header buttons to be visible
       &[class*="header-upload-button"],
-      &[class*="breadcrumb-create-folder-button"] {
+      &[class*="breadcrumb-create-folder-button-single"] {
         display: flex !important;
+      }
+      
+      // Hide any old button references
+      &[class*="breadcrumb-create-folder-button"]:not([class*="single"]) {
+        display: none !important;
       }
     }
   }
