@@ -6,6 +6,8 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { MediaService, MediaFile, MediaFolder, PagedResponse, CreateFolderRequest } from '../../../core/services/media.service';
 import { AppContextService } from '../../../core/services/app-context.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-media',
@@ -16,8 +18,9 @@ import { AppContextService } from '../../../core/services/app-context.service';
 })
 export class MediaComponent implements OnInit {
   private mediaService = inject(MediaService);
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
   appContext = inject(AppContextService);
-  // private toastService = inject(ToastService);
 
   // App context
   selectedApp = this.appContext.selectedApp;
@@ -72,7 +75,14 @@ export class MediaComponent implements OnInit {
     region: '',
     credentials: '',
     folderId: '',
-    description: ''
+    description: '',
+    // Cloudflare R2 specific fields
+    accessKeyId: '',
+    secretAccessKey: '',
+    accountId: '',
+    endpoint: '',
+    publicAccess: false,
+    customDomain: ''
   };
 
   // Available storage providers
@@ -86,6 +96,11 @@ export class MediaComponent implements OnInit {
       type: 'AWS_S3',
       name: 'Amazon S3',
       description: 'Store files in Amazon S3 cloud storage'
+    },
+    {
+      type: 'CLOUDFLARE_R2',
+      name: 'Cloudflare R2',
+      description: 'Store files in Cloudflare R2 object storage'
     },
     {
       type: 'GOOGLE_DRIVE',
@@ -150,7 +165,7 @@ export class MediaComponent implements OnInit {
         this.folders.set(folders);
       },
       error: (error) => {
-        console.error('Error loading folders:', error);
+        this.errorHandler.handleError(error, 'load_folders');
         this.folders.set([]);
       }
     });
@@ -189,8 +204,7 @@ export class MediaComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading files:', error);
-        console.error('Failed to load files');
+        this.errorHandler.handleError(error, 'load_files');
         this.isLoading.set(false);
       }
     });
@@ -275,13 +289,12 @@ export class MediaComponent implements OnInit {
 
     this.mediaService.createFolder(request).subscribe({
       next: () => {
-        console.log('Folder created successfully');
+        this.toastService.success('Folder created successfully');
         this.closeCreateFolderDialog();
         this.loadFolders();
       },
       error: (error) => {
-        console.error('Error creating folder:', error);
-        console.error('Failed to create folder');
+        this.errorHandler.handleError(error, 'create_folder');
       }
     });
   }
@@ -290,12 +303,11 @@ export class MediaComponent implements OnInit {
     if (confirm(`Are you sure you want to delete the folder "${folder.name}"?`)) {
       this.mediaService.deleteFolder(folder.id).subscribe({
         next: () => {
-          console.log('Folder deleted successfully');
+          this.toastService.success('Folder deleted successfully');
           this.loadFolders();
         },
         error: (error) => {
-          console.error('Error deleting folder:', error);
-          console.error('Failed to delete folder');
+          this.errorHandler.handleError(error, 'delete_folder');
         }
       });
     }
@@ -382,20 +394,20 @@ export class MediaComponent implements OnInit {
           if (completedUploads === files.length) {
             this.isUploading.set(false);
             if (!hasErrors) {
-              console.log(`Successfully uploaded ${files.length} file(s)`);
+              this.toastService.success(`Successfully uploaded ${files.length} file(s)`);
               this.closeUploadDialog();
               this.loadFiles();
             }
           }
         },
         error: (error) => {
-          console.error('Upload error:', error);
           hasErrors = true;
           completedUploads++;
           
+          this.errorHandler.handleError(error, 'upload_media');
+          
           if (completedUploads === files.length) {
             this.isUploading.set(false);
-            console.error('Some files failed to upload');
           }
         }
       });
@@ -412,8 +424,7 @@ export class MediaComponent implements OnInit {
           window.open(urlResponse.url, '_blank');
         },
         error: (error) => {
-          console.error('Error generating file URL:', error);
-          console.error('Failed to open file');
+          this.errorHandler.handleError(error, 'generate_file_url');
         }
       });
     }
@@ -435,8 +446,7 @@ export class MediaComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: (error) => {
-        console.error('Error downloading file:', error);
-        console.error('Failed to download file');
+        this.errorHandler.handleError(error, 'download_file');
         // Fallback to opening in new tab
         this.openFileInNewTab(file);
       }
@@ -447,15 +457,14 @@ export class MediaComponent implements OnInit {
     if (confirm(`Are you sure you want to delete "${file.originalFilename}"?`)) {
       this.mediaService.deleteFile(file.id).subscribe({
         next: () => {
-          console.log('File deleted successfully');
+          this.toastService.success('File deleted successfully');
           this.loadFiles();
           if (this.selectedFile()?.id === file.id) {
             this.selectedFile.set(null);
           }
         },
         error: (error) => {
-          console.error('Error deleting file:', error);
-          console.error('Failed to delete file');
+          this.errorHandler.handleError(error, 'delete_file');
         }
       });
     }
@@ -498,7 +507,7 @@ export class MediaComponent implements OnInit {
         console.log('Current storage provider loaded:', provider);
       },
       error: (error) => {
-        console.error('Error loading current storage provider:', error);
+        this.errorHandler.handleError(error, 'load_storage_provider');
         // Fallback to local storage as default
         this.currentStorageProvider.set({
           providerType: 'LOCAL',
@@ -527,9 +536,16 @@ export class MediaComponent implements OnInit {
       secretKey: config.secretKey || '',
       bucketName: config.bucketName || '',
       region: config.region || '',
-      credentials: config.credentials || '',
+      credentials: config.credentials || config.serviceAccountJson || '', // Support both field names
       folderId: config.folderId || '',
-      description: config.description || ''
+      description: config.description || '',
+      // Cloudflare R2 specific fields
+      accessKeyId: config.accessKeyId || '',
+      secretAccessKey: config.secretAccessKey || '',
+      accountId: config.accountId || '',
+      endpoint: config.endpoint || '',
+      publicAccess: config.publicAccess || false,
+      customDomain: config.customDomain || ''
     };
   }
 
@@ -541,7 +557,14 @@ export class MediaComponent implements OnInit {
       region: '',
       credentials: '',
       folderId: '',
-      description: ''
+      description: '',
+      // Cloudflare R2 specific fields
+      accessKeyId: '',
+      secretAccessKey: '',
+      accountId: '',
+      endpoint: '',
+      publicAccess: false,
+      customDomain: ''
     };
   }
 
@@ -563,6 +586,13 @@ export class MediaComponent implements OnInit {
                 this.providerConfig.region);
     }
 
+    if (selectedType === 'CLOUDFLARE_R2') {
+      return !!(this.providerConfig.accessKeyId && 
+                this.providerConfig.secretAccessKey && 
+                this.providerConfig.bucketName && 
+                this.providerConfig.accountId);
+    }
+
     if (selectedType === 'GOOGLE_DRIVE') {
       return !!(this.providerConfig.credentials);
     }
@@ -575,9 +605,17 @@ export class MediaComponent implements OnInit {
 
     this.isSavingProvider.set(true);
 
+    // Map frontend config to backend expected format
+    let config: any = { ...this.providerConfig };
+    if (this.selectedProviderType() === 'GOOGLE_DRIVE') {
+      // Map 'credentials' to 'serviceAccountJson' for backend
+      config.serviceAccountJson = this.providerConfig.credentials;
+      delete config.credentials; // Remove the frontend field
+    }
+
     const providerData = {
       providerType: this.selectedProviderType(),
-      config: this.providerConfig,
+      config: config,
       description: this.providerConfig.description || `${this.getProviderDisplayName(this.selectedProviderType()!)} configuration`
     };
 
@@ -585,8 +623,6 @@ export class MediaComponent implements OnInit {
 
     this.mediaService.saveStorageProvider(providerData).subscribe({
       next: (response) => {
-        console.log('Storage provider configuration saved successfully:', response);
-        
         // Update current provider
         this.currentStorageProvider.set({
           providerType: this.selectedProviderType(),
@@ -597,15 +633,11 @@ export class MediaComponent implements OnInit {
         this.isSavingProvider.set(false);
         this.closeStorageSettingsDialog();
         
-        // Show success message
-        console.log('Storage provider configured successfully');
+        this.toastService.success('Storage provider configured successfully');
       },
       error: (error) => {
-        console.error('Error saving storage provider configuration:', error);
         this.isSavingProvider.set(false);
-        
-        // Show error message
-        console.error('Failed to save storage provider configuration');
+        this.errorHandler.handleError(error, 'storage_provider_save');
       }
     });
   }
@@ -613,21 +645,29 @@ export class MediaComponent implements OnInit {
   testProviderConnection() {
     if (!this.isProviderConfigValid()) return;
 
+    // Map frontend config to backend expected format
+    let config: any = { ...this.providerConfig };
+    if (this.selectedProviderType() === 'GOOGLE_DRIVE') {
+      // Map 'credentials' to 'serviceAccountJson' for backend
+      config.serviceAccountJson = this.providerConfig.credentials;
+      delete config.credentials; // Remove the frontend field
+    }
+
     const providerData = {
       providerType: this.selectedProviderType(),
-      config: this.providerConfig
+      config: config
     };
 
     console.log('Testing storage provider connection:', providerData);
 
     this.mediaService.testStorageProvider(providerData).subscribe({
       next: (response) => {
-        console.log('Storage provider connection test successful:', response);
-        console.log('Connection test passed');
+        console.log('Test connection response:', response);
+        this.toastService.success('Connection test passed', 'Storage provider connection is working correctly');
       },
       error: (error) => {
-        console.error('Storage provider connection test failed:', error);
-        console.error('Connection test failed');
+        console.error('Test connection error:', error);
+        this.errorHandler.handleError(error, 'storage_provider_test');
       }
     });
   }

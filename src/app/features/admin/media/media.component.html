@@ -448,6 +448,9 @@
                           @case ('AWS_S3') {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
                           }
+                          @case ('CLOUDFLARE_R2') {
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z M12 8v8m-4-4h8"/>
+                          }
                           @case ('GOOGLE_DRIVE') {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"/>
                           }
@@ -509,6 +512,9 @@
                             }
                             @case ('AWS_S3') {
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                            }
+                            @case ('CLOUDFLARE_R2') {
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z M12 8v8m-4-4h8"/>
                             }
                             @case ('GOOGLE_DRIVE') {
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"/>
@@ -579,6 +585,74 @@
                             <option value="eu-west-1">Europe (Ireland)</option>
                             <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
                           </select>
+                        </div>
+                      </div>
+                    }
+                    @case ('CLOUDFLARE_R2') {
+                      <div class="form-grid">
+                        <div class="form-group">
+                          <label for="r2AccessKeyId">{{ 'media.r2AccessKeyId' | translate }}</label>
+                          <input 
+                            id="r2AccessKeyId"
+                            type="text" 
+                            [(ngModel)]="providerConfig.accessKeyId"
+                            [placeholder]="'media.r2AccessKeyIdPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="r2SecretAccessKey">{{ 'media.r2SecretAccessKey' | translate }}</label>
+                          <input 
+                            id="r2SecretAccessKey"
+                            type="password" 
+                            [(ngModel)]="providerConfig.secretAccessKey"
+                            [placeholder]="'media.r2SecretAccessKeyPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="r2BucketName">{{ 'media.r2BucketName' | translate }}</label>
+                          <input 
+                            id="r2BucketName"
+                            type="text" 
+                            [(ngModel)]="providerConfig.bucketName"
+                            [placeholder]="'media.r2BucketNamePlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="r2AccountId">{{ 'media.r2AccountId' | translate }}</label>
+                          <input 
+                            id="r2AccountId"
+                            type="text" 
+                            [(ngModel)]="providerConfig.accountId"
+                            [placeholder]="'media.r2AccountIdPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="r2Endpoint">{{ 'media.r2Endpoint' | translate }}</label>
+                          <input 
+                            id="r2Endpoint"
+                            type="text" 
+                            [(ngModel)]="providerConfig.endpoint"
+                            [placeholder]="'media.r2EndpointPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group">
+                          <label for="r2CustomDomain">{{ 'media.r2CustomDomain' | translate }}</label>
+                          <input 
+                            id="r2CustomDomain"
+                            type="text" 
+                            [(ngModel)]="providerConfig.customDomain"
+                            [placeholder]="'media.r2CustomDomainPlaceholder' | translate"
+                            class="form-input">
+                        </div>
+                        <div class="form-group full-width">
+                          <label class="checkbox-label">
+                            <input 
+                              type="checkbox" 
+                              [(ngModel)]="providerConfig.publicAccess"
+                              class="form-checkbox">
+                            <span>{{ 'media.r2PublicAccess' | translate }}</span>
+                          </label>
+                          <p class="form-help">{{ 'media.r2PublicAccessHelp' | translate }}</p>
                         </div>
                       </div>
                     }

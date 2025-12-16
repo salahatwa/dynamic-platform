@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 import { trigger, transition, style, query, animate } from '@angular/animations';
 import { ThemeService } from './core/services/theme.service';
 
@@ -17,7 +18,7 @@ const routeAnimations = trigger('routeAnimations', [
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastContainerComponent],
   animations: [routeAnimations],
   template: `
     @if (!isAdminRoute()) { <app-navbar></app-navbar> }
@@ -25,6 +26,7 @@ const routeAnimations = trigger('routeAnimations', [
       <router-outlet #outlet="outlet"></router-outlet>
     </div>
     @if (!isAdminRoute()) { <app-footer></app-footer> }
+    <app-toast-container></app-toast-container>
   `
 })
 export class AppComponent implements OnInit {

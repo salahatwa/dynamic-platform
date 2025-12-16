@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ErrorCodeService } from '../../../core/services/error-code.service';
 import { AppContextService } from '../../../core/services/app-context.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { 
   ErrorCode, 
   ErrorCodeCategory, 
@@ -24,6 +26,8 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 export class ErrorCodeManagementComponent implements OnInit {
   // Services
   private appContext = inject(AppContextService);
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
   
   // Signals
   errorCodes = signal<ErrorCode[]>([]);
@@ -151,7 +155,7 @@ export class ErrorCodeManagementComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading error codes:', error);
+        this.errorHandler.handleError(error, 'load_error_codes');
         this.loading.set(false);
       }
     });
@@ -160,7 +164,7 @@ export class ErrorCodeManagementComponent implements OnInit {
   loadCategories() {
     this.errorCodeService.getAllCategories(true).subscribe({
       next: (categories) => this.categories.set(categories),
-      error: (error) => console.error('Error loading categories:', error)
+      error: (error) => this.errorHandler.handleError(error, 'load_error_code_categories')
     });
   }
 
@@ -268,10 +272,15 @@ export class ErrorCodeManagementComponent implements OnInit {
 
     operation.subscribe({
       next: () => {
+        const action = this.modalMode() === 'create' ? 'created' : 'updated';
+        this.toastService.success(`Error code ${action} successfully`);
         this.loadErrorCodes();
         this.closeModal();
       },
-      error: (error) => console.error('Error saving error code:', error)
+      error: (error) => {
+        const context = this.modalMode() === 'create' ? 'create_error_code' : 'update_error_code';
+        this.errorHandler.handleError(error, context);
+      }
     });
   }
 
@@ -279,8 +288,11 @@ export class ErrorCodeManagementComponent implements OnInit {
     if (!confirm('Are you sure you want to delete this error code?')) return;
 
     this.errorCodeService.deleteErrorCode(id).subscribe({
-      next: () => this.loadErrorCodes(),
-      error: (error) => console.error('Error deleting error code:', error)
+      next: () => {
+        this.toastService.success('Error code deleted successfully');
+        this.loadErrorCodes();
+      },
+      error: (error) => this.errorHandler.handleError(error, 'delete_error_code')
     });
   }
 
