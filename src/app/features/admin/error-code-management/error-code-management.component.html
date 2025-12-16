@@ -16,7 +16,7 @@
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
-          Create New Error Code
+          Create
         </button>
       </div>
     </div>
@@ -73,15 +73,7 @@
               placeholder="{{ 'errorCode.search' | translate }}">
           </div>
 
-          <!-- Category Filter -->
-          <div class="filter-item">
-            <select class="form-control" [value]="selectedCategory() || ''" (change)="onCategoryChange($any($event.target).value)">
-              <option value="">{{ 'errorCode.allCategories' | translate }}</option>
-              @for (category of categories(); track category.id) {
-                <option [value]="category.id">{{ category.categoryName }}</option>
-              }
-            </select>
-          </div>
+
 
           <!-- Severity Filter -->
           <div class="filter-item">
@@ -178,10 +170,6 @@
                       <div class="meta-row">
                         <span class="label">Module</span>
                         <span class="value">{{ errorCode.moduleName || '-' }}</span>
-                      </div>
-                      <div class="meta-row">
-                        <span class="label">Category</span>
-                        <span class="value">{{ getCategoryName(errorCode.categoryId) }}</span>
                       </div>
                     </div>
                   </div>
@@ -304,22 +292,22 @@
           <!-- Module Name -->
           <div class="form-group">
             <label class="form-label">{{ 'errorCode.moduleName' | translate }}</label>
-            <input 
-              type="text" 
-              class="form-control"
-              [(ngModel)]="currentErrorCode()!.moduleName"
-              placeholder="e.g., Authentication">
-          </div>
-
-          <!-- Category -->
-          <div class="form-group">
-            <label class="form-label">{{ 'errorCode.category' | translate }}</label>
-            <select class="form-control" [(ngModel)]="currentErrorCode()!.categoryId">
-              <option [ngValue]="undefined">{{ 'errorCode.none' | translate }}</option>
-              @for (category of categories(); track category.id) {
-                <option [ngValue]="category.id">{{ category.categoryName }}</option>
-              }
-            </select>
+            <div class="module-input-container">
+              <input 
+                type="text" 
+                class="form-control"
+                [(ngModel)]="currentErrorCode()!.moduleName"
+                placeholder="e.g., Authentication"
+                list="modules-list">
+              <datalist id="modules-list">
+                @for (module of modules(); track module) {
+                  <option [value]="module">{{ module }}</option>
+                }
+              </datalist>
+            </div>
+            <small class="form-text text-muted">
+              Select from existing modules or type a new one
+            </small>
           </div>
 
           <!-- Severity -->

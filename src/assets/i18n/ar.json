@@ -24,7 +24,11 @@
     "viewAll": "عرض الكل",
     "manage": "إدارة",
     "page": "صفحة",
-    "of": "من"
+    "of": "من",
+    "profile": "الملف الشخصي",
+    "account": "الحساب",
+    "settings": "الإعدادات",
+    "userMenu": "قائمة المستخدم"
   },
   "landing": {
     "title": "المنصة الديناميكية",
@@ -518,8 +522,8 @@
     "subtitlePrefix": "إدارة إعدادات التطبيق",
     "selectAppPrompt": "اختر تطبيقًا لإدارة الإعدادات",
     "actions": {
-      "createGroupPrefix": "إنشاء مجموعة جديدة لـ",
-      "createConfigPrefix": "إنشاء إعداد جديد لـ"
+      "createGroupPrefix": "إنشاء مجموعة",
+      "createConfigPrefix": "إنشاء إعداد"
     },
     "noApp": {
       "selectAppTitle": "اختر تطبيقًا",

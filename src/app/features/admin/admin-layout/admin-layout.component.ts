@@ -319,18 +319,27 @@ import { ThemeService } from '../../../core/services/theme.service';
       inset: 0;
       background: rgba(0, 0, 0, 0.5);
       z-index: 99;
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
         width: 280px !important; /* Force full width on mobile when open */
+        box-shadow: none;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
       }
       
       .sidebar.open {
         transform: translateX(0);
-        box-shadow: 0 0 40px rgba(0,0,0,0.2);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
       }
     }
 
@@ -341,6 +350,10 @@ import { ThemeService } from '../../../core/services/theme.service';
       align-items: center;
       justify-content: space-between;
       height: 72px; /* Match Navbar height */
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     
     .logo-area {
@@ -500,6 +513,9 @@ import { ThemeService } from '../../../core/services/theme.service';
       border-bottom: 1px solid var(--border);
       background: var(--surface);
       padding: 0.75rem 2rem;
+      position: sticky;
+      top: 72px;
+      z-index: 40;
     }
     
     .app-selector-container {
@@ -528,6 +544,16 @@ import { ThemeService } from '../../../core/services/theme.service';
         padding: 0.75rem 1rem;
       }
     }
+    
+    @media (max-width: 480px) {
+      .app-selector-bar {
+        padding: 0.5rem 0.75rem;
+      }
+      
+      .app-selector-container {
+        gap: 0.5rem;
+      }
+    }
 
     .content-wrapper {
       padding: 2rem;
@@ -535,11 +561,18 @@ import { ThemeService } from '../../../core/services/theme.service';
       margin: 0 auto;
       width: 100%;
       flex: 1;
+      min-height: 0; /* Prevent flex overflow */
     }
 
     @media (max-width: 768px) {
       .content-wrapper {
         padding: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .content-wrapper {
+        padding: 0.75rem;
       }
     }
     

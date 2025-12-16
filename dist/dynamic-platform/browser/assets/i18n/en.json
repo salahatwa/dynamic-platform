@@ -24,7 +24,11 @@
     "viewAll": "View All",
     "manage": "Manage",
     "page": "Page",
-    "of": "of"
+    "of": "of",
+    "profile": "Profile",
+    "account": "Account",
+    "settings": "Settings",
+    "userMenu": "User menu"
   },
   "landing": {
     "title": "Dynamic Platform",
@@ -143,7 +147,7 @@
     "minPassword": "Minimum 6 characters"
   },
   "admin": {
-    "dashboard": "Dashboard",
+    "dashboard": "Dy Platform",
     "translations": "Translations",
     "surveys": "Surveys",
     "templates": "Templates",
@@ -549,8 +553,8 @@
     "subtitlePrefix": "Manage configuration for app",
     "selectAppPrompt": "Select an app to manage configurations",
     "actions": {
-      "createGroupPrefix": "Create New Group for",
-      "createConfigPrefix": "Create New Configuration for"
+      "createGroupPrefix": "Create Group",
+      "createConfigPrefix": "Create Configuration"
     },
     "noApp": {
       "selectAppTitle": "Select an App",

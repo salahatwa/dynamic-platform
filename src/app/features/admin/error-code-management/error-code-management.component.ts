@@ -30,13 +30,13 @@ export class ErrorCodeManagementComponent implements OnInit {
   // Signals
   errorCodes = signal<ErrorCode[]>([]);
   categories = signal<ErrorCodeCategory[]>([]);
+  modules = signal<string[]>([]);
   loading = signal(false);
   totalElements = signal(0);
   currentPage = signal(0);
   pageSize = signal(20);
 
   // Filters
-  selectedCategory = signal<number | undefined>(undefined);
   selectedSeverity = signal<ErrorSeverity | undefined>(undefined);
   selectedStatus = signal<ErrorStatus | undefined>(undefined);
   searchTerm = signal('');
@@ -86,7 +86,6 @@ export class ErrorCodeManagementComponent implements OnInit {
   // Computed
   totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()));
   hasFilters = computed(() => 
-    !!this.selectedCategory() || 
     !!this.selectedSeverity() || 
     !!this.selectedStatus() || 
     !!this.searchTerm()
@@ -131,6 +130,7 @@ export class ErrorCodeManagementComponent implements OnInit {
       console.log('App changed from', this.lastLoadedAppId, 'to', app.id, '- loading data');
       this.lastLoadedAppId = app.id;
       this.loadCategories();
+      this.loadModules();
       this.loadErrorCodes();
     } else {
       console.log('Same app, skipping data load');
@@ -154,7 +154,7 @@ export class ErrorCodeManagementComponent implements OnInit {
       this.currentPage(),
       this.pageSize(),
       app.name, // Use app name for now, will be updated to appId in backend
-      this.selectedCategory(),
+      undefined, // Remove category filter
       this.selectedSeverity(),
       this.selectedStatus(),
       this.searchTerm() || undefined
@@ -178,16 +178,21 @@ export class ErrorCodeManagementComponent implements OnInit {
     });
   }
 
+  loadModules() {
+    const app = this.selectedApp();
+    if (!app) {
+      this.modules.set([]);
+      return;
+    }
+
+    this.errorCodeService.getDistinctModules(app.name).subscribe({
+      next: (modules) => this.modules.set(modules.filter(m => m != null && m.trim() !== '')),
+      error: (error) => this.errorHandler.handleError(error, 'load_error_code_modules')
+    });
+  }
+
 
   // ==================== FILTER ACTIONS ====================
-
-
-
-  onCategoryChange(value: string) {
-    this.selectedCategory.set(value ? Number(value) : undefined);
-    this.currentPage.set(0);
-    this.loadErrorCodes();
-  }
 
   onSeverityChange(value: string) {
     this.selectedSeverity.set(value ? value as ErrorSeverity : undefined);
@@ -207,7 +212,6 @@ export class ErrorCodeManagementComponent implements OnInit {
   }
 
   clearFilters() {
-    this.selectedCategory.set(undefined);
     this.selectedSeverity.set(undefined);
     this.selectedStatus.set(undefined);
     this.searchTerm.set('');

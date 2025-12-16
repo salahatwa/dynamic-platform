@@ -51,22 +51,27 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
           
           <!-- Right Section: Toggle + Actions -->
           <div class="navbar-right">
-            <!-- Mobile Menu Toggle (Public Only) -->
-            @if (mode === 'public') {
-              <button class="navbar-toggle" 
-                      (click)="toggleMenu()" 
-                      [class.active]="menuOpen"
-                      [attr.aria-expanded]="menuOpen"
-                      aria-label="Toggle menu"
-                      aria-controls="primary-menu">
-                <span class="toggle-line"></span>
-                <span class="toggle-line"></span>
-                <span class="toggle-line"></span>
-              </button>
-            }
+            <!-- Mobile Menu Toggle (Both Public and Admin) -->
+            <button class="navbar-toggle" 
+                    (click)="toggleMenu()" 
+                    [class.active]="menuOpen"
+                    [attr.aria-expanded]="menuOpen"
+                    aria-label="Toggle menu"
+                    aria-controls="primary-menu">
+              <span class="toggle-line"></span>
+              <span class="toggle-line"></span>
+              <span class="toggle-line"></span>
+            </button>
 
             <!-- Actions / Menu -->
             <div class="navbar-menu" [class.open]="menuOpen" [class.admin-menu]="mode === 'admin'" id="primary-menu">
+              <!-- Mobile Menu Close Button -->
+              <!-- <button class="mobile-close-btn" (click)="closeMenu()" aria-label="Close menu">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button> -->
+              
               <div class="navbar-actions">
               <!-- Language Selector -->
               <div class="dropdown" #langDropdown>
@@ -172,22 +177,48 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
               <!-- Admin Navigation Links -->
               @if (mode === 'admin') {
-                <div class="user-profile">
-                   <button class="icon-btn profile-btn" (click)="logout()">
+                <div class="user-profile dropdown" #userDropdown>
+                  <button class="icon-btn profile-btn" 
+                          (click)="toggleUserMenu($event)"
+                          [class.active]="userMenuOpen"
+                          aria-label="User menu">
                     <div class="avatar">
-                      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                      </svg>
+                      <span class="avatar-initials">{{ userInitials }}</span>
                     </div>
-                     <span class="logout-text">{{ 'common.logout' | translate }}</span>
+                    <div class="user-info">
+                      <span class="user-name">{{ userName }}</span>
+                      <!-- <span class="user-email">{{ currentUser?.email }}</span> -->
+                    </div>
+                    <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                      <path d="M6 8L2 4h8L6 8z"/>
+                    </svg>
                   </button>
+                  @if (userMenuOpen) {
+                    <div class="dropdown-menu user-dropdown-menu">
+                      <div class="user-info-header">
+                        <div class="avatar-large">
+                          <span class="avatar-initials">{{ userInitials }}</span>
+                        </div>
+                        <div class="user-details">
+                          <div class="user-name-large">{{ userName }}</div>
+                          <div class="user-email-small">{{ currentUser?.email }}</div>
+                        </div>
+                      </div>
+                      <div class="dropdown-divider"></div>
+                      <button class="dropdown-item" (click)="logout()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        <span>{{ 'common.logout' | translate }}</span>
+                      </button>
+                    </div>
+                  }
                 </div>
               }
             </div>
             </div>
-            @if (mode === 'public') {
-              <div class="mobile-overlay" [class.show]="menuOpen" (click)="closeMenu()"></div>
-            }
+            <div class="mobile-overlay" [class.show]="menuOpen" (click)="closeMenu()"></div>
           </div>
         </div>
       </div>
@@ -350,7 +381,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
     /* Mobile Menu Toggle */
     .navbar-toggle {
-      display: flex;
+      display: none; /* Hidden by default, shown on mobile */
       flex-direction: column;
       justify-content: center;
       gap: 5px;
@@ -365,9 +396,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       position: relative;
     }
     
-    @media (min-width: 768px) {
+    @media (max-width: 767px) {
       .navbar-toggle {
-        display: none;
+        display: flex;
       }
     }
 
@@ -387,11 +418,11 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         gap: 0.5rem;
         flex: 1 1 auto;
         min-width: 0;
-        padding-inline-end: 56px;
+        padding-inline-end: 100px; /* More space for both toggles in admin mode */
       }
       
       .navbar-right {
-        gap: 0.5rem;
+        gap: 0.25rem;
         flex: 0 0 auto;
         margin-left: auto;
         position: relative !important;
@@ -401,21 +432,35 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         justify-content: flex-end !important;
       }
 
-      /* Place public hamburger toggle at the right edge */
+      /* Mobile navbar menu toggle positioning */
       .navbar-toggle {
-        position: static !important;
+        position: absolute !important;
+        right: 0.5rem !important;
+        top: 14px !important;
         z-index: 1002 !important;
       }
       
+      /* Admin sidebar toggle positioning */
       .menu-toggle {
         width: 40px;
         height: 40px;
         padding: 0.5rem;
         flex-shrink: 0;
         position: absolute !important;
-        right: 0.5rem !important;
+        right: 50px !important; /* Position to the left of navbar toggle */
         top: 16px !important;
         z-index: 1002 !important;
+      }
+      
+      /* RTL adjustments */
+      [dir="rtl"] .navbar-toggle {
+        right: auto !important;
+        left: 0.5rem !important;
+      }
+      
+      [dir="rtl"] .menu-toggle {
+        right: auto !important;
+        left: 50px !important;
       }
       
       .brand-text {
@@ -424,45 +469,73 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         }
       }
       
-      /* Mobile drawer menu from right */
+      /* Modern Professional Mobile Drawer */
       .navbar-menu {
         position: fixed !important;
-        top: 72px !important;
+        top: 0 !important;
         right: 0 !important;
         left: auto !important;
         bottom: 0 !important;
-        width: 82vw !important;
-        max-width: 380px;
-        background: var(--surface);
+        width: 90vw !important;
+        max-width: 420px;
+        background: var(--surface) !important;
+        backdrop-filter: blur(24px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
         border-left: 1px solid var(--border) !important;
-        box-shadow: -12px 0 32px rgba(0, 0, 0, 0.2);
+        box-shadow: -20px 0 60px rgba(0, 0, 0, 0.15), 
+                    -8px 0 32px rgba(0, 0, 0, 0.1),
+                    inset 1px 0 0 rgba(255, 255, 255, 0.1) !important;
         transform: translateX(100%) !important;
-        opacity: 1;
-        visibility: visible;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
         z-index: 1001;
-        padding: 1rem;
-        border-radius: 12px 0 0 0;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        max-height: calc(100vh - 72px);
+        padding: 0 !important;
+        border-radius: 24px 0 0 24px !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
       }
       
       .navbar-menu.open {
         transform: translateX(0) !important;
-        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
       }
 
-      /* RTL: open drawer from left */
-      [dir="rtl"] .navbar-menu {
-        right: auto;
-        left: 0;
-        border-left: none;
-        border-right: 1px solid var(--border);
-        transform: translateX(-100%);
-        box-shadow: 12px 0 32px rgba(0, 0, 0, 0.2);
+      /* Dark mode enhancements */
+      :host-context([data-theme="dark"]) .navbar-menu,
+      [data-theme="dark"] .navbar-menu {
+        background: rgba(15, 23, 42, 0.95) !important;
+        border-left-color: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: -20px 0 60px rgba(0, 0, 0, 0.4), 
+                    -8px 0 32px rgba(0, 0, 0, 0.3),
+                    inset 1px 0 0 rgba(255, 255, 255, 0.05) !important;
       }
-      [dir="rtl"] .navbar-menu.open { transform: translateX(0); }
+
+      /* RTL: Professional drawer from left */
+      [dir="rtl"] .navbar-menu {
+        right: auto !important;
+        left: 0 !important;
+        border-left: none !important;
+        border-right: 1px solid var(--border) !important;
+        transform: translateX(-100%) !important;
+        box-shadow: 20px 0 60px rgba(0, 0, 0, 0.15), 
+                    8px 0 32px rgba(0, 0, 0, 0.1),
+                    inset -1px 0 0 rgba(255, 255, 255, 0.1) !important;
+        border-radius: 0 24px 24px 0 !important;
+      }
+      
+      [dir="rtl"] .navbar-menu.open { 
+        transform: translateX(0) !important; 
+      }
+      
+      [dir="rtl"][data-theme="dark"] .navbar-menu {
+        border-right-color: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 20px 0 60px rgba(0, 0, 0, 0.4), 
+                    8px 0 32px rgba(0, 0, 0, 0.3),
+                    inset -1px 0 0 rgba(255, 255, 255, 0.05) !important;
+      }
 
       /* Keep navbar-right anchored to the physical right even in RTL */
       [dir="rtl"] .navbar-right {
@@ -484,21 +557,104 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         opacity: 1;
         visibility: visible;
         border-radius: 0;
+        padding: 0;
+        max-height: none;
+        overflow: visible;
+      }
+      
+      /* Mobile Menu Header */
+      .navbar-menu::before {
+        content: '';
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        background: linear-gradient(135deg, 
+          rgba(99, 102, 241, 0.1) 0%, 
+          rgba(168, 85, 247, 0.1) 100%);
+        border-bottom: 1px solid var(--border);
+        z-index: 10;
+        display: block;
+      }
+      
+      /* Mobile Menu Close Button */
+      .mobile-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        z-index: 11;
+      }
+      
+      .mobile-close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: var(--primary);
+        transform: scale(1.05);
+        color: var(--primary);
+      }
+      
+      [dir="rtl"] .mobile-close-btn {
+        right: auto;
+        left: 20px;
+      }
+      
+      /* Dark mode close button */
+      :host-context([data-theme="dark"]) .mobile-close-btn,
+      [data-theme="dark"] .mobile-close-btn {
+        background: rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      :host-context([data-theme="dark"]) .mobile-close-btn:hover,
+      [data-theme="dark"] .mobile-close-btn:hover {
+        background: rgba(0, 0, 0, 0.3);
       }
       
       .navbar-actions {
         flex-direction: column;
-        padding: 1rem;
-        gap: 0.75rem;
+        padding: 6rem 2rem 2rem;
+        gap: 1.5rem;
+        align-items: stretch;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Mobile menu section headers */
+      .navbar-actions::before {
+        content: 'Menu';
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-secondary);
+        margin-bottom: -0.5rem;
+        padding-left: 0.5rem;
       }
       
       .admin-menu .navbar-actions {
         flex-direction: row;
         padding: 0;
-        gap: 0.5rem;
+        gap: 0.25rem;
+        align-items: center;
+        flex: none;
+        overflow: visible;
       }
       
-      /* Mobile dropdown adjustments inside drawer */
+      /* Professional Mobile Dropdown Menus */
       .dropdown-menu {
         position: static !important;
         right: auto !important;
@@ -506,24 +662,173 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         width: 100% !important;
         max-width: none !important;
         z-index: 1002 !important;
-        box-shadow: none;
-        border: 1px solid var(--border);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    0 4px 16px rgba(0, 0, 0, 0.1) !important;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        margin-top: 0.75rem;
+        background: var(--surface-elevated);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        overflow: hidden;
+        animation: slideDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
       
-      /* Mobile icon buttons */
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      
+      /* Dark mode dropdown */
+      :host-context([data-theme="dark"]) .dropdown-menu,
+      [data-theme="dark"] .dropdown-menu {
+        background: rgba(30, 41, 59, 0.9) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                    0 4px 16px rgba(0, 0, 0, 0.3) !important;
+      }
+      
+      /* Admin mode dropdown positioning */
+      .admin-menu .dropdown-menu {
+        position: absolute !important;
+        top: calc(100% + 0.5rem) !important;
+        right: 0 !important;
+        left: auto !important;
+        width: auto !important;
+        min-width: 280px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        margin-top: 0;
+      }
+      
+      [dir="rtl"] .admin-menu .dropdown-menu {
+        right: auto !important;
+        left: 0 !important;
+      }
+      
+      /* Professional Mobile Icon Buttons */
       .icon-btn {
-        min-width: 44px;
-        min-height: 44px;
-        padding: 0.75rem;
-        border-width: 1px;
+        min-width: 56px;
+        min-height: 56px;
+        padding: 1rem;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface-elevated);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        position: relative;
+        overflow: hidden;
       }
       
-      /* Mobile user profile */
-      .user-profile {
-        .profile-btn {
-          .logout-text {
-            display: none;
-          }
+      .icon-btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, 
+          rgba(99, 102, 241, 0.05) 0%, 
+          rgba(168, 85, 247, 0.05) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      
+      .icon-btn:hover::before,
+      .icon-btn.active::before {
+        opacity: 1;
+      }
+      
+      .icon-btn:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+      }
+      
+      .icon-btn.active {
+        border-color: var(--primary);
+        background: var(--primary-light);
+        color: var(--primary);
+      }
+      
+      /* Dark mode button enhancements */
+      :host-context([data-theme="dark"]) .icon-btn,
+      [data-theme="dark"] .icon-btn {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      }
+      
+      :host-context([data-theme="dark"]) .icon-btn:hover,
+      [data-theme="dark"] .icon-btn:hover {
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+      }
+      
+      /* Professional Mobile User Profile */
+      .user-profile .profile-btn {
+        padding: 1rem 1.25rem;
+        gap: 1rem;
+        min-width: auto;
+        border-radius: 20px;
+        background: linear-gradient(135deg, 
+          var(--primary) 0%, 
+          var(--secondary) 100%);
+        border: 2px solid transparent;
+        color: white;
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        
+        .user-info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          flex: 1;
+        }
+        
+        .user-name {
+          color: white;
+          font-weight: 700;
+          font-size: 1rem;
+          max-width: none;
+        }
+        
+        .dropdown-arrow {
+          display: block;
+          color: rgba(255, 255, 255, 0.8);
+        }
+      }
+      
+      .user-profile .profile-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      
+      .user-profile .profile-btn.active {
+        background: linear-gradient(135deg, 
+          var(--secondary) 0%, 
+          var(--primary) 100%);
+        box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+      }
+      
+      .admin-menu .user-profile .profile-btn {
+        padding: 0.375rem 0.5rem;
+        gap: 0.5rem;
+        border-radius: 12px;
+        background: transparent;
+        border: 2px solid var(--border);
+        color: var(--text);
+        box-shadow: none;
+        
+        .user-info {
+          display: none;
+        }
+        
+        .dropdown-arrow {
+          display: none;
         }
       }
     }
@@ -544,17 +849,62 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       }
     }
     
-    .toggle-line {
-      width: 22px;
-      height: 2.5px;
-      background: var(--text);
-      border-radius: 2px;
-      transition: all 0.3s; 
+    .navbar-toggle {
+      background: var(--surface-elevated);
+      border: 2px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     
-    .navbar-toggle.active .toggle-line:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
-    .navbar-toggle.active .toggle-line:nth-child(2) { opacity: 0; }
-    .navbar-toggle.active .toggle-line:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+    .navbar-toggle:hover {
+      background: var(--surface-hover);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+    
+    .navbar-toggle.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    }
+    
+    .toggle-line {
+      width: 20px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .navbar-toggle.active .toggle-line {
+      background: var(--primary);
+    }
+    
+    .navbar-toggle.active .toggle-line:nth-child(1) { 
+      transform: translateY(7px) rotate(45deg); 
+    }
+    .navbar-toggle.active .toggle-line:nth-child(2) { 
+      opacity: 0; 
+      transform: scale(0.8);
+    }
+    .navbar-toggle.active .toggle-line:nth-child(3) { 
+      transform: translateY(-7px) rotate(-45deg); 
+    }
+    
+    /* Dark mode toggle */
+    :host-context([data-theme="dark"]) .navbar-toggle,
+    [data-theme="dark"] .navbar-toggle {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    :host-context([data-theme="dark"]) .navbar-toggle:hover,
+    [data-theme="dark"] .navbar-toggle:hover {
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
 
 
     /* Navigation Menu */
@@ -686,24 +1036,145 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     .dropdown-item:hover { background: var(--surface-hover); color: var(--primary); }
     .dropdown-item.active { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
 
-    /* Profile Button */
+    /* User Profile & Avatar */
+    .user-profile {
+      position: relative;
+    }
+    
     .profile-btn {
       border: 1px solid var(--border);
       padding: 0.375rem 0.75rem;
       gap: 0.75rem;
       white-space: nowrap;
+      min-width: 0;
+      max-width: 280px;
+    }
+    
+    .profile-btn:hover {
+      border-color: var(--primary);
+      background: var(--surface-hover);
+    }
+    
+    .profile-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
     }
     
     .avatar {
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: var(--primary-light);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      font-weight: 600;
+      font-size: 0.875rem;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+    }
+    
+    .avatar-initials {
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 0;
+      flex: 1;
+    }
+    
+    .user-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+    
+    .user-email {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+    
+    /* User Dropdown Menu */
+    .user-dropdown-menu {
+      min-width: 280px;
+      padding: 0;
+    }
+    
+    .user-info-header {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      padding: 1rem;
+      background: var(--surface-hover);
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .avatar-large {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 1.125rem;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+    
+    .user-details {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .user-name-large {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .user-email-small {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+    
+    .user-dropdown-menu .dropdown-item {
+      padding: 0.875rem 1rem;
+      margin: 0;
+      border-radius: 0;
+    }
+    
+    .user-dropdown-menu .dropdown-item:last-child {
+      border-radius: 0 0 12px 12px;
     }
     
     .logout-text {
@@ -735,19 +1206,76 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         white-space: nowrap;
     }
     .nav-link:hover { background: var(--surface-hover); color: var(--text); }
-    .navbar-actions .nav-link,
-    .navbar-actions .btn { width: 100%; justify-content: center; }
+    
+    /* Mobile nav links and buttons */
+    @media (max-width: 767px) {
+      .navbar-actions .nav-link,
+      .navbar-actions .btn { 
+        width: 100%; 
+        justify-content: flex-start;
+        padding: 1rem 1.25rem;
+        border-radius: 16px;
+        font-weight: 600;
+        gap: 1rem;
+        min-height: 56px;
+        background: var(--surface-elevated);
+        border: 2px solid var(--border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      
+      .navbar-actions .nav-link:hover,
+      .navbar-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15);
+        border-color: var(--primary);
+      }
+      
+      .navbar-actions .btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+      }
+      
+      .navbar-actions .btn-primary:hover {
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        transform: translateY(-3px);
+      }
+      
+      .navbar-actions .btn-outline {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border);
+      }
+    }
 
     .mobile-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.35);
+      background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.4) 0%, 
+        rgba(15, 23, 42, 0.6) 100%);
+      backdrop-filter: blur(8px) saturate(120%);
+      -webkit-backdrop-filter: blur(8px) saturate(120%);
       opacity: 0;
       visibility: hidden;
-      transition: all 0.25s ease;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       z-index: 999;
     }
-    .mobile-overlay.show { opacity: 1; visibility: visible; }
+    
+    .mobile-overlay.show { 
+      opacity: 1; 
+      visibility: visible; 
+    }
+    
+    /* Dark mode overlay */
+    :host-context([data-theme="dark"]) .mobile-overlay,
+    [data-theme="dark"] .mobile-overlay {
+      background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.6) 0%, 
+        rgba(15, 23, 42, 0.8) 100%);
+    }
   `]
 })
 export class NavbarComponent {
@@ -765,6 +1293,32 @@ export class NavbarComponent {
 
   menuOpen = false;
   langMenuOpen = false;
+  userMenuOpen = false;
+  
+  // User info
+  get currentUser() {
+    const userInfo = localStorage.getItem('userInfo');
+    return userInfo ? JSON.parse(userInfo) : null;
+  }
+  
+  get userInitials() {
+    const user = this.currentUser;
+    if (!user) return 'U';
+    
+    const firstInitial = user.firstName?.charAt(0)?.toUpperCase() || '';
+    const lastInitial = user.lastName?.charAt(0)?.toUpperCase() || '';
+    return firstInitial + lastInitial || user.email?.charAt(0)?.toUpperCase() || 'U';
+  }
+  
+  get userName() {
+    const user = this.currentUser;
+    if (!user) return 'User';
+    
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    return user.name || user.email || 'User';
+  }
 
   constructor() {
     console.log('NavbarComponent initialized');
@@ -781,8 +1335,9 @@ export class NavbarComponent {
     this.onDocumentClick = (event: Event) => {
       const target = event.target as HTMLElement;
       const dropdown = target.closest('.dropdown');
-      if (!dropdown && this.langMenuOpen) {
+      if (!dropdown) {
         this.langMenuOpen = false;
+        this.userMenuOpen = false;
       }
     };
     document.addEventListener('click', this.onDocumentClick);
@@ -790,12 +1345,14 @@ export class NavbarComponent {
     this.router.events.subscribe(() => {
       this.menuOpen = false;
       this.langMenuOpen = false;
+      this.userMenuOpen = false;
     });
 
     document.addEventListener('keydown', (e) => {
       if (e instanceof KeyboardEvent && e.key === 'Escape') {
         this.menuOpen = false;
         this.langMenuOpen = false;
+        this.userMenuOpen = false;
       }
     });
   }
@@ -820,17 +1377,16 @@ export class NavbarComponent {
 
   toggleLangMenu(event: Event) {
     event.stopPropagation();
-    console.log('toggleLangMenu called, current state:', this.langMenuOpen);
     this.langMenuOpen = !this.langMenuOpen;
-    console.log('toggleLangMenu new state:', this.langMenuOpen);
+    this.userMenuOpen = false; // Close user menu when opening lang menu
     this.cdr.detectChanges();
-    
-    // Debug: Check if dropdown menu exists in DOM
-    setTimeout(() => {
-      const dropdown = document.querySelector('.dropdown-menu');
-      console.log('Dropdown menu element:', dropdown);
-      console.log('Dropdown display:', dropdown ? window.getComputedStyle(dropdown).display : 'not found');
-    }, 50);
+  }
+  
+  toggleUserMenu(event: Event) {
+    event.stopPropagation();
+    this.userMenuOpen = !this.userMenuOpen;
+    this.langMenuOpen = false; // Close lang menu when opening user menu
+    this.cdr.detectChanges();
   }
 
   toggleTheme() {

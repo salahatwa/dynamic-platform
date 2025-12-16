@@ -70,6 +70,12 @@ export class ErrorCodeService {
     return this.http.get<string[]>(`${this.apiUrl}/apps`);
   }
 
+  getDistinctModules(appName?: string): Observable<string[]> {
+    let params = new HttpParams();
+    if (appName) params = params.set('appName', appName);
+    return this.http.get<string[]>(`${this.apiUrl}/modules`, { params });
+  }
+
   // ==================== CATEGORY OPERATIONS ====================
 
   createCategory(request: Partial<ErrorCodeCategory>): Observable<ErrorCodeCategory> {

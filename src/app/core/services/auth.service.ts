@@ -30,6 +30,12 @@ export interface UserInfo {
   corporateName: string | null;
 }
 
+export interface CurrentUser {
+  token: string;
+  user?: UserInfo;
+  permissions?: string[];
+}
+
 export interface AuthResponse {
   token: string;
   permissions: string[];
