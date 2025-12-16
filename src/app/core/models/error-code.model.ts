@@ -106,7 +106,10 @@ export interface ErrorCodeRequest {
 
 export interface ErrorCodeSettings {
   id?: number;
-  corporateId: number;
+  app?: {
+    id: number;
+    name: string;
+  };
   prefix: string;
   sequenceLength: number;
   currentSequence: number;

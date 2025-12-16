@@ -7,11 +7,11 @@
           <input type="text" class="template-name-input" [(ngModel)]="templateName" placeholder="Enter template name"
             (blur)="updateTemplateName()">
         </h1>
-        <p class="page-subtitle">
+        <!-- <p class="page-subtitle">
           <span class="template-type-badge">{{ templateType() }}</span>
-          <!-- <span class="separator">•</span>
-          <span>{{ isHtmlType() ? 'HTML Template Editor' : 'Text Template Editor' }}</span> -->
-        </p>
+           <span class="separator">•</span>
+          <span>{{ isHtmlType() ? 'HTML Template Editor' : 'Text Template Editor' }}</span> 
+        </p> -->
       </div>
       <div class="header-actions">
         <button class="btn btn-outline" (click)="saveTemplate()" [disabled]="saving()">

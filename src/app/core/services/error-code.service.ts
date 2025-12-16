@@ -117,24 +117,30 @@ export class ErrorCodeService {
 
   // ==================== AUTO-GENERATION OPERATIONS ====================
 
-  getErrorCodeSettings(): Observable<ErrorCodeSettings> {
-    return this.http.get<ErrorCodeSettings>(`${this.apiUrl}/settings`);
+  getErrorCodeSettings(appName: string): Observable<ErrorCodeSettings> {
+    const params = new HttpParams().set('appName', appName);
+    return this.http.get<ErrorCodeSettings>(`${this.apiUrl}/settings`, { params });
   }
 
-  updateErrorCodeSettings(request: ErrorCodeSettingsRequest): Observable<ErrorCodeSettings> {
-    return this.http.put<ErrorCodeSettings>(`${this.apiUrl}/settings`, request);
+  updateErrorCodeSettings(appName: string, request: ErrorCodeSettingsRequest): Observable<ErrorCodeSettings> {
+    const params = new HttpParams().set('appName', appName);
+    return this.http.put<ErrorCodeSettings>(`${this.apiUrl}/settings`, request, { params });
   }
 
-  generateNextErrorCode(): Observable<ErrorCodeGenerationResponse> {
-    return this.http.post<ErrorCodeGenerationResponse>(`${this.apiUrl}/generate`, {});
+  generateNextErrorCode(appName: string): Observable<ErrorCodeGenerationResponse> {
+    const params = new HttpParams().set('appName', appName);
+    return this.http.post<ErrorCodeGenerationResponse>(`${this.apiUrl}/generate`, {}, { params });
   }
 
-  previewNextErrorCode(): Observable<ErrorCodeGenerationResponse> {
-    return this.http.get<ErrorCodeGenerationResponse>(`${this.apiUrl}/preview`);
+  previewNextErrorCode(appName: string): Observable<ErrorCodeGenerationResponse> {
+    const params = new HttpParams().set('appName', appName);
+    return this.http.get<ErrorCodeGenerationResponse>(`${this.apiUrl}/preview`, { params });
   }
 
-  checkErrorCodeUnique(errorCode: string): Observable<boolean> {
-    const params = new HttpParams().set('errorCode', errorCode);
+  checkErrorCodeUnique(appName: string, errorCode: string): Observable<boolean> {
+    const params = new HttpParams()
+      .set('appName', appName)
+      .set('errorCode', errorCode);
     return this.http.get<boolean>(`${this.apiUrl}/check-unique`, { params });
   }
 }

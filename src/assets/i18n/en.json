@@ -147,7 +147,7 @@
     "minPassword": "Minimum 6 characters"
   },
   "admin": {
-    "dashboard": "Dy Platform",
+    "dashboard": "Dashboard",
     "translations": "Translations",
     "surveys": "Surveys",
     "templates": "Templates",

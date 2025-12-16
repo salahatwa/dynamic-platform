@@ -452,7 +452,10 @@ export class ErrorCodeManagementComponent implements OnInit {
   // ==================== AUTO-GENERATION METHODS ====================
 
   loadErrorCodeSettings() {
-    this.errorCodeService.getErrorCodeSettings().subscribe({
+    const app = this.selectedApp();
+    if (!app) return;
+
+    this.errorCodeService.getErrorCodeSettings(app.name).subscribe({
       next: (settings) => {
         this.errorCodeSettings.set(settings);
         this.updatePreviewCode();
@@ -472,10 +475,11 @@ export class ErrorCodeManagementComponent implements OnInit {
 
   saveErrorCodeSettings() {
     const settings = this.errorCodeSettings();
-    if (!settings) return;
+    const app = this.selectedApp();
+    if (!settings || !app) return;
 
     this.saving.set(true);
-    this.errorCodeService.updateErrorCodeSettings(settings).subscribe({
+    this.errorCodeService.updateErrorCodeSettings(app.name, settings).subscribe({
       next: (updatedSettings) => {
         this.errorCodeSettings.set(updatedSettings);
         this.toastService.success('Error code settings updated successfully');
@@ -490,8 +494,11 @@ export class ErrorCodeManagementComponent implements OnInit {
   }
 
   generateErrorCode() {
+    const app = this.selectedApp();
+    if (!app) return;
+
     this.generatingCode.set(true);
-    this.errorCodeService.generateNextErrorCode().subscribe({
+    this.errorCodeService.generateNextErrorCode(app.name).subscribe({
       next: (response) => {
         const errorCode = this.currentErrorCode();
         if (errorCode) {
@@ -510,7 +517,10 @@ export class ErrorCodeManagementComponent implements OnInit {
   }
 
   updatePreviewCode() {
-    this.errorCodeService.previewNextErrorCode().subscribe({
+    const app = this.selectedApp();
+    if (!app) return;
+
+    this.errorCodeService.previewNextErrorCode(app.name).subscribe({
       next: (response) => {
         this.previewCode.set(response.generatedCode);
       },
