@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './shared/components/navbar/navbar.component';
+import { UnifiedHeaderComponent } from './shared/components/unified-header/unified-header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 import { trigger, transition, style, query, animate } from '@angular/animations';
@@ -18,10 +18,10 @@ const routeAnimations = trigger('routeAnimations', [
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastContainerComponent],
+  imports: [RouterOutlet, UnifiedHeaderComponent, FooterComponent, ToastContainerComponent],
   animations: [routeAnimations],
   template: `
-    @if (!isAdminRoute()) { <app-navbar></app-navbar> }
+    @if (!isAdminRoute()) { <app-unified-header [mode]="'public'"></app-unified-header> }
     <div class="route-anim" [@routeAnimations]="getRouteAnimationState()">
       <router-outlet #outlet="outlet"></router-outlet>
     </div>

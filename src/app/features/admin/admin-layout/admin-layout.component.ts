@@ -3,15 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
-import { AppSelectorComponent } from '../../../shared/components/app-selector/app-selector.component';
+import { UnifiedHeaderComponent } from '../../../shared/components/unified-header/unified-header.component';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, NavbarComponent, AppSelectorComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, UnifiedHeaderComponent],
   template: `
     <div class="admin-layout" [attr.dir]="currentLanguage() === 'ar' ? 'rtl' : 'ltr'">
       <!-- Mobile Overlay -->
@@ -227,34 +226,14 @@ import { ThemeService } from '../../../core/services/theme.service';
       </aside>
       
       <main class="main-content" [class.expanded]="sidebarCollapsed()">
-        <!-- Admin Navbar with App Selector -->
+        <!-- Unified Header -->
         <div class="admin-header">
-          <app-navbar 
+          <app-unified-header 
               [mode]="'admin'" 
               [fluid]="true" 
-              [sidebarOpen]="sidebarOpen()"
               [showBrand]="isMobile()"
               (toggleSidebar)="toggleSidebar()">
-          </app-navbar>
-          
-          <!-- App Selector Bar -->
-          @if (appContext.hasApps()) {
-            <div class="app-selector-bar">
-              <div class="app-selector-container">
-                <app-selector />
-                
-                <!-- @if (appContext.selectedApp(); as app) {
-                  <div class="app-info-badge">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>{{ app.appKey }}</span>
-                  </div>
-                } -->
-              </div>
-            </div>
-          }
+          </app-unified-header>
         </div>
 
         <div class="content-wrapper">
@@ -349,7 +328,7 @@ import { ThemeService } from '../../../core/services/theme.service';
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 72px; /* Match Navbar height */
+      height: 64px; /* Match Unified Header height */
       background: var(--surface);
       position: sticky;
       top: 0;
@@ -507,52 +486,6 @@ import { ThemeService } from '../../../core/services/theme.service';
       top: 0;
       z-index: 50;
       background: var(--background);
-    }
-    
-    .app-selector-bar {
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      padding: 0.75rem 2rem;
-      position: sticky;
-      top: 72px;
-      z-index: 40;
-    }
-    
-    .app-selector-container {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-    
-    .app-info-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      background: var(--background);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      font-family: 'Courier New', monospace;
-    }
-    
-    @media (max-width: 768px) {
-      .app-selector-bar {
-        padding: 0.75rem 1rem;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .app-selector-bar {
-        padding: 0.5rem 0.75rem;
-      }
-      
-      .app-selector-container {
-        gap: 0.5rem;
-      }
     }
 
     .content-wrapper {
