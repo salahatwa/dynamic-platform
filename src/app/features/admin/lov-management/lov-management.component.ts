@@ -1,10 +1,12 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LovService } from '../../../core/services/lov.service';
 import { Lov, LovRequest, LovType, LovVersion, LovAudit } from '../../../core/models/lov.model';
 import { AppContextService } from '../../../core/services/app-context.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
@@ -112,6 +114,9 @@ export class LovManagementComponent implements OnInit {
     return Array.from(languages).sort();
   });
 
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
+
   constructor(
     private lovService: LovService,
     private router: Router,
@@ -152,8 +157,7 @@ export class LovManagementComponent implements OnInit {
         this.lovTypes.set(types);
       },
       error: (err) => {
-        console.error('Error loading LOV types:', err);
-        console.error('Error details:', err.error);
+        this.errorHandler.handleError(err, 'load_lov_types');
       }
     });
   }
@@ -196,7 +200,7 @@ export class LovManagementComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Error loading LOV pages:', err);
+        this.errorHandler.handleError(err, 'load_lov_pages');
         this.loading.set(false);
       }
     });
@@ -220,7 +224,7 @@ export class LovManagementComponent implements OnInit {
 
   saveLov() {
     if (!this.lovCode() || !this.lovName()) {
-      alert('Please fill in LOV Code and Name');
+      this.toastService.error('Validation Error', 'Please fill in LOV Code and Name');
       return;
     }
 
@@ -257,10 +261,10 @@ export class LovManagementComponent implements OnInit {
       next: () => {
         this.showDeleteModal.set(false);
         this.loadLovs();
+        this.toastService.success('LOV Deleted', 'LOV deleted successfully');
       },
       error: (err) => {
-        console.error('Error deleting LOV:', err);
-        alert('Error deleting LOV');
+        this.errorHandler.handleError(err, 'delete_lov');
       }
     });
   }
@@ -275,14 +279,14 @@ export class LovManagementComponent implements OnInit {
   loadVersions(lovId: number) {
     this.lovService.getLovVersions(lovId).subscribe({
       next: (versions) => this.versions.set(versions),
-      error: (err) => console.error('Error loading versions:', err)
+      error: (err) => this.errorHandler.handleError(err, 'load_lov_versions')
     });
   }
 
   loadAudit(lovId: number) {
     this.lovService.getLovAudit(lovId).subscribe({
       next: (audit) => this.auditLogs.set(audit),
-      error: (err) => console.error('Error loading audit:', err)
+      error: (err) => this.errorHandler.handleError(err, 'load_lov_audit')
     });
   }
 
@@ -295,11 +299,10 @@ export class LovManagementComponent implements OnInit {
         next: () => {
           this.loadLovs();
           this.loadVersions(lov.id);
-          alert('Version restored successfully');
+          this.toastService.success('Version Restored', 'Version restored successfully');
         },
         error: (err) => {
-          console.error('Error restoring version:', err);
-          alert('Error restoring version');
+          this.errorHandler.handleError(err, 'restore_lov_version');
         }
       });
     }
@@ -315,7 +318,7 @@ export class LovManagementComponent implements OnInit {
         a.click();
         window.URL.revokeObjectURL(url);
       },
-      error: (err) => console.error('Error exporting LOVs:', err)
+      error: (err) => this.errorHandler.handleError(err, 'export_lovs')
     });
   }
 

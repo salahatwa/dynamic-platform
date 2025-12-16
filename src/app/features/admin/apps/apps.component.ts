@@ -6,6 +6,8 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { AppService } from '../../../core/services/app.service';
 import { SubscriptionService } from '../../../core/services/subscription.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { App, AppStatus } from '../../../core/models/app.model';
 
 @Component({
@@ -20,6 +22,8 @@ export class AppsComponent implements OnInit {
   private appService = inject(AppService);
   private subscriptionService = inject(SubscriptionService);
   private router = inject(Router);
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
 
   // Signals
   apps = this.appContext.apps;
@@ -68,7 +72,7 @@ export class AppsComponent implements OnInit {
   loadLimits() {
     this.subscriptionService.getLimits().subscribe({
       next: (limits: any) => this.limits.set(limits),
-      error: (error: any) => console.error('Error loading limits:', error)
+      error: (error: any) => this.errorHandler.handleError(error, 'load_subscription_limits')
     });
   }
 
@@ -78,7 +82,7 @@ export class AppsComponent implements OnInit {
 
   createApp() {
     if (!this.canCreateMore()) {
-      alert('You have reached your app limit. Please upgrade your plan.');
+      this.toastService.warning('App Limit Reached', 'You have reached your app limit. Please upgrade your plan.');
       return;
     }
     this.router.navigate(['/admin/apps/create']);
@@ -99,11 +103,10 @@ export class AppsComponent implements OnInit {
     this.appService.archiveApp(app.id).subscribe({
       next: () => {
         this.appContext.removeApp(app.id);
-        alert('App archived successfully');
+        this.toastService.success('App Archived', 'App archived successfully');
       },
       error: (error) => {
-        console.error('Error archiving app:', error);
-        alert('Failed to archive app');
+        this.errorHandler.handleError(error, 'archive_app');
       }
     });
   }
@@ -114,11 +117,10 @@ export class AppsComponent implements OnInit {
     this.appService.restoreApp(app.id).subscribe({
       next: (restoredApp) => {
         this.appContext.updateApp(restoredApp);
-        alert('App restored successfully');
+        this.toastService.success('App Restored', 'App restored successfully');
       },
       error: (error) => {
-        console.error('Error restoring app:', error);
-        alert('Failed to restore app');
+        this.errorHandler.handleError(error, 'restore_app');
       }
     });
   }
@@ -133,11 +135,10 @@ export class AppsComponent implements OnInit {
     this.appService.deleteAppPermanently(app.id).subscribe({
       next: () => {
         this.appContext.removeApp(app.id);
-        alert('App deleted permanently');
+        this.toastService.success('App Deleted', 'App deleted permanently');
       },
       error: (error) => {
-        console.error('Error deleting app:', error);
-        alert('Failed to delete app');
+        this.errorHandler.handleError(error, 'delete_app_permanently');
       }
     });
   }

@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { InvitationService } from '../../../core/services/invitation.service';
 import { Invitation, InvitationRequest, InvitationStatus } from '../../../core/models/invitation.model';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../core/services/translation.service';
 
@@ -38,6 +40,9 @@ export class InvitationsComponent implements OnInit {
   };
 
   private t = inject(TranslationService);
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
+  
   constructor(
     private invitationService: InvitationService,
     private http: HttpClient
@@ -60,7 +65,7 @@ export class InvitationsComponent implements OnInit {
       error: (err) => {
         this.error.set(this.t.translate('invitations.error.loadFailed'));
         this.loading.set(false);
-        console.error('Error loading invitations:', err);
+        this.errorHandler.handleError(err, 'load_invitations');
       }
     });
   }
@@ -71,7 +76,7 @@ export class InvitationsComponent implements OnInit {
         this.availableRoles.set(roles);
       },
       error: (err) => {
-        console.error('Error loading roles:', err);
+        this.errorHandler.handleError(err, 'load_roles');
       }
     });
   }
@@ -129,13 +134,14 @@ export class InvitationsComponent implements OnInit {
         this.invitations.update(invs => [invitation, ...invs]);
         this.closeCreateDialog();
         this.submitting.set(false);
+        this.toastService.success('Invitation Sent', 'Invitation sent successfully');
       },
       error: (err) => {
-        console.error('Error creating invitation:', err);
+        this.submitting.set(false);
+        this.errorHandler.handleError(err, 'create_invitation');
         
-        // Extract user-friendly error message
+        // Also set form error for inline display
         let errorMessage = this.t.translate('invitations.alerts.createFailed');
-        
         if (err.error?.message) {
           errorMessage = err.error.message;
         } else if (err.error?.error) {
@@ -143,9 +149,7 @@ export class InvitationsComponent implements OnInit {
         } else if (err.message) {
           errorMessage = err.message;
         }
-        
         this.formError.set(errorMessage);
-        this.submitting.set(false);
       }
     });
   }
@@ -160,10 +164,10 @@ export class InvitationsComponent implements OnInit {
         this.invitations.update(invs =>
           invs.map(inv => inv.id === id ? { ...inv, status: InvitationStatus.CANCELLED } : inv)
         );
+        this.toastService.success('Invitation Cancelled', 'Invitation cancelled successfully');
       },
       error: (err) => {
-        alert(this.t.translate('invitations.alerts.cancelFailed') + ': ' + (err.error?.error || 'Unknown error'));
-        console.error('Error cancelling invitation:', err);
+        this.errorHandler.handleError(err, 'cancel_invitation');
       }
     });
   }
@@ -175,10 +179,10 @@ export class InvitationsComponent implements OnInit {
           invs.map(inv => inv.id === id ? { ...inv, status: InvitationStatus.CANCELLED } : inv)
         );
         this.invitations.update(invs => [newInvitation, ...invs]);
+        this.toastService.success('Invitation Resent', 'Invitation resent successfully');
       },
       error: (err) => {
-        alert(this.t.translate('invitations.alerts.resendFailed') + ': ' + (err.error?.error || 'Unknown error'));
-        console.error('Error resending invitation:', err);
+        this.errorHandler.handleError(err, 'resend_invitation');
       }
     });
   }

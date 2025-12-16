@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { AppConfigService } from '../../../core/services/app-config.service';
 import { AppContextService } from '../../../core/services/app-context.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { 
   AppConfig, 
   AppConfigGroup, 
@@ -25,6 +27,8 @@ import {
 export class AppConfigManagementComponent implements OnInit {
   // Services
   private appContext = inject(AppContextService);
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
   
   // Data
   configs = signal<AppConfig[]>([]);
@@ -223,7 +227,7 @@ export class AppConfigManagementComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Error loading configs:', err);
+        this.errorHandler.handleError(err, 'load_app_configs');
         this.loading.set(false);
       }
     });
@@ -255,7 +259,7 @@ export class AppConfigManagementComponent implements OnInit {
         this.loadingGroups.set(false);
       },
       error: (err) => {
-        console.error('Error loading groups:', err);
+        this.errorHandler.handleError(err, 'load_app_config_groups');
         this.loadingGroups.set(false);
       }
     });
@@ -294,7 +298,7 @@ export class AppConfigManagementComponent implements OnInit {
 
   saveConfig() {
     if (!this.configKey() || !this.configName() || !this.appName()) {
-      alert('Please fill in required fields: Config Key, Config Name, and App Name');
+      this.toastService.error('Validation Error', 'Please fill in required fields: Config Key, Config Name, and App Name');
       return;
     }
 
@@ -327,11 +331,11 @@ export class AppConfigManagementComponent implements OnInit {
         this.saving.set(false);
         this.loadConfigs();
         this.resetConfigForm();
+        this.toastService.success('Configuration Saved', 'Configuration saved successfully');
       },
       error: (err) => {
-        console.error('Error saving config:', err);
-        alert(err.error?.message || 'Error saving configuration');
         this.saving.set(false);
+        this.errorHandler.handleError(err, 'save_app_config');
       }
     });
   }
@@ -351,10 +355,10 @@ export class AppConfigManagementComponent implements OnInit {
       next: () => {
         this.showDeleteModal.set(false);
         this.loadConfigs();
+        this.toastService.success('Configuration Deleted', 'Configuration deleted successfully');
       },
       error: (err) => {
-        console.error('Error deleting config:', err);
-        alert('Error deleting configuration');
+        this.errorHandler.handleError(err, 'delete_app_config');
       }
     });
   }
@@ -383,11 +387,8 @@ export class AppConfigManagementComponent implements OnInit {
   }
 
   saveGroup() {
-    console.log(this.groupKey());
-    console.log(this.groupName());
-    console.log(this.groupAppName());
     if (!this.groupKey() || !this.groupName() || !this.groupAppName()) {
-      alert('Please fill in required fields: Group Key, Group Name, and App Name');
+      this.toastService.error('Validation Error', 'Please fill in required fields: Group Key, Group Name, and App Name');
       return;
     }
 
@@ -412,11 +413,11 @@ export class AppConfigManagementComponent implements OnInit {
         this.saving.set(false);
         this.loadGroups();
         this.resetGroupForm();
+        this.toastService.success('Group Saved', 'Configuration group saved successfully');
       },
       error: (err) => {
-        console.error('Error saving group:', err);
-        alert(err.error?.message || 'Error saving group');
         this.saving.set(false);
+        this.errorHandler.handleError(err, 'save_app_config_group');
       }
     });
   }
@@ -436,10 +437,10 @@ export class AppConfigManagementComponent implements OnInit {
       next: () => {
         this.showDeleteModal.set(false);
         this.loadGroups();
+        this.toastService.success('Group Deleted', 'Configuration group deleted successfully');
       },
       error: (err) => {
-        console.error('Error deleting group:', err);
-        alert(err.error?.message || 'Error deleting group');
+        this.errorHandler.handleError(err, 'delete_app_config_group');
       }
     });
   }
@@ -457,14 +458,14 @@ export class AppConfigManagementComponent implements OnInit {
   loadVersions(configId: number) {
     this.configService.getConfigVersions(configId).subscribe({
       next: (versions) => this.versions.set(versions),
-      error: (err) => console.error('Error loading versions:', err)
+      error: (err) => this.errorHandler.handleError(err, 'load_config_versions')
     });
   }
 
   loadAudit(configId: number) {
     this.configService.getConfigAudit(configId).subscribe({
       next: (audit) => this.auditLogs.set(audit),
-      error: (err) => console.error('Error loading audit:', err)
+      error: (err) => this.errorHandler.handleError(err, 'load_config_audit')
     });
   }
 
@@ -477,11 +478,10 @@ export class AppConfigManagementComponent implements OnInit {
         next: () => {
           this.loadConfigs();
           this.loadVersions(config.id);
-          alert('Version restored successfully');
+          this.toastService.success('Version Restored', 'Configuration version restored successfully');
         },
         error: (err) => {
-          console.error('Error restoring version:', err);
-          alert('Error restoring version');
+          this.errorHandler.handleError(err, 'restore_config_version');
         }
       });
     }
@@ -632,6 +632,6 @@ export class AppConfigManagementComponent implements OnInit {
 
   invalidateCache() {
     this.configService.invalidateCache();
-    alert('Cache invalidated successfully');
+    this.toastService.success('Cache Invalidated', 'Configuration cache invalidated successfully');
   }
 }

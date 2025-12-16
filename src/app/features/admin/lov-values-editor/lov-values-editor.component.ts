@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LovService } from '../../../core/services/lov.service';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { TranslationService } from '../../../core/services/translation.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { Lov, LovRequest } from '../../../core/models/lov.model';
 
@@ -60,14 +62,16 @@ export class LovValuesEditorComponent implements OnInit {
 
   hasSelectedApp = computed(() => !!this.appContext.selectedApp());
 
+  private translationService = inject(TranslationService);
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private lovService: LovService,
     private appContext: AppContextService
   ) {}
-
-  private translationService = inject(TranslationService);
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -123,7 +127,7 @@ export class LovValuesEditorComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Error loading LOV values:', err);
+        this.errorHandler.handleError(err, 'load_lov_values');
         // If no values exist yet, that's okay for new LOV types
         this.loading.set(false);
       }
@@ -160,10 +164,10 @@ export class LovValuesEditorComponent implements OnInit {
         this.lovService.deleteLov(row.id).subscribe({
           next: () => {
             this.values.update(vals => vals.filter((_, i) => i !== index));
+            this.toastService.success('LOV Value Deleted', 'LOV value deleted successfully');
           },
           error: (err) => {
-            console.error('Error deleting LOV:', err);
-            alert(this.translationService.t('lovEditor.alerts.deleteFailed'));
+            this.errorHandler.handleError(err, 'delete_lov_value');
           }
         });
       }
@@ -184,14 +188,14 @@ export class LovValuesEditorComponent implements OnInit {
     const valuesToSave = this.values().filter(v => v.isNew || v.isModified);
     
     if (valuesToSave.length === 0) {
-      alert(this.translationService.t('lovEditor.alerts.noChanges'));
+      this.toastService.info('No Changes', 'No changes to save');
       return;
     }
 
     // Validate lovType is set
     const currentLovType = this.lovType();
     if (!currentLovType || currentLovType.trim() === '') {
-      alert(this.translationService.t('lovEditor.alerts.lovTypeMissing'));
+      this.toastService.error('Validation Error', 'LOV Type is missing');
       console.error('lovType is empty:', currentLovType);
       return;
     }
@@ -212,7 +216,7 @@ export class LovValuesEditorComponent implements OnInit {
       const selectedApp = this.appContext.selectedApp();
       const appName = selectedApp ? selectedApp.name : undefined;
       if (!appName) {
-        alert(this.translationService.t('lovEditor.alerts.selectAppBeforeCreate'));
+        this.toastService.error('App Required', 'Please select an app before creating LOV values');
         this.saving.set(false);
         return;
       }
@@ -241,7 +245,7 @@ export class LovValuesEditorComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error('Error bulk creating LOVs:', err);
+          this.errorHandler.handleError(err, 'bulk_create_lov_values');
           errors += newValues.length;
           if (++completed >= totalOperations) {
             this.finishSaving(completed, errors);
@@ -256,7 +260,7 @@ export class LovValuesEditorComponent implements OnInit {
       const selectedApp = this.appContext.selectedApp();
       const appName = selectedApp ? selectedApp.name : undefined;
       if (!appName) {
-        alert(this.translationService.t('lovEditor.alerts.selectAppBeforeUpdate'));
+        this.toastService.error('App Required', 'Please select an app before updating LOV values');
         this.saving.set(false);
         return;
       }
@@ -286,7 +290,7 @@ export class LovValuesEditorComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error('Error bulk updating LOVs:', err);
+          this.errorHandler.handleError(err, 'bulk_update_lov_values');
           errors += modifiedValues.length;
           if (++completed >= totalOperations) {
             this.finishSaving(completed, errors);
@@ -300,9 +304,9 @@ export class LovValuesEditorComponent implements OnInit {
     this.saving.set(false);
     
     if (errors > 0) {
-      alert(`${this.translationService.t('lovEditor.alerts.savedPartialPrefix')} ${completed} ${this.translationService.t('lovEditor.alerts.valuesWord')}, ${errors} ${this.translationService.t('lovEditor.alerts.failedSuffix')}`);
+      this.toastService.warning('Partial Save', `Saved ${completed} values, ${errors} failed`);
     } else {
-      alert(`${this.translationService.t('lovEditor.alerts.savedSuccessPrefix')} ${completed} ${this.translationService.t('lovEditor.alerts.valuesWord')}`);
+      this.toastService.success('LOV Values Saved', `Successfully saved ${completed} values`);
     }
     
     // Reload data

@@ -1,9 +1,11 @@
-import { Component, OnInit, signal, computed, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TemplateManagementService } from '../../../../core/services/template-management.service';
 import { AppContextService } from '../../../../core/services/app-context.service';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import {
   TemplateType,
   TemplateFolder,
@@ -126,6 +128,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   PageOrientationLabels = PageOrientationLabels;
   PageOrientationDescriptions = PageOrientationDescriptions;
 
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
+
   constructor(
     private templateService: TemplateManagementService,
     private appContext: AppContextService,
@@ -195,7 +200,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
         this.rootFolders.set(folders);
         this.folders.set(folders);
       },
-      error: (err) => console.error('Error loading folders:', err)
+      error: (err) => this.errorHandler.handleError(err, 'load_template_folders')
     });
   }
 
@@ -219,8 +224,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
         this.loadFolders();
         this.selectedFolder.set(folder);
         this.showFolderModal.set(false);
+        this.toastService.success('Folder Created', 'Template folder created successfully');
       },
-      error: (err) => console.error('Error creating folder:', err)
+      error: (err) => this.errorHandler.handleError(err, 'create_template_folder')
     });
   }
 
@@ -239,7 +245,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           this.createDefaultPageForExistingTemplate();
         }
       },
-      error: (err) => console.error('Error loading pages:', err)
+      error: (err) => this.errorHandler.handleError(err, 'load_template_pages')
     });
   }
 
@@ -259,7 +265,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
         this.htmlContent.set(page.content);
       },
       error: (err) => {
-        console.error('Error creating default page:', err);
+        this.errorHandler.handleError(err, 'create_default_template_page');
         // Fallback: create a temporary page
         const now = new Date().toISOString();
         const defaultPage: TemplatePage = {
@@ -335,8 +341,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
             this.pages.set([...currentPages]);
           }
           this.showPageModal.set(false);
+          this.toastService.success('Page Updated', 'Template page updated successfully');
         },
-        error: (err) => console.error('Error updating page:', err)
+        error: (err) => this.errorHandler.handleError(err, 'update_template_page')
       });
     } else {
       this.templateService.createPage(id, request).subscribe({
@@ -345,8 +352,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           this.pages.set([...this.pages(), page]);
           this.showPageModal.set(false);
           this.selectPage(page);
+          this.toastService.success('Page Created', 'Template page created successfully');
         },
-        error: (err) => console.error('Error creating page:', err)
+        error: (err) => this.errorHandler.handleError(err, 'create_template_page')
       });
     }
   }
@@ -414,8 +422,11 @@ export class TemplateEditorEnhancedComponent implements OnInit {
     if (!id) return;
 
     this.templateService.reorderPages(id, pageIds).subscribe({
-      next: () => this.loadPages(),
-      error: (err) => console.error('Error reordering pages:', err)
+      next: () => {
+        this.loadPages();
+        this.toastService.success('Pages Reordered', 'Template pages reordered successfully');
+      },
+      error: (err) => this.errorHandler.handleError(err, 'reorder_template_pages')
     });
   }
 
@@ -426,7 +437,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
 
     this.templateService.getAllAttributes(id).subscribe({
       next: (attrs) => this.attributes.set(attrs),
-      error: (err) => console.error('Error loading attributes:', err)
+      error: (err) => this.errorHandler.handleError(err, 'load_template_attributes')
     });
   }
 
@@ -450,7 +461,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
 
   saveAttribute() {
     if (!this.attributeKey().trim()) {
-      alert('Attribute key is required');
+      this.toastService.error('Validation Error', 'Attribute key is required');
       return;
     }
 
@@ -480,8 +491,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
             this.attributes.set([...currentAttrs]);
           }
           this.showAttributeModal.set(false);
+          this.toastService.success('Attribute Updated', 'Template attribute updated successfully');
         },
-        error: (err) => console.error('Error updating attribute:', err)
+        error: (err) => this.errorHandler.handleError(err, 'update_template_attribute')
       });
     } else {
       this.templateService.createAttribute(id, request).subscribe({
@@ -489,8 +501,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           // Add the new attribute to the local array instead of reloading
           this.attributes.set([...this.attributes(), newAttr]);
           this.showAttributeModal.set(false);
+          this.toastService.success('Attribute Created', 'Template attribute created successfully');
         },
-        error: (err) => console.error('Error creating attribute:', err)
+        error: (err) => this.errorHandler.handleError(err, 'create_template_attribute')
       });
     }
   }
@@ -536,8 +549,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           if (this.activePage()?.id === id && this.pages().length > 0) {
             this.selectPage(this.pages()[0]);
           }
+          this.toastService.success('Page Deleted', 'Template page deleted successfully');
         },
-        error: (err) => console.error('Error deleting page:', err)
+        error: (err) => this.errorHandler.handleError(err, 'delete_template_page')
       });
     } else if (type === 'attribute') {
       this.templateService.deleteAttribute(templateId, id).subscribe({
@@ -545,8 +559,9 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           // Remove the attribute from local array instead of reloading
           this.attributes.set(this.attributes().filter(a => a.id !== id));
           this.showDeleteModal.set(false);
+          this.toastService.success('Attribute Deleted', 'Template attribute deleted successfully');
         },
-        error: (err) => console.error('Error deleting attribute:', err)
+        error: (err) => this.errorHandler.handleError(err, 'delete_template_attribute')
       });
     }
   }
@@ -668,23 +683,21 @@ export class TemplateEditorEnhancedComponent implements OnInit {
             }).subscribe({
               next: () => {
                 this.saving.set(false);
-                alert('Template saved successfully!');
+                this.toastService.success('Template Saved', 'Template saved successfully!');
               },
               error: (err) => {
                 this.saving.set(false);
-                console.error('Error saving page content:', err);
-                alert('Error saving page content');
+                this.errorHandler.handleError(err, 'save_template_page_content');
               }
             });
           } else {
             this.saving.set(false);
-            alert('Template saved successfully!');
+            this.toastService.success('Template Saved', 'Template saved successfully!');
           }
         },
         error: (err) => {
           this.saving.set(false);
-          console.error('Error saving template:', err);
-          alert('Error saving template');
+          this.errorHandler.handleError(err, 'save_template');
         }
       });
     }
@@ -692,7 +705,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
 
   createNewTemplate() {
     if (!this.templateName().trim()) {
-      alert('Please enter a template name');
+      this.toastService.error('Validation Error', 'Please enter a template name');
       return;
     }
 
@@ -720,14 +733,13 @@ export class TemplateEditorEnhancedComponent implements OnInit {
         if (tempPages.length > 0 || tempAttrs.length > 0) {
           this.createPagesAndAttributesForTemplate(template.id, tempPages, tempAttrs);
         } else {
-          alert('Template created successfully!');
+          this.toastService.success('Template Created', 'Template created successfully!');
           this.router.navigate(['/admin/template-editor', template.id]);
         }
       },
       error: (err) => {
         this.saving.set(false);
-        console.error('Error creating template:', err);
-        alert('Error creating template');
+        this.errorHandler.handleError(err, 'create_template');
       }
     });
   }
@@ -776,7 +788,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
 
   checkCreationComplete(templateId: number, pagesCreated: number, totalPages: number, attrsCreated: number, totalAttrs: number) {
     if (pagesCreated === totalPages && attrsCreated === totalAttrs) {
-      alert('Template created successfully with all pages and attributes!');
+      this.toastService.success('Template Created', 'Template created successfully with all pages and attributes!');
       this.router.navigate(['/admin/template-editor', templateId]);
     }
   }
@@ -804,13 +816,13 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           console.error('Error loading template:', err);
 
           if (err.status === 403) {
-            alert('Access denied: You do not have permission to access this template. It may belong to another organization.');
+            this.toastService.error('Access Denied', 'You do not have permission to access this template. It may belong to another organization.');
             this.router.navigate(['/admin/templates']);
           } else if (err.status === 404) {
-            alert('Template not found. It may have been deleted.');
+            this.toastService.error('Template Not Found', 'Template not found. It may have been deleted.');
             this.router.navigate(['/admin/templates']);
           } else {
-            alert('Error loading template: ' + (err.error?.message || err.message || 'Unknown error'));
+            this.errorHandler.handleError(err, 'load_template');
           }
         }
       });
@@ -916,7 +928,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   saveTemplateMetadata() {
     const id = this.templateId();
     if (!id) {
-      alert('Please save the template first');
+      this.toastService.warning('Template Not Saved', 'Please save the template first');
       return;
     }
 
@@ -948,7 +960,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   exportToPdf() {
     const id = this.templateId();
     if (!id) {
-      alert('Please save the template first');
+      this.toastService.warning('Template Not Saved', 'Please save the template first');
       return;
     }
 
@@ -986,8 +998,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       },
       error: (err) => {
         this.pdfExporting.set(false);
-        console.error('Error exporting PDF:', err);
-        alert('Error exporting PDF: ' + (err.error?.message || err.message || 'Unknown error'));
+        this.errorHandler.handleError(err, 'export_template_pdf_with_parameters');
       }
     });
   }
@@ -1012,8 +1023,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       },
       error: (err) => {
         this.pdfExporting.set(false);
-        console.error('Error exporting PDF:', err);
-        alert('Error exporting PDF: ' + (err.error?.message || err.message || 'Unknown error'));
+        this.errorHandler.handleError(err, 'export_template_pdf_skip_parameters');
       }
     });
   }
@@ -1021,7 +1031,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   downloadPdf() {
     const id = this.templateId();
     if (!id) {
-      alert('Please save the template first');
+      this.toastService.warning('Template Not Saved', 'Please save the template first');
       return;
     }
 
@@ -1046,8 +1056,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       },
       error: (err) => {
         this.pdfExporting.set(false);
-        console.error('Error downloading PDF:', err);
-        alert('Error downloading PDF: ' + (err.error?.message || err.message || 'Unknown error'));
+        this.errorHandler.handleError(err, 'download_template_pdf');
       }
     });
   }
@@ -1055,7 +1064,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   exportToWord() {
     const id = this.templateId();
     if (!id) {
-      alert('Please save the template first');
+      this.toastService.warning('Template Not Saved', 'Please save the template first');
       return;
     }
 
@@ -1074,8 +1083,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
         this.downloadFile(blob, `${this.templateName()}.docx`, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       },
       error: (err) => {
-        console.error('Error exporting Word:', err);
-        alert('Error exporting Word: ' + (err.error?.message || err.message || 'Unknown error'));
+        this.errorHandler.handleError(err, 'export_template_word');
       }
     });
   }

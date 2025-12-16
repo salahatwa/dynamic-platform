@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { TranslationManagementService } from '../../../core/services/translation-management.service';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastService } from '../../../core/services/toast.service';
 import {
   TranslationKey,
   TranslationStatus,
@@ -34,6 +36,8 @@ export class TranslationsComponent implements OnInit {
   // Services
   private appContext = inject(AppContextService);
   private themeService = inject(ThemeService);
+  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
 
   // State
   activeView = signal<'grid' | 'list'>('list');
@@ -197,7 +201,7 @@ export class TranslationsComponent implements OnInit {
             this.loadKeys();
           },
           error: (error) => {
-            console.error('Error loading app languages:', error);
+            this.errorHandler.handleError(error, 'load_app_languages');
             // Fallback to default languages
             this.appLanguages.set(['en', 'ar']);
 
@@ -213,7 +217,7 @@ export class TranslationsComponent implements OnInit {
         });
       },
       error: (error) => {
-        console.error('Error getting or creating translation app:', error);
+        this.errorHandler.handleError(error, 'create_translation_app');
         // Fallback to localStorage or default languages
         const savedLanguages = localStorage.getItem(`app_${app.id}_languages`);
         if (savedLanguages) {
@@ -271,10 +275,10 @@ export class TranslationsComponent implements OnInit {
         this.closeLanguageModal();
 
         // Show success message
-        console.log(`Language ${langCode.toUpperCase()} added successfully`);
+        this.toastService.success('Language Added', `Language ${langCode.toUpperCase()} added successfully`);
       },
       error: (error) => {
-        console.error('Error adding language:', error);
+        this.errorHandler.handleError(error, 'add_language');
 
         // Fallback to local storage update if API fails
         const updatedLanguages = [...this.appLanguages(), langCode];
@@ -289,7 +293,7 @@ export class TranslationsComponent implements OnInit {
         this.closeLanguageModal();
 
         // Show warning that it's only saved locally
-        alert('Language added locally. Backend sync failed - please check your connection.');
+        this.toastService.warning('Language Added Locally', 'Language added locally. Backend sync failed - please check your connection.');
       }
     });
   }
@@ -333,10 +337,10 @@ export class TranslationsComponent implements OnInit {
         this.loadKeys();
 
         this.languageLoading.set(false);
-        console.log(`Language ${langCode.toUpperCase()} removed successfully`);
+        this.toastService.success('Language Removed', `Language ${langCode.toUpperCase()} removed successfully`);
       },
       error: (error) => {
-        console.error('Error removing language:', error);
+        this.errorHandler.handleError(error, 'remove_language');
 
         // Fallback to local storage update if API fails
         const updatedLanguages = this.appLanguages().filter(lang => lang !== langCode);
@@ -357,7 +361,7 @@ export class TranslationsComponent implements OnInit {
 
         this.languageLoading.set(false);
         // Show warning that it's only saved locally
-        alert('Language removed locally. Backend sync failed - please check your connection.');
+        this.toastService.warning('Language Removed Locally', 'Language removed locally. Backend sync failed - please check your connection.');
       }
     });
   }
@@ -391,7 +395,7 @@ export class TranslationsComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading translation keys:', error);
+        this.errorHandler.handleError(error, 'load_translation_keys');
         this.loading.set(false);
       }
     });
@@ -433,16 +437,18 @@ export class TranslationsComponent implements OnInit {
         next: () => {
           this.loadKeys();
           this.showKeyModal = false;
+          this.toastService.success('Translation Key Updated', 'Translation key updated successfully');
         },
-        error: (error) => console.error('Error updating key:', error)
+        error: (error) => this.errorHandler.handleError(error, 'update_translation_key')
       });
     } else {
       this.translationService.createKey(form).subscribe({
         next: () => {
           this.loadKeys();
           this.showKeyModal = false;
+          this.toastService.success('Translation Key Created', 'Translation key created successfully');
         },
-        error: (error) => console.error('Error creating key:', error)
+        error: (error) => this.errorHandler.handleError(error, 'create_translation_key')
       });
     }
   }
@@ -468,8 +474,9 @@ export class TranslationsComponent implements OnInit {
           status: TranslationStatus.PUBLISHED,
           updatedAt: new Date().toISOString()
         };
+        this.toastService.success('Translation Updated', `Translation for ${language.toUpperCase()} updated successfully`);
       },
-      error: (error) => console.error('Error updating translation:', error)
+      error: (error) => this.errorHandler.handleError(error, 'update_translation')
     });
   }
 
@@ -488,8 +495,9 @@ export class TranslationsComponent implements OnInit {
         this.loadKeys();
         this.showDeleteConfirm = false;
         this.deletingItem = null;
+        this.toastService.success('Translation Key Deleted', 'Translation key deleted successfully');
       },
-      error: (error) => console.error('Error deleting key:', error)
+      error: (error) => this.errorHandler.handleError(error, 'delete_translation_key')
     });
   }
 
