@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../core/services/translation.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface User {
   id: number;
@@ -100,27 +101,48 @@ interface PageResponse {
                   <td>{{ formatDate(user.createdAt) }}</td>
                   <td>
                     <div class="action-buttons">
-                      @if (user.enabled) {
-                        <button class="btn-action btn-warning" (click)="deactivateUser(user)" [attr.title]="('users.actions.deactivate' | translate)">
+                      @if (isCurrentUser(user)) {
+                        <!-- Current user - show disabled buttons with tooltips -->
+                        <button class="btn-action btn-disabled" 
+                                disabled 
+                                [attr.title]="('users.actions.cannotModifySelf' | translate)">
                           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                          </svg>
+                        </button>
+                        <button class="btn-action btn-disabled" 
+                                disabled 
+                                [attr.title]="('users.actions.cannotDeleteSelf' | translate)">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                           </svg>
                         </button>
                       } @else {
-                        <button class="btn-action btn-success" (click)="activateUser(user)" [attr.title]="('users.actions.activate' | translate)">
+                        <!-- Other users - normal actions -->
+                        @if (user.enabled) {
+                          <button class="btn-action btn-warning" (click)="deactivateUser(user)" [attr.title]="('users.actions.deactivate' | translate)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                            </svg>
+                          </button>
+                        } @else {
+                          <button class="btn-action btn-success" (click)="activateUser(user)" [attr.title]="('users.actions.activate' | translate)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                          </button>
+                        }
+                        <button class="btn-action btn-danger" (click)="deleteUser(user)" [attr.title]="('users.actions.delete' | translate)">
                           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                           </svg>
                         </button>
                       }
-                      <button class="btn-action btn-danger" (click)="deleteUser(user)" [attr.title]="('users.actions.delete' | translate)">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                      </button>
                     </div>
                   </td>
                 </tr>
@@ -397,6 +419,19 @@ interface PageResponse {
       background: rgba(239, 68, 68, 0.1);
     }
 
+    .btn-disabled {
+      color: var(--text-secondary);
+      border-color: var(--border);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-disabled:hover {
+      background: transparent;
+      color: var(--text-secondary);
+      border-color: var(--border);
+    }
+
     .pagination {
       display: flex;
       justify-content: center;
@@ -469,6 +504,7 @@ export class UsersComponent implements OnInit {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/users`;
   private t = inject(TranslationService);
+  private authService = inject(AuthService);
   
   users = signal<User[]>([]);
   loading = signal(true);
@@ -478,8 +514,16 @@ export class UsersComponent implements OnInit {
   searchQuery = '';
   private searchTimeout: any;
   
+  // Current user info for disabling self-actions
+  currentUser = signal<any>(null);
+  
   ngOnInit() {
     this.loadUsers();
+    
+    // Subscribe to current user changes
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser.set(user);
+    });
   }
   
   loadUsers() {
@@ -596,5 +640,16 @@ export class UsersComponent implements OnInit {
     if (days < 7) return `${days}` + this.t.translate('users.date.daysAgoSuffix');
     if (days < 30) return `${Math.floor(days / 7)}` + this.t.translate('users.date.weeksAgoSuffix');
     return d.toLocaleDateString();
+  }
+  
+  /**
+   * Check if the given user is the currently logged-in user
+   */
+  isCurrentUser(user: User): boolean {
+    const current = this.currentUser();
+    if (!current || !current.user) return false;
+    
+    // Compare by email or ID
+    return current.user.email === user.email || current.user.id === user.id;
   }
 }

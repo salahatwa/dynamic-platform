@@ -783,7 +783,9 @@
     "actions": {
       "activate": "تفعيل",
       "deactivate": "إلغاء التفعيل",
-      "delete": "حذف"
+      "delete": "حذف",
+      "cannotModifySelf": "لا يمكنك تعديل حالة حسابك الخاص",
+      "cannotDeleteSelf": "لا يمكنك حذف حسابك الخاص"
     },
     "confirmActivatePrefix": "تفعيل المستخدم",
     "confirmDeactivatePrefix": "إلغاء تفعيل المستخدم",

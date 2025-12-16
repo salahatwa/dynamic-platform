@@ -363,13 +363,20 @@
 
           <div class="form-group">
             <label class="form-label">{{ 'appConfig.modal.config.groupLabel' | translate }}</label>
-            <select class="form-control" [value]="groupId() || ''"
-              (change)="groupId.set($any($event.target).value ? +$any($event.target).value : undefined)">
+            <select class="form-control" 
+              [ngModel]="groupId() || ''"
+              (ngModelChange)="groupId.set($event ? +$event : undefined)">
               <option value="">{{ 'appConfig.modal.config.noGroup' | translate }}</option>
               @for (group of filteredGroups(); track group.id) {
               <option [value]="group.id">{{ group.groupName }}</option>
               }
             </select>
+            <!-- Debug info (remove in production) -->
+            <small class="text-muted" style="font-size: 11px;">
+              Current groupId: {{ groupId() || 'undefined' }} | 
+              Groups loaded: {{ filteredGroups().length }} |
+              Selected group: {{ getGroupNameById(groupId()) }}
+            </small>
           </div>
 
           <div class="form-group full-width">

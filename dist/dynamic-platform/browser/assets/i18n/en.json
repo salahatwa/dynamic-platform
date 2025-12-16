@@ -814,7 +814,9 @@
     "actions": {
       "activate": "Activate",
       "deactivate": "Deactivate",
-      "delete": "Delete"
+      "delete": "Delete",
+      "cannotModifySelf": "You cannot modify your own account status",
+      "cannotDeleteSelf": "You cannot delete your own account"
     },
     "confirmActivatePrefix": "Activate user",
     "confirmDeactivatePrefix": "Deactivate user",

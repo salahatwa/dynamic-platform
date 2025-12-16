@@ -268,6 +268,7 @@ export class AppConfigManagementComponent implements OnInit {
       activeFilter
     ).subscribe({
       next: (groups) => {
+        console.log('Groups loaded:', groups);
         this.groups.set(groups);
         this.loadingGroups.set(false);
       },
@@ -280,12 +281,62 @@ export class AppConfigManagementComponent implements OnInit {
 
   // ==================== Config CRUD ====================
 
-  openConfigModal(config?: AppConfig) {
+  /**
+   * Get group name by ID for display purposes
+   */
+  getGroupNameById(groupId: number | undefined): string {
+    if (!groupId) return 'No Group';
+    const group = this.groups().find(g => g.id === groupId);
+    return group?.groupName || 'No Group';
+  }
+
+  /**
+   * Ensure groups are loaded before opening modal
+   */
+  private ensureGroupsLoaded(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.groups().length > 0) {
+        resolve();
+        return;
+      }
+
+      // Load groups if not already loaded
+      const app = this.selectedApp();
+      if (!app) {
+        resolve();
+        return;
+      }
+
+      this.loadingGroups.set(true);
+      this.configService.getAllGroups(app.id, undefined).subscribe({
+        next: (groups) => {
+          console.log('Groups loaded for modal:', groups);
+          this.groups.set(groups);
+          this.loadingGroups.set(false);
+          resolve();
+        },
+        error: (err) => {
+          console.error('Error loading groups for modal:', err);
+          this.loadingGroups.set(false);
+          resolve(); // Resolve anyway to not block modal
+        }
+      });
+    });
+  }
+
+  async openConfigModal(config?: AppConfig) {
     const app = this.selectedApp();
     if (!app) return;
 
+    // Ensure groups are loaded before opening modal
+    await this.ensureGroupsLoaded();
+
     if (config) {
       // Edit mode
+      console.log('Opening config modal for edit - config:', config);
+      console.log('Config groupId:', config.groupId);
+      console.log('Available groups:', this.groups());
+      
       this.configId.set(config.id);
       this.configKey.set(config.configKey);
       this.configName.set(config.configName);
@@ -298,7 +349,13 @@ export class AppConfigManagementComponent implements OnInit {
       this.isPublic.set(config.isPublic);
       this.isRequired.set(config.isRequired);
       this.displayOrder.set(config.displayOrder);
-      this.groupId.set(config.groupId);
+      
+      // Ensure groupId is set correctly - handle both number and undefined
+      const groupIdValue = config.groupId !== null && config.groupId !== undefined ? config.groupId : undefined;
+      console.log('Setting groupId to:', groupIdValue);
+      console.log('Group exists in list:', this.groups().find(g => g.id === groupIdValue));
+      this.groupId.set(groupIdValue);
+      
       this.appName.set(app.name);
       this.active.set(config.active);
     } else {
@@ -306,7 +363,11 @@ export class AppConfigManagementComponent implements OnInit {
       this.resetConfigForm();
       this.appName.set(app.name);
     }
-    this.showConfigModal.set(true);
+    
+    // Small delay to ensure DOM is updated before showing modal
+    setTimeout(() => {
+      this.showConfigModal.set(true);
+    }, 50);
   }
 
   saveConfig() {

@@ -197,7 +197,7 @@
                 <th style="width: 25%">{{ 'translationsMgmt.table.key' | translate }}</th>
                 <th style="width: 35%">{{ selectedLanguage().toUpperCase() }} {{ 'translationsMgmt.table.translation' |
                   translate }}</th>
-                <th style="width: 30%">{{ 'translationsMgmt.table.description' | translate }}</th>
+                <!-- <th style="width: 30%">{{ 'translationsMgmt.table.description' | translate }}</th> -->
                 <th style="width: 10%" class="text-end">{{ 'common.actions' | translate }}</th>
               </tr>
             </thead>
@@ -216,9 +216,9 @@
                     (blur)="updateTranslation(key, selectedLanguage(), $any($event.target).value)"
                     placeholder="{{ 'translationsMgmt.enterTranslation' | translate }}">
                 </td>
-                <td class="text-secondary small">
+                <!-- <td class="text-secondary small">
                   {{ key.description || '-' }}
-                </td>
+                </td> -->
                 <td class="text-end">
                   <div class="d-flex justify-content-end gap-2">
                     <button class="btn btn-icon btn-sm btn-ghost text-primary" (click)="openKeyModal(key)"
@@ -279,12 +279,12 @@
         <small class="form-text text-muted">{{ 'translationsMgmt.form.keyNameHelp' | translate }}</small>
       </div>
 
-      <div class="form-group mb-3">
+      <!-- <div class="form-group mb-3">
         <label class="form-label">{{ 'translationsMgmt.form.description' | translate }}</label>
         <input type="text" class="form-control" [value]="keyForm().description"
           (input)="updateKeyFormField('description', $any($event.target).value)"
           placeholder="{{ 'translationsMgmt.form.descriptionPlaceholder' | translate }}">
-      </div>
+      </div> -->
 
       <div class="form-group mb-3">
         <label class="form-label">{{ 'translationsMgmt.form.context' | translate }}</label>
