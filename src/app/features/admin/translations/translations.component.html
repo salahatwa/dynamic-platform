@@ -273,7 +273,7 @@
 
     <div class="modal-body">
       <div class="form-group mb-3">
-        <label class="form-label">{{ 'translationsMgmt.form.keyName' | translate }}</label>
+        <label class="form-label">{{ 'translationsMgmt.form.keyName' | translate }} *</label>
         <input type="text" class="form-control" [value]="keyForm().keyName"
           (input)="updateKeyFormField('keyName', $any($event.target).value)" placeholder="welcome.message">
         <small class="form-text text-muted">{{ 'translationsMgmt.form.keyNameHelp' | translate }}</small>
@@ -296,7 +296,10 @@
 
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="closeKeyModal()">{{ 'common.cancel' | translate }}</button>
-      <button class="btn btn-primary" (click)="saveKey()">
+      <button class="btn btn-primary" (click)="saveKey()" [disabled]="!isKeyFormValid() || saving()">
+        @if (saving()) {
+          <span class="spinner-small"></span>
+        }
         {{ editingKey ? ( 'common.update' | translate ) : ( 'common.add' | translate ) }}
       </button>
     </div>
@@ -347,7 +350,7 @@
               {{ lang.flag }} {{ lang.name }} ({{ lang.code.toUpperCase() }})
             </option>
           </select>
-          <button class="btn btn-primary text-nowrap" [disabled]="!newLanguageCode() || languageLoading()"
+          <button class="btn btn-primary text-nowrap" [disabled]="!isLanguageFormValid() || languageLoading()"
             (click)="addLanguage()">
             <span *ngIf="languageLoading()" class="spinner-sm me-1"></span>
             {{ languageLoading() ? ( 'translationsMgmt.langModal.adding' | translate ) : (

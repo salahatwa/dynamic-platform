@@ -155,7 +155,7 @@
         
         <form (submit)="submitInvitation($event)">
           <div class="form-group">
-            <label>{{ 'invitations.dialog.create.email' | translate }}</label>
+            <label>{{ 'invitations.dialog.create.email' | translate }} *</label>
             <input 
               type="email" 
               [(ngModel)]="invitationForm.email" 
@@ -166,7 +166,7 @@
           </div>
           
           <div class="form-group">
-            <label>{{ 'invitations.dialog.create.roles' | translate }}</label>
+            <label>{{ 'invitations.dialog.create.roles' | translate }} *</label>
             <div class="roles-list">
               @for (role of availableRoles(); track role.id) {
                 <label class="checkbox-label">
@@ -194,7 +194,7 @@
             <button type="button" class="btn-secondary" (click)="closeCreateDialog()">
               {{ 'common.cancel' | translate }}
             </button>
-            <button type="submit" class="btn-primary" [disabled]="submitting()">
+            <button type="submit" class="btn-primary" [disabled]="!isInvitationFormValid() || submitting()">
               @if (submitting()) {
                 <span class="spinner-small"></span>
               }

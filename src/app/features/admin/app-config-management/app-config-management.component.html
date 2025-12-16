@@ -414,7 +414,10 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="closeModal('config')">{{ 'common.cancel' | translate }}</button>
-        <button class="btn btn-primary" (click)="saveConfig()" [disabled]="saving()">
+        <button class="btn btn-primary" (click)="saveConfig()" [disabled]="!isConfigFormValid() || saving()">
+          @if (saving()) {
+            <span class="spinner-small"></span>
+          }
           {{ configId() ? ('common.update' | translate) : ('common.create' | translate) }}
         </button>
       </div>
@@ -455,7 +458,10 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="closeModal('group')">{{ 'common.cancel' | translate }}</button>
-        <button class="btn btn-primary" (click)="saveGroup()" [disabled]="saving()">
+        <button class="btn btn-primary" (click)="saveGroup()" [disabled]="!isGroupFormValid() || saving()">
+          @if (saving()) {
+            <span class="spinner-small"></span>
+          }
           {{ groupFormId() ? ('common.update' | translate) : ('common.create' | translate) }}
         </button>
       </div>

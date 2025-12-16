@@ -96,6 +96,11 @@ export class LovManagementComponent implements OnInit {
     return grouped;
   });
 
+  // Form validation
+  isLovFormValid = computed(() => {
+    return this.lovCode().trim().length > 0 && this.lovName().trim().length > 0;
+  });
+
   selectedAppName = computed(() => {
     const app = this.appContext.selectedApp();
     return app ? app.name : '';
@@ -223,10 +228,9 @@ export class LovManagementComponent implements OnInit {
   }
 
   saveLov() {
-    if (!this.lovCode() || !this.lovName()) {
-      this.toastService.error('Validation Error', 'Please fill in LOV Code and Name');
-      return;
-    }
+    if (!this.isLovFormValid()) return;
+
+    this.saving.set(true);
 
     // Store values before resetting
     const code = this.lovCode();
@@ -235,6 +239,7 @@ export class LovManagementComponent implements OnInit {
 
     // Close modal and reset form
     this.showLovModal.set(false);
+    this.saving.set(false);
     this.resetForm();
     
     // Navigate to values editor to add actual values

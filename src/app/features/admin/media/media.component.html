@@ -96,7 +96,7 @@
     </div>
 
     <!-- Breadcrumb Navigation -->
-    <div class="breadcrumb-section">
+    <div class="breadcrumb-section" [attr.data-instance]="componentId">
       <div class="breadcrumb-nav">
         <button class="breadcrumb-item root" (click)="navigateToRoot()">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +128,8 @@
           id="breadcrumb-create-folder-btn"
           class="btn btn-secondary btn-sm breadcrumb-create-folder-button"
           *hasPermission="'media:create'"
-          (click)="openCreateFolderDialog()">
+          (click)="openCreateFolderDialog()"
+          [attr.data-instance]="componentId">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
           </svg>

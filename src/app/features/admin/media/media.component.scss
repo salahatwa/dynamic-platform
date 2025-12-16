@@ -598,15 +598,16 @@
   }
 }
 
-// Ensure breadcrumb actions only show one button
+// Ensure breadcrumb actions show the button properly
 .breadcrumb-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
   .breadcrumb-create-folder-button {
     display: flex !important;
-    
-    // Hide any duplicate instances
-    &:not(:first-child) {
-      display: none !important;
-    }
+    align-items: center;
+    gap: 0.5rem;
   }
 }
 

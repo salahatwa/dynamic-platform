@@ -188,7 +188,7 @@
           <h2>{{ 'apiKeys.dialog.create.title' | translate }}</h2>
           <form (submit)="createApiKey($event)">
             <div class="form-group">
-              <label>{{ 'apiKeys.dialog.create.name' | translate }}</label>
+              <label>{{ 'apiKeys.dialog.create.name' | translate }} *</label>
               <input type="text" [(ngModel)]="newKey.name" name="name" required 
                      [placeholder]="('apiKeys.dialog.create.namePlaceholder' | translate)" class="form-input"/>
             </div>

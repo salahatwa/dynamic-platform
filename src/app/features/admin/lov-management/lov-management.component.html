@@ -243,7 +243,10 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" (click)="closeModal('lov')">{{ 'lov.modal.cancel' | translate }}</button>
-          <button class="btn btn-primary" (click)="saveLov()" [disabled]="saving() || !hasSelectedApp()">
+          <button class="btn btn-primary" (click)="saveLov()" [disabled]="!isLovFormValid() || saving() || !hasSelectedApp()">
+            @if (saving()) {
+              <span class="spinner-small"></span>
+            }
             {{ 'lov.modal.createAddValues' | translate }}
           </button>
           @if (!hasSelectedApp()) {

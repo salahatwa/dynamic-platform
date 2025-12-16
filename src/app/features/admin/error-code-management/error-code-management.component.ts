@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject, effect } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ErrorCodeService } from '../../../core/services/error-code.service';
@@ -10,10 +10,8 @@ import {
   ErrorCodeCategory, 
   ErrorCodeRequest,
   ErrorSeverity,
-  ErrorStatus,
-  ErrorCodeTranslation
+  ErrorStatus
 } from '../../../core/models/error-code.model';
-import { App } from '../../../core/models/app.model';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
@@ -56,6 +54,7 @@ export class ErrorCodeManagementComponent implements OnInit {
   showVersionModal = signal(false);
   showAuditModal = signal(false);
   modalMode = signal<'create' | 'edit'>('create');
+  saving = signal(false);
 
   // Current items
   currentErrorCode = signal<ErrorCode | null>(null);
@@ -92,6 +91,17 @@ export class ErrorCodeManagementComponent implements OnInit {
     !!this.selectedStatus() || 
     !!this.searchTerm()
   );
+
+  // Form validation
+  isErrorCodeFormValid = computed(() => {
+    const errorCode = this.currentErrorCode();
+    if (!errorCode) return false;
+    
+    return errorCode.errorCode.trim().length > 0 && 
+           errorCode.severity && 
+           errorCode.status && 
+           errorCode.defaultMessage.trim().length > 0;
+  });
 
   private lastLoadedAppId: number | null = null;
 
@@ -246,8 +256,12 @@ export class ErrorCodeManagementComponent implements OnInit {
   }
 
   saveErrorCode() {
+    if (!this.isErrorCodeFormValid()) return;
+    
     const errorCode = this.currentErrorCode();
     if (!errorCode) return;
+
+    this.saving.set(true);
 
     const request: ErrorCodeRequest = {
       errorCode: errorCode.errorCode,
@@ -276,10 +290,12 @@ export class ErrorCodeManagementComponent implements OnInit {
         this.toastService.success(`Error code ${action} successfully`);
         this.loadErrorCodes();
         this.closeModal();
+        this.saving.set(false);
       },
       error: (error) => {
         const context = this.modalMode() === 'create' ? 'create_error_code' : 'update_error_code';
         this.errorHandler.handleError(error, context);
+        this.saving.set(false);
       }
     });
   }

@@ -147,6 +147,19 @@ export class AppConfigManagementComponent implements OnInit {
     });
   });
 
+  // Form validation
+  isConfigFormValid = computed(() => {
+    return this.configKey().trim().length > 0 && 
+           this.configName().trim().length > 0 && 
+           this.appName().trim().length > 0;
+  });
+
+  isGroupFormValid = computed(() => {
+    return this.groupKey().trim().length > 0 && 
+           this.groupName().trim().length > 0 && 
+           this.groupAppName().trim().length > 0;
+  });
+
   private lastLoadedAppId: number | null = null;
 
   constructor(
@@ -297,10 +310,7 @@ export class AppConfigManagementComponent implements OnInit {
   }
 
   saveConfig() {
-    if (!this.configKey() || !this.configName() || !this.appName()) {
-      this.toastService.error('Validation Error', 'Please fill in required fields: Config Key, Config Name, and App Name');
-      return;
-    }
+    if (!this.isConfigFormValid()) return;
 
     this.saving.set(true);
 
@@ -387,10 +397,7 @@ export class AppConfigManagementComponent implements OnInit {
   }
 
   saveGroup() {
-    if (!this.groupKey() || !this.groupName() || !this.groupAppName()) {
-      this.toastService.error('Validation Error', 'Please fill in required fields: Group Key, Group Name, and App Name');
-      return;
-    }
+    if (!this.isGroupFormValid()) return;
 
     this.saving.set(true);
 

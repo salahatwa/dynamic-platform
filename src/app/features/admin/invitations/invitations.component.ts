@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -42,6 +42,13 @@ export class InvitationsComponent implements OnInit {
   private t = inject(TranslationService);
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
+
+  // Form validation
+  isInvitationFormValid = computed(() => {
+    return this.invitationForm.email.trim().length > 0 && 
+           this.invitationForm.email.includes('@') &&
+           this.invitationForm.roleIds.length > 0;
+  });
   
   constructor(
     private invitationService: InvitationService,
@@ -117,13 +124,7 @@ export class InvitationsComponent implements OnInit {
     event.preventDefault();
     this.formError.set(null);
 
-    if (!this.invitationForm.email) {
-      this.formError.set(this.t.translate('invitations.form.emailRequired'));
-      return;
-    }
-
-    if (this.invitationForm.roleIds.length === 0) {
-      this.formError.set(this.t.translate('invitations.form.rolesRequired'));
+    if (!this.isInvitationFormValid()) {
       return;
     }
 

@@ -14,9 +14,7 @@ import {
 } from '../../../core/models/translation.model';
 
 // Import new unified components
-import { ButtonComponent } from '../../../shared/components/ui/button.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
-import { ThemeSelectorComponent } from '../../../shared/components/theme-selector/theme-selector.component';
 
 
 @Component({
@@ -25,9 +23,7 @@ import { ThemeSelectorComponent } from '../../../shared/components/theme-selecto
   imports: [
     CommonModule,
     FormsModule,
-    ButtonComponent,
-    TranslatePipe,
-    ThemeSelectorComponent
+    TranslatePipe
   ],
   templateUrl: './translations.component.html',
   styleUrls: ['./translations.component.scss']
@@ -44,6 +40,7 @@ export class TranslationsComponent implements OnInit {
   keys = signal<TranslationKey[]>([]);
   selectedLanguage = signal<string>('en');
   loading = signal(false);
+  saving = signal(false);
   searchQuery = signal('');
   currentLanguage = signal(localStorage.getItem('language') || 'en');
 
@@ -86,6 +83,16 @@ export class TranslationsComponent implements OnInit {
       key.keyName.toLowerCase().includes(query) ||
       key.description?.toLowerCase().includes(query)
     );
+  });
+
+  // Form validation
+  isKeyFormValid = computed(() => {
+    const form = this.keyForm();
+    return form.keyName.trim().length > 0;
+  });
+
+  isLanguageFormValid = computed(() => {
+    return this.newLanguageCode().trim().length > 0;
   });
 
   availableLanguages = computed(() => {
@@ -429,26 +436,38 @@ export class TranslationsComponent implements OnInit {
   }
 
   saveKey() {
+    if (!this.isKeyFormValid()) return;
+    
     const form = this.keyForm();
     const editing = this.editingKey;
+    
+    this.saving.set(true);
 
     if (editing) {
       this.translationService.updateKey(editing.id, form).subscribe({
         next: () => {
           this.loadKeys();
           this.showKeyModal = false;
+          this.saving.set(false);
           this.toastService.success('Translation Key Updated', 'Translation key updated successfully');
         },
-        error: (error) => this.errorHandler.handleError(error, 'update_translation_key')
+        error: (error) => {
+          this.saving.set(false);
+          this.errorHandler.handleError(error, 'update_translation_key');
+        }
       });
     } else {
       this.translationService.createKey(form).subscribe({
         next: () => {
           this.loadKeys();
           this.showKeyModal = false;
+          this.saving.set(false);
           this.toastService.success('Translation Key Created', 'Translation key created successfully');
         },
-        error: (error) => this.errorHandler.handleError(error, 'create_translation_key')
+        error: (error) => {
+          this.saving.set(false);
+          this.errorHandler.handleError(error, 'create_translation_key');
+        }
       });
     }
   }

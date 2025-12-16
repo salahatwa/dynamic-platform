@@ -123,6 +123,15 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   isTxtType = computed(() => this.templateType() === TemplateType.TXT);
   hasPages = computed(() => this.pages().length > 0);
 
+  // Form validation
+  isPageFormValid = computed(() => {
+    return this.pageName().trim().length > 0;
+  });
+
+  isAttributeFormValid = computed(() => {
+    return this.attributeKey().trim().length > 0;
+  });
+
   TemplateType = TemplateType;
   PageOrientation = PageOrientation;
   PageOrientationLabels = PageOrientationLabels;
@@ -317,6 +326,8 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   }
 
   savePage() {
+    if (!this.isPageFormValid()) return;
+    
     const id = this.templateId();
     if (!id) {
       // If no template ID, we need to create the template first
@@ -324,6 +335,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       return;
     }
 
+    this.saving.set(true);
     const request: TemplatePageRequest = {
       name: this.pageName(),
       content: this.pageContent()
@@ -341,9 +353,13 @@ export class TemplateEditorEnhancedComponent implements OnInit {
             this.pages.set([...currentPages]);
           }
           this.showPageModal.set(false);
+          this.saving.set(false);
           this.toastService.success('Page Updated', 'Template page updated successfully');
         },
-        error: (err) => this.errorHandler.handleError(err, 'update_template_page')
+        error: (err) => {
+          this.saving.set(false);
+          this.errorHandler.handleError(err, 'update_template_page');
+        }
       });
     } else {
       this.templateService.createPage(id, request).subscribe({
@@ -352,9 +368,13 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           this.pages.set([...this.pages(), page]);
           this.showPageModal.set(false);
           this.selectPage(page);
+          this.saving.set(false);
           this.toastService.success('Page Created', 'Template page created successfully');
         },
-        error: (err) => this.errorHandler.handleError(err, 'create_template_page')
+        error: (err) => {
+          this.saving.set(false);
+          this.errorHandler.handleError(err, 'create_template_page');
+        }
       });
     }
   }
@@ -460,10 +480,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   }
 
   saveAttribute() {
-    if (!this.attributeKey().trim()) {
-      this.toastService.error('Validation Error', 'Attribute key is required');
-      return;
-    }
+    if (!this.isAttributeFormValid()) return;
 
     const id = this.templateId();
     if (!id) {
@@ -472,6 +489,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       return;
     }
 
+    this.saving.set(true);
     const request: TemplateAttributeRequest = {
       attributeKey: this.attributeKey(),
       attributeValue: this.attributeValue(),
@@ -491,9 +509,13 @@ export class TemplateEditorEnhancedComponent implements OnInit {
             this.attributes.set([...currentAttrs]);
           }
           this.showAttributeModal.set(false);
+          this.saving.set(false);
           this.toastService.success('Attribute Updated', 'Template attribute updated successfully');
         },
-        error: (err) => this.errorHandler.handleError(err, 'update_template_attribute')
+        error: (err) => {
+          this.saving.set(false);
+          this.errorHandler.handleError(err, 'update_template_attribute');
+        }
       });
     } else {
       this.templateService.createAttribute(id, request).subscribe({
@@ -501,9 +523,13 @@ export class TemplateEditorEnhancedComponent implements OnInit {
           // Add the new attribute to the local array instead of reloading
           this.attributes.set([...this.attributes(), newAttr]);
           this.showAttributeModal.set(false);
+          this.saving.set(false);
           this.toastService.success('Attribute Created', 'Template attribute created successfully');
         },
-        error: (err) => this.errorHandler.handleError(err, 'create_template_attribute')
+        error: (err) => {
+          this.saving.set(false);
+          this.errorHandler.handleError(err, 'create_template_attribute');
+        }
       });
     }
   }

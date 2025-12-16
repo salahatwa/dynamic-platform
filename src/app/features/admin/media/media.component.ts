@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, effect } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -16,11 +16,14 @@ import { ToastService } from '../../../core/services/toast.service';
   templateUrl: './media.component.html',
   styleUrl: './media.component.scss'
 })
-export class MediaComponent implements OnInit {
+export class MediaComponent implements OnInit, OnDestroy {
   private mediaService = inject(MediaService);
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
   appContext = inject(AppContextService);
+
+  // Component instance identifier
+  componentId = Math.random().toString(36).substring(2, 11);
 
   // App context
   selectedApp = this.appContext.selectedApp;
@@ -110,8 +113,7 @@ export class MediaComponent implements OnInit {
   ];
 
   constructor() {
-    const instanceId = Math.random().toString(36).substring(2, 11);
-    console.log('MediaComponent constructor called - Instance ID:', instanceId);
+    console.log('MediaComponent constructor called - Instance ID:', this.componentId);
     console.log('MediaComponent instances count:', (window as any).mediaComponentInstances = ((window as any).mediaComponentInstances || 0) + 1);
     // Watch for app changes and reload files
     effect(() => {
@@ -145,6 +147,12 @@ export class MediaComponent implements OnInit {
   ngOnInit() {
     // Data will be loaded automatically when app is selected via effect
     // No need to load here as effect will handle both initial load and app changes
+    console.log('MediaComponent ngOnInit - Instance:', this.componentId);
+  }
+
+  ngOnDestroy() {
+    console.log('MediaComponent ngOnDestroy - Instance:', this.componentId);
+    // Clean up any subscriptions or effects if needed
   }
 
   loadFolders() {

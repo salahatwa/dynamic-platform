@@ -455,7 +455,10 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="closeModal()">{{ 'common.cancel' | translate }}</button>
-        <button class="btn btn-primary" (click)="saveErrorCode()">
+        <button class="btn btn-primary" (click)="saveErrorCode()" [disabled]="!isErrorCodeFormValid() || saving()">
+          @if (saving()) {
+            <span class="spinner-small"></span>
+          }
           {{ modalMode() === 'create' ? ('common.create' | translate) : ('common.save' | translate) }}
         </button>
       </div>

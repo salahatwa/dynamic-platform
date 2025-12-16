@@ -9,8 +9,8 @@
         </h1>
         <p class="page-subtitle">
           <span class="template-type-badge">{{ templateType() }}</span>
-          <span class="separator">•</span>
-          <span>{{ isHtmlType() ? 'HTML Template Editor' : 'Text Template Editor' }}</span>
+          <!-- <span class="separator">•</span>
+          <span>{{ isHtmlType() ? 'HTML Template Editor' : 'Text Template Editor' }}</span> -->
         </p>
       </div>
       <div class="header-actions">
@@ -371,7 +371,7 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>Page Name</label>
+          <label>Page Name *</label>
           <input type="text" class="form-control" [(ngModel)]="pageName" placeholder="Page 1">
         </div>
         <div class="form-group">
@@ -382,7 +382,10 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" (click)="closeModal('page')">Cancel</button>
-        <button class="btn btn-primary" (click)="savePage()">
+        <button class="btn btn-primary" (click)="savePage()" [disabled]="!isPageFormValid() || saving()">
+          @if (saving()) {
+            <span class="spinner-small"></span>
+          }
           {{ editingPageId() ? 'Update' : 'Create' }}
         </button>
       </div>
@@ -425,7 +428,10 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" (click)="closeModal('attribute')">Cancel</button>
-        <button class="btn btn-primary" (click)="saveAttribute()">
+        <button class="btn btn-primary" (click)="saveAttribute()" [disabled]="!isAttributeFormValid() || saving()">
+          @if (saving()) {
+            <span class="spinner-small"></span>
+          }
           {{ editingAttributeId() ? 'Update' : 'Create' }}
         </button>
       </div>
