@@ -1076,7 +1076,9 @@
       "create_api_key": "إنشاء مفتاح API",
       "delete_api_key": "حذف مفتاح API",
       "storage_provider_test": "اختبار مزود التخزين",
-      "storage_provider_save": "تكوين مزود التخزين"
+      "storage_provider_save": "تكوين مزود التخزين",
+      "load_error_codes": "تحميل رموز الأخطاء",
+      "load_error_code_categories": "تحميل فئات رموز الأخطاء"
     }
   }
 }

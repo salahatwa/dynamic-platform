@@ -1109,7 +1109,9 @@
       "create_api_key": "API key creation",
       "delete_api_key": "API key deletion",
       "storage_provider_test": "Storage provider test",
-      "storage_provider_save": "Storage provider configuration"
+      "storage_provider_save": "Storage provider configuration",
+      "load_error_codes": "Loading error codes",
+      "load_error_code_categories": "Loading error code categories"
     }
   }
 }

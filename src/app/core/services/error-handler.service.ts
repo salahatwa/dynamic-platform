@@ -202,26 +202,46 @@ export class ErrorHandlerService {
    * Parse HTTP error response
    */
   private parseHttpError(error: HttpErrorResponse): ErrorCode {
-    const apiError = error.error as ApiError;
+    const apiError = error.error as any; // Use any to handle different backend response formats
     
-    // Check if backend provided a structured error
+    // Helper function to extract backend message
+    const getBackendMessage = (): string | undefined => {
+      // Try different possible message locations in the response
+      return apiError?.message || 
+             apiError?.error?.message || 
+             apiError?.details || 
+             apiError?.error?.details;
+    };
+
+    const backendMessage = getBackendMessage();
+    
+    // Check if backend provided a structured error with code
     if (apiError?.error?.code) {
       const knownError = this.errorCodeMappings[apiError.error.code];
       if (knownError) {
         return {
           ...knownError,
-          details: apiError.error.details || knownError.details
+          details: backendMessage || knownError.details
         };
       }
     }
 
-    // Handle HTTP status codes
+    // If backend provided a clear message, use it directly instead of generic messages
+    if (backendMessage && backendMessage.trim()) {
+      return {
+        code: `HTTP_${error.status}`,
+        message: backendMessage, // Use backend message directly as the main message
+        details: this.getHttpStatusDescription(error.status)
+      };
+    }
+
+    // Handle HTTP status codes with generic messages
     switch (error.status) {
       case 400:
         return {
           code: 'HTTP_400',
           message: 'errors.http.bad_request',
-          details: apiError?.error?.message || 'errors.http.bad_request_details'
+          details: 'errors.http.bad_request_details'
         };
       case 401:
         return {
@@ -249,13 +269,13 @@ export class ErrorHandlerService {
         return {
           code: 'HTTP_409',
           message: 'errors.http.conflict',
-          details: apiError?.error?.message || 'errors.http.conflict_details'
+          details: 'errors.http.conflict_details'
         };
       case 422:
         return {
           code: 'HTTP_422',
           message: 'errors.http.validation_failed',
-          details: apiError?.error?.message || 'errors.http.validation_failed_details'
+          details: 'errors.http.validation_failed_details'
         };
       case 429:
         return {
@@ -291,31 +311,66 @@ export class ErrorHandlerService {
         return {
           code: `HTTP_${error.status}`,
           message: 'errors.http.unknown_error',
-          details: apiError?.error?.message || error.message || 'errors.http.unknown_error_details'
+          details: 'errors.http.unknown_error_details'
         };
     }
+  }
+
+  /**
+   * Get HTTP status description for details
+   */
+  private getHttpStatusDescription(status: number): string {
+    const descriptions: Record<number, string> = {
+      400: 'Bad Request - The request could not be processed',
+      401: 'Unauthorized - Authentication required',
+      403: 'Forbidden - Access denied',
+      404: 'Not Found - Resource not found',
+      409: 'Conflict - Resource conflict',
+      422: 'Validation Failed - Invalid data provided',
+      429: 'Too Many Requests - Rate limit exceeded',
+      500: 'Internal Server Error - Server encountered an error',
+      502: 'Bad Gateway - Invalid server response',
+      503: 'Service Unavailable - Server temporarily unavailable',
+      504: 'Gateway Timeout - Server response timeout'
+    };
+    
+    return descriptions[status] || `HTTP ${status} Error`;
   }
 
   /**
    * Get user-friendly message with context
    */
   private getUserFriendlyMessage(errorInfo: ErrorCode, context?: string): ErrorCode {
-    const translatedMessage = this.translationService.translate(errorInfo.message);
-    const translatedDetails = errorInfo.details ? this.translationService.translate(errorInfo.details) : undefined;
+    // Check if the message is already a user-friendly message (not a translation key)
+    const isTranslationKey = errorInfo.message.includes('.') && errorInfo.message.startsWith('errors.');
+    
+    let finalMessage: string;
+    let finalDetails: string | undefined;
 
-    let contextualMessage = translatedMessage;
+    if (isTranslationKey) {
+      // It's a translation key, translate it
+      finalMessage = this.translationService.translate(errorInfo.message);
+      finalDetails = errorInfo.details ? this.translationService.translate(errorInfo.details) : undefined;
+    } else {
+      // It's already a user-friendly message from backend, use it directly
+      finalMessage = errorInfo.message;
+      finalDetails = errorInfo.details;
+    }
+
+    // Add context if provided
+    let contextualMessage = finalMessage;
     if (context) {
       const contextKey = `errors.context.${context}`;
       const contextTranslation = this.translationService.translate(contextKey);
       if (contextTranslation !== contextKey) {
-        contextualMessage = `${contextTranslation}: ${translatedMessage}`;
+        contextualMessage = `${contextTranslation}: ${finalMessage}`;
       }
     }
 
     return {
       ...errorInfo,
       message: contextualMessage,
-      details: translatedDetails,
+      details: finalDetails,
       action: errorInfo.action ? {
         ...errorInfo.action,
         label: this.translationService.translate(errorInfo.action.label)
