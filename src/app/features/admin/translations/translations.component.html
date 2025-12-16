@@ -13,13 +13,13 @@
       </div>
 
       <div class="admin-header-actions" *ngIf="selectedApp()">
-        <button class="btn btn-outline" (click)="openLanguageModal()">
+        <!-- <button class="btn btn-outline" (click)="openLanguageModal()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
           </svg>
           <span>{{ 'translationsMgmt.manageLanguages' | translate }}</span>
-        </button>
+        </button> -->
 
         <button class="btn btn-outline" (click)="exportTranslations()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,6 +40,56 @@
   </div>
 
   <div class="container pb-5">
+    <!-- Language Selection Card -->
+    <div class="language-selection-card" *ngIf="selectedApp()">
+      <div class="language-card-header">
+        <div class="language-card-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+          </svg>
+          <span>Languages</span>
+          <span class="language-count">({{ availableLanguages().length }})</span>
+        </div>
+        <button class="btn btn-sm btn-outline" (click)="openLanguageModal()"
+          title="{{ 'translationsMgmt.manageLanguages' | translate }}">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="d-none d-sm-inline">{{ 'translationsMgmt.addLanguage' | translate }}</span>
+        </button>
+      </div>
+      
+      <div class="language-scroll-container">
+        <div class="language-horizontal-list">
+          <button *ngFor="let lang of availableLanguages()" class="language-item-compact"
+            [class.active]="selectedLanguage() === lang" (click)="selectedLanguage.set(lang)">
+            <div class="language-compact-content">
+              <span class="language-flag-small">{{ getLanguageInfo(lang).flag }}</span>
+              <div class="language-text">
+                <span class="language-name-small">{{ getLanguageInfo(lang).name }}</span>
+                <span class="language-code-small">{{ lang.toUpperCase() }}</span>
+              </div>
+            </div>
+            <div class="language-actions-compact" *ngIf="lang !== 'en' && availableLanguages().length > 1">
+              <button class="remove-btn-compact" 
+                (click)="$event.stopPropagation(); removeLanguage(lang)"
+                title="{{ 'translationsMgmt.langModal.remove' | translate }} {{ getLanguageInfo(lang).name }}">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="language-status-compact" *ngIf="selectedLanguage() === lang">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Filters & Search -->
     <div class="admin-filters-section" *ngIf="selectedApp()">
       <div class="admin-filters-grid">
@@ -52,27 +102,6 @@
           </span>
           <input type="text" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)"
             placeholder="{{ 'translationsMgmt.searchPlaceholder' | translate }}">
-        </div>
-
-        <!-- Language Tabs -->
-        <div class="language-tabs-wrapper">
-          <div class="language-tabs">
-            <button *ngFor="let lang of availableLanguages()" class="language-tab"
-              [class.active]="selectedLanguage() === lang" (click)="selectedLanguage.set(lang)">
-              <span class="flag">{{ getLanguageInfo(lang).flag }}</span>
-              <span class="lang-code">{{ lang.toUpperCase() }}</span>
-              <button *ngIf="lang !== 'en' && availableLanguages().length > 1" class="remove-lang-btn"
-                (click)="$event.stopPropagation(); removeLanguage(lang)"
-                title="{{ 'translationsMgmt.langModal.remove' | translate }} {{ getLanguageInfo(lang).name }}">
-                ×
-              </button>
-            </button>
-
-            <button class="language-tab add-language" (click)="openLanguageModal()"
-              title="{{ 'translationsMgmt.addLanguage' | translate }}">
-              <span class="add-icon">+</span>
-            </button>
-          </div>
         </div>
 
         <div class="view-toggle ms-auto">

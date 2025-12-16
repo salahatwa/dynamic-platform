@@ -556,12 +556,12 @@ html[lang="ar"] h6 {
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 0rem;
 }
 
 @media (min-width: 768px) {
   .container {
-    padding: 0 2rem;
+    padding: 0 0rem;
   }
 }
 
