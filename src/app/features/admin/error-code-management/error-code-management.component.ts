@@ -53,8 +53,14 @@ export class ErrorCodeManagementComponent implements OnInit {
   showCategoryModal = signal(false);
   showVersionModal = signal(false);
   showAuditModal = signal(false);
+  showSettingsModal = signal(false);
   modalMode = signal<'create' | 'edit'>('create');
   saving = signal(false);
+
+  // Auto-generation states
+  errorCodeSettings = signal<any>(null);
+  generatingCode = signal(false);
+  previewCode = signal<string>('');
 
   // Current items
   currentErrorCode = signal<ErrorCode | null>(null);
@@ -239,6 +245,10 @@ export class ErrorCodeManagementComponent implements OnInit {
       }
     });
     this.selectedLanguages.set(['en']); // English is always default
+    
+    // Load settings and preview for auto-generation
+    this.loadErrorCodeSettings();
+    
     this.showModal.set(true);
   }
 
@@ -437,5 +447,81 @@ export class ErrorCodeManagementComponent implements OnInit {
     const translation = errorCode.translations[lang];
     const value = (translation as any)[field];
     return (typeof value === 'string' ? value : '') || '';
+  }
+
+  // ==================== AUTO-GENERATION METHODS ====================
+
+  loadErrorCodeSettings() {
+    this.errorCodeService.getErrorCodeSettings().subscribe({
+      next: (settings) => {
+        this.errorCodeSettings.set(settings);
+        this.updatePreviewCode();
+      },
+      error: (error) => this.errorHandler.handleError(error, 'load_error_code_settings')
+    });
+  }
+
+  openSettingsModal() {
+    this.loadErrorCodeSettings();
+    this.showSettingsModal.set(true);
+  }
+
+  closeSettingsModal() {
+    this.showSettingsModal.set(false);
+  }
+
+  saveErrorCodeSettings() {
+    const settings = this.errorCodeSettings();
+    if (!settings) return;
+
+    this.saving.set(true);
+    this.errorCodeService.updateErrorCodeSettings(settings).subscribe({
+      next: (updatedSettings) => {
+        this.errorCodeSettings.set(updatedSettings);
+        this.toastService.success('Error code settings updated successfully');
+        this.updatePreviewCode();
+        this.saving.set(false);
+      },
+      error: (error) => {
+        this.errorHandler.handleError(error, 'update_error_code_settings');
+        this.saving.set(false);
+      }
+    });
+  }
+
+  generateErrorCode() {
+    this.generatingCode.set(true);
+    this.errorCodeService.generateNextErrorCode().subscribe({
+      next: (response) => {
+        const errorCode = this.currentErrorCode();
+        if (errorCode) {
+          errorCode.errorCode = response.generatedCode;
+          this.currentErrorCode.set({ ...errorCode });
+        }
+        this.updatePreviewCode();
+        this.generatingCode.set(false);
+        this.toastService.success(`Generated code: ${response.generatedCode}`);
+      },
+      error: (error) => {
+        this.errorHandler.handleError(error, 'generate_error_code');
+        this.generatingCode.set(false);
+      }
+    });
+  }
+
+  updatePreviewCode() {
+    this.errorCodeService.previewNextErrorCode().subscribe({
+      next: (response) => {
+        this.previewCode.set(response.generatedCode);
+      },
+      error: (error) => {
+        console.error('Failed to update preview code:', error);
+        this.previewCode.set('');
+      }
+    });
+  }
+
+  onSettingsChange() {
+    this.updatePreviewCode();
   }
 }

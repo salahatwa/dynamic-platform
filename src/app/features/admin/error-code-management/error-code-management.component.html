@@ -12,6 +12,15 @@
         </p>
       </div>
       <div class="admin-header-actions" *ngIf="selectedApp()">
+        <button class="btn btn-outline btn-lg" (click)="openSettingsModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Settings
+        </button>
         <button class="btn btn-primary btn-lg" (click)="openCreateModal()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -279,14 +288,36 @@
 
       <div class="modal-body">
         <div class="form-grid">
-          <!-- Error Code -->
+          <!-- Error Code with Auto-Generation -->
           <div class="form-group">
             <label class="form-label">{{ 'errorCode.code' | translate }} *</label>
-            <input 
-              type="text" 
-              class="form-control"
-              [(ngModel)]="currentErrorCode()!.errorCode"
-              placeholder="e.g., AUTH_001">
+            <div class="input-group">
+              <input 
+                type="text" 
+                class="form-control"
+                [(ngModel)]="currentErrorCode()!.errorCode"
+                placeholder="e.g., AUTH_001">
+              <button 
+                type="button"
+                class="btn btn-outline btn-icon"
+                (click)="generateErrorCode()"
+                [disabled]="generatingCode()"
+                title="Generate unique error code">
+                @if (generatingCode()) {
+                  <span class="spinner-small"></span>
+                } @else {
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (previewCode()) {
+              <small class="form-text text-muted">
+                Next available: {{ previewCode() }}
+              </small>
+            }
           </div>
 
           <!-- Module Name -->
@@ -448,6 +479,121 @@
             <span class="spinner-small"></span>
           }
           {{ modalMode() === 'create' ? ('common.create' | translate) : ('common.save' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Error Code Settings Modal -->
+@if (showSettingsModal() && errorCodeSettings()) {
+  <div class="modal-overlay" (click)="closeSettingsModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Error Code Generation Settings</h2>
+        <button class="btn btn-icon btn-sm btn-ghost" (click)="closeSettingsModal()">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <!-- Prefix -->
+          <div class="form-group">
+            <label class="form-label">Prefix *</label>
+            <input 
+              type="text" 
+              class="form-control"
+              [(ngModel)]="errorCodeSettings()!.prefix"
+              (input)="onSettingsChange()"
+              placeholder="e.g., E, ERR, AUTH"
+              maxlength="10">
+            <small class="form-text text-muted">
+              Letters/numbers that appear at the beginning of each error code
+            </small>
+          </div>
+
+          <!-- Sequence Length -->
+          <div class="form-group">
+            <label class="form-label">Sequence Length *</label>
+            <input 
+              type="number" 
+              class="form-control"
+              [(ngModel)]="errorCodeSettings()!.sequenceLength"
+              (input)="onSettingsChange()"
+              min="1"
+              max="10"
+              placeholder="6">
+            <small class="form-text text-muted">
+              Number of digits in the sequence (1-10)
+            </small>
+          </div>
+
+          <!-- Separator -->
+          <div class="form-group">
+            <label class="form-label">Separator</label>
+            <input 
+              type="text" 
+              class="form-control"
+              [(ngModel)]="errorCodeSettings()!.separator"
+              (input)="onSettingsChange()"
+              placeholder="Leave empty or use _, -, etc."
+              maxlength="5">
+            <small class="form-text text-muted">
+              Optional character(s) between prefix and sequence
+            </small>
+          </div>
+
+          <!-- Current Sequence -->
+          <div class="form-group">
+            <label class="form-label">Current Sequence</label>
+            <input 
+              type="number" 
+              class="form-control"
+              [value]="errorCodeSettings()!.currentSequence"
+              readonly
+              disabled>
+            <small class="form-text text-muted">
+              Current sequence number (read-only)
+            </small>
+          </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="preview-section mt-4 p-3 bg-surface rounded border">
+          <h4 class="h6 mb-2">Preview</h4>
+          <div class="d-flex align-items-center gap-3">
+            <span class="preview-label">Next code will be:</span>
+            <span class="preview-code badge bg-primary-subtle text-primary fs-6">
+              {{ previewCode() || 'Loading...' }}
+            </span>
+          </div>
+          <small class="text-muted d-block mt-1">
+            Format: {{ errorCodeSettings()!.prefix }}{{ errorCodeSettings()!.separator }}{{ '0'.repeat(errorCodeSettings()!.sequenceLength) }}
+          </small>
+        </div>
+
+        <!-- Active Status -->
+        <div class="form-group mt-3">
+          <label class="checkbox-label d-flex align-items-center gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="errorCodeSettings()!.isActive">
+            <span>Enable auto-generation</span>
+          </label>
+          <small class="form-text text-muted">
+            When enabled, the generate button will be available in the create form
+          </small>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeSettingsModal()">{{ 'common.cancel' | translate }}</button>
+        <button class="btn btn-primary" (click)="saveErrorCodeSettings()" [disabled]="saving()">
+          @if (saving()) {
+            <span class="spinner-small"></span>
+          }
+          {{ 'common.save' | translate }}
         </button>
       </div>
     </div>

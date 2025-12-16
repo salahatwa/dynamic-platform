@@ -103,3 +103,32 @@ export interface ErrorCodeRequest {
   documentationUrl?: string;
   translations?: { [key: string]: ErrorCodeTranslation };
 }
+
+export interface ErrorCodeSettings {
+  id?: number;
+  corporateId: number;
+  prefix: string;
+  sequenceLength: number;
+  currentSequence: number;
+  separator: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface ErrorCodeSettingsRequest {
+  prefix: string;
+  sequenceLength: number;
+  separator?: string;
+  isActive?: boolean;
+}
+
+export interface ErrorCodeGenerationResponse {
+  generatedCode: string;
+  sequenceNumber: number;
+  prefix: string;
+  separator: string;
+  sequenceLength: number;
+}

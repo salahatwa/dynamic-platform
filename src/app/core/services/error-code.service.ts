@@ -8,7 +8,10 @@ import {
   ErrorCodeVersion, 
   ErrorCodeAudit,
   ErrorSeverity,
-  ErrorStatus
+  ErrorStatus,
+  ErrorCodeSettings,
+  ErrorCodeSettingsRequest,
+  ErrorCodeGenerationResponse
 } from '../models/error-code.model';
 
 interface PageResponse<T> {
@@ -110,5 +113,28 @@ export class ErrorCodeService {
 
   restoreVersion(id: number, versionNumber: number): Observable<ErrorCode> {
     return this.http.post<ErrorCode>(`${this.apiUrl}/${id}/restore/${versionNumber}`, {});
+  }
+
+  // ==================== AUTO-GENERATION OPERATIONS ====================
+
+  getErrorCodeSettings(): Observable<ErrorCodeSettings> {
+    return this.http.get<ErrorCodeSettings>(`${this.apiUrl}/settings`);
+  }
+
+  updateErrorCodeSettings(request: ErrorCodeSettingsRequest): Observable<ErrorCodeSettings> {
+    return this.http.put<ErrorCodeSettings>(`${this.apiUrl}/settings`, request);
+  }
+
+  generateNextErrorCode(): Observable<ErrorCodeGenerationResponse> {
+    return this.http.post<ErrorCodeGenerationResponse>(`${this.apiUrl}/generate`, {});
+  }
+
+  previewNextErrorCode(): Observable<ErrorCodeGenerationResponse> {
+    return this.http.get<ErrorCodeGenerationResponse>(`${this.apiUrl}/preview`);
+  }
+
+  checkErrorCodeUnique(errorCode: string): Observable<boolean> {
+    const params = new HttpParams().set('errorCode', errorCode);
+    return this.http.get<boolean>(`${this.apiUrl}/check-unique`, { params });
   }
 }

@@ -180,9 +180,9 @@
               <div class="card-key text-primary fw-bold font-monospace">{{ config.configKey }}</div>
             </div>
             <div class="admin-card-title">{{ config.configName }}</div>
-            @if (config.description) {
+            <!-- @if (config.description) {
             <div class="text-secondary small text-truncate">{{ config.description }}</div>
-            }
+            } -->
 
             <div class="p-2 bg-surface rounded border font-monospace text-break small mt-2">
               @if (config.configType === ConfigType.BOOLEAN) {
@@ -345,12 +345,12 @@
               [placeholder]="('appConfig.modal.config.configNamePlaceholder' | translate)">
           </div>
 
-          <div class="form-group full-width">
+          <!-- <div class="form-group full-width">
             <label class="form-label">{{ 'appConfig.modal.config.descriptionLabel' | translate }}</label>
             <textarea class="form-control" rows="2" [value]="configDescription()"
               (input)="configDescription.set($any($event.target).value)"
               [placeholder]="('appConfig.modal.config.descriptionPlaceholder' | translate)"></textarea>
-          </div>
+          </div> -->
 
           <div class="form-group">
             <label class="form-label">{{ 'appConfig.modal.config.typeLabel' | translate }}</label>
@@ -396,14 +396,14 @@
 
           <div class="form-group full-width">
             <div class="d-flex gap-4 p-3 bg-surface rounded border">
-              <label class="checkbox-label cursor-pointer d-flex align-items-center gap-2">
+              <!-- <label class="checkbox-label cursor-pointer d-flex align-items-center gap-2">
                 <input type="checkbox" [checked]="isPublic()" (change)="isPublic.set(!isPublic())">
                 <span>{{ 'appConfig.modal.config.publicDesc' | translate }}</span>
               </label>
               <label class="checkbox-label cursor-pointer d-flex align-items-center gap-2">
                 <input type="checkbox" [checked]="isRequired()" (change)="isRequired.set(!isRequired())">
                 <span>{{ 'appConfig.modal.config.requiredDesc' | translate }}</span>
-              </label>
+              </label> -->
               <label class="checkbox-label cursor-pointer d-flex align-items-center gap-2">
                 <input type="checkbox" [checked]="active()" (change)="active.set(!active())">
                 <span>{{ 'appConfig.modal.config.activeLabel' | translate }}</span>
