@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, effect } from '@angular/core';
+import { Component, inject, signal, OnInit, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -6,8 +6,10 @@ import { Router } from '@angular/router';
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { TranslationService } from '../../../core/services/translation.service';
 import { AppContextService } from '../../../core/services/app-context.service';
+import { PermissionService } from '../../../core/services/permission.service';
 import { environment } from '../../../../environments/environment';
 
 interface ApiKey {
@@ -40,7 +42,7 @@ interface ApiGuide {
 @Component({
   selector: 'app-api-keys',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardComponent, ButtonComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, CardComponent, ButtonComponent, TranslatePipe, HasPermissionDirective],
   templateUrl: './api-keys.component.html',
   styleUrls: ['./api-keys.component.scss']
 })
@@ -51,6 +53,13 @@ export class ApiKeysComponent implements OnInit {
   private docUrl = `${environment.apiUrl}/documentation/api-keys`;
   private t = inject(TranslationService);
   private appContext = inject(AppContextService);
+  private permissionService = inject(PermissionService);
+
+  // Permission checks
+  canCreateApiKeys = computed(() => this.permissionService.canCreate('api_keys'));
+  canUpdateApiKeys = computed(() => this.permissionService.canUpdate('api_keys'));
+  canDeleteApiKeys = computed(() => this.permissionService.canDelete('api_keys'));
+  canReadApiKeys = computed(() => this.permissionService.canRead('api_keys'));
   
   apiKeys = signal<ApiKey[]>([]);
   loading = signal(true);
