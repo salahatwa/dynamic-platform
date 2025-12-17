@@ -137,9 +137,7 @@ export class TemplatesComponent implements OnInit {
   showFiltersDropdown = signal(false);
   activeView = signal<'grid' | 'list'>('grid');
 
-  ngOnInit() {
-    this.loadTemplates();
-
+  constructor() {
     // Watch for app changes and reload templates
     effect(() => {
       const app = this.selectedApp();
@@ -148,7 +146,11 @@ export class TemplatesComponent implements OnInit {
         this.currentPage.set(0);
         this.loadTemplates(true);
       }
-    });
+    }, { allowSignalWrites: true });
+  }
+
+  ngOnInit() {
+    this.loadTemplates();
   }
 
   private i18n = inject(TranslationService);

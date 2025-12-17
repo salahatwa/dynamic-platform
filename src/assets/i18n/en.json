@@ -158,6 +158,7 @@
     "templates": "Templates",
     "tickets": "Tickets",
     "users": "Users",
+    "roles": "Roles",
     "apiKeys": "API Keys",
     "settings": "Settings",
     "invitations": "Invitations",
@@ -1218,5 +1219,45 @@
       "restore_app": "Restoring app",
       "delete_app_permanently": "Deleting app permanently"
     }
+  },
+  "roles": {
+    "title": "Role Management",
+    "subtitle": "Manage system and custom roles with granular permissions",
+    "createRole": "Create Role",
+    "editRole": "Edit Role",
+    "createRoleDesc": "Create a new custom role with specific permissions",
+    "editRoleDesc": "Update role information and permissions",
+    "createFirstRole": "Create Your First Role",
+    "systemRoles": "System Roles",
+    "systemRolesDesc": "Built-in roles with predefined permissions (read-only)",
+    "customRoles": "Custom Roles",
+    "customRolesDesc": "Organization-specific roles you can create and modify",
+    "system": "System",
+    "custom": "Custom",
+    "permissions": "permissions",
+    "viewDetails": "View Details",
+    "searchPlaceholder": "Search roles by name or description...",
+    "loadingSystemRoles": "Loading system roles...",
+    "loadingCustomRoles": "Loading custom roles...",
+    "loading": "Loading...",
+    "empty": {
+      "title": "No Custom Roles",
+      "desc": "Create custom roles to define specific permission sets for your organization"
+    },
+    "name": "Role Name",
+    "description": "Description",
+    "type": "Type",
+    "namePlaceholder": "Enter role name (e.g., Content Manager)",
+    "descriptionPlaceholder": "Enter role description (optional)",
+    "basicInfo": "Basic Information",
+    "basicInfoDesc": "Define the role name and description",
+    "permissionsDesc": "Select the permissions this role should have",
+    "permissionsSelected": "permissions selected",
+    "selectAll": "Select All",
+    "clearAll": "Clear All",
+    "selectGroup": "Select Group",
+    "deselectGroup": "Deselect Group",
+    "confirmDeletePrefix": "Delete role",
+    "noDescription": "No description provided"
   }
 }

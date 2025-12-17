@@ -163,7 +163,7 @@ export class TranslationsComponent implements OnInit {
           // loadKeys() will be called after translationAppId is set in loadAppLanguages()
         }, 0);
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit() {

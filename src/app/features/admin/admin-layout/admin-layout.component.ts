@@ -72,7 +72,8 @@ import { PermissionService } from '../../../core/services/permission.service';
           <div class="nav-divider"></div>
           
           <!-- App-Dependent Items (Disabled if no app selected) -->
-          <a routerLink="/admin/translations" 
+          <a *hasPermission="'translations:read'" 
+             routerLink="/admin/translations" 
              routerLinkActive="active" 
              class="nav-item"
              [class.disabled]="!appContext.hasSelectedApp()">
@@ -90,7 +91,8 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/templates" 
+          <a *hasPermission="'templates:read'" 
+             routerLink="/admin/templates" 
              [class.active]="isTemplatesActive()" 
              class="nav-item"
              [class.disabled]="!appContext.hasSelectedApp()">
@@ -108,7 +110,8 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/lov" 
+          <a *hasPermission="'lov:read'" 
+             routerLink="/admin/lov" 
              routerLinkActive="active" 
              class="nav-item"
              [class.disabled]="!appContext.hasSelectedApp()">
@@ -126,7 +129,8 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/config" 
+          <a *hasPermission="'app_config:read'" 
+             routerLink="/admin/config" 
              routerLinkActive="active" 
              class="nav-item"
              [class.disabled]="!appContext.hasSelectedApp()">
@@ -146,7 +150,8 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/error-codes" 
+          <a *hasPermission="'error_codes:read'" 
+             routerLink="/admin/error-codes" 
              routerLinkActive="active" 
              class="nav-item"
              [class.disabled]="!appContext.hasSelectedApp()">
@@ -164,7 +169,8 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/media" 
+          <a *hasPermission="'media:read'" 
+             routerLink="/admin/media" 
              routerLinkActive="active" 
              class="nav-item"
              [class.disabled]="!appContext.hasSelectedApp()">
@@ -195,10 +201,21 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/api-keys" routerLinkActive="active" class="nav-item">
+          <!-- Roles - Permission Based -->
+          <a *hasPermission="'roles:read'" routerLink="/admin/roles" routerLinkActive="active" class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            @if (!sidebarCollapsed()) {
+              <span>{{ 'admin.roles' | translate }}</span>
+            }
+          </a>
+          
+          <a *hasPermission="'api_keys:read'" routerLink="/admin/api-keys" routerLinkActive="active" class="nav-item">
              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1 7 21 9z"/>
+                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
             </svg>
             @if (!sidebarCollapsed()) {
               <span>{{ 'admin.apiKeys' | translate }}</span>
@@ -215,7 +232,7 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/invitations" routerLinkActive="active" class="nav-item">
+          <a *hasPermission="'invitations:read'" routerLink="/admin/invitations" routerLinkActive="active" class="nav-item">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -225,7 +242,7 @@ import { PermissionService } from '../../../core/services/permission.service';
             }
           </a>
           
-          <a routerLink="/admin/organization" routerLinkActive="active" class="nav-item">
+          <a *hasPermission="'organization:read'" routerLink="/admin/organization" routerLinkActive="active" class="nav-item">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h2M7 3h10M12 7v8m-4-4h8"/>

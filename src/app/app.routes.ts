@@ -64,6 +64,18 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/users/users.component').then(m => m.UsersComponent)
       },
       {
+        path: 'roles',
+        loadComponent: () => import('./features/admin/roles/roles.component').then(m => m.RolesComponent)
+      },
+      {
+        path: 'roles/create',
+        loadComponent: () => import('./features/admin/roles/role-form/role-form.component').then(m => m.RoleFormComponent)
+      },
+      {
+        path: 'roles/edit/:id',
+        loadComponent: () => import('./features/admin/roles/role-form/role-form.component').then(m => m.RoleFormComponent)
+      },
+      {
         path: 'api-keys',
         loadComponent: () => import('./features/admin/api-keys/api-keys.component').then(m => m.ApiKeysComponent)
       },

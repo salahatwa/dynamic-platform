@@ -88,7 +88,8 @@ export class InvitationsComponent implements OnInit {
   }
 
   loadRoles() {
-    this.http.get<Role[]>(`${environment.apiUrl}/roles`).subscribe({
+    // Use the available roles endpoint which returns all roles (system + custom) as an array
+    this.http.get<Role[]>(`${environment.apiUrl}/roles/available`).subscribe({
       next: (roles) => {
         this.availableRoles.set(roles);
       },
