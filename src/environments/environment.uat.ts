@@ -7,7 +7,7 @@
 export const environment = {
   production: false,
   name: 'uat',
-  apiUrl: 'https://dynamic-platform-api-latest.onrender.com/api',
+  apiUrl: 'http://35.196.142.99:8080/api',
   
   // GitHub Pages deployment configuration
   deploymentUrl: 'https://salahatwa.github.io/dynamic-platform',
