@@ -16,18 +16,27 @@
   z-index: 1200;
   padding: 1rem;
   animation: fadeIn 0.2s ease-out;
-  
-  /* Additional centering techniques for better browser compatibility */
-  place-items: center;
-  place-content: center;
+  box-sizing: border-box;
+}
+
+.modal-overlay * {
+  box-sizing: border-box;
+}
+
+.modal-overlay::before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  width: 0;
 }
 
 .modal {
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
-  background-color: var(--surface);
-  border: 1px solid var(--border);
+  background-color: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border-radius: 16px;
   overflow: hidden;
@@ -36,10 +45,6 @@
   flex-direction: column;
   position: relative;
   margin: auto;
-  
-  /* Ensure modal stays centered */
-  align-self: center;
-  justify-self: center;
 }
 
 .modal-sm {
@@ -51,15 +56,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  background-color: var(--surface-elevated);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  background-color: var(--surface-elevated, #f9fafb);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--text, #111827);
 }
 
 .btn-close {
@@ -69,9 +74,9 @@
   width: 32px;
   height: 32px;
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, #e5e7eb);
   border-radius: 8px;
-  color: var(--text-secondary);
+  color: var(--text-secondary, #6b7280);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 1.25rem;
@@ -79,9 +84,9 @@
 }
 
 .btn-close:hover {
-  background: var(--surface-hover);
-  border-color: var(--primary);
-  color: var(--primary);
+  background: var(--surface-hover, #f3f4f6);
+  border-color: var(--primary, #6366f1);
+  color: var(--primary, #6366f1);
 }
 
 .modal-body {
@@ -99,27 +104,27 @@
 }
 
 .delete-icon svg {
-  color: var(--danger);
+  color: var(--danger, #dc2626);
 }
 
 .delete-confirmation p {
   margin: 0 0 0.75rem 0;
-  color: var(--text);
+  color: var(--text, #111827);
   line-height: 1.5;
 }
 
 .item-name {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary, #6366f1);
   font-family: monospace;
-  background: var(--surface-elevated);
+  background: var(--surface-elevated, #f9fafb);
   padding: 0.5rem;
   border-radius: 6px;
   margin: 0.75rem 0 !important;
 }
 
 .warning-text {
-  color: var(--text-secondary);
+  color: var(--text-secondary, #6b7280);
   font-size: 0.875rem;
   font-style: italic;
 }
@@ -130,8 +135,8 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1.5rem;
-  border-top: 1px solid var(--border);
-  background-color: var(--surface-elevated);
+  border-top: 1px solid var(--border, #e5e7eb);
+  background-color: var(--surface-elevated, #f9fafb);
 }
 
 .btn {
@@ -155,24 +160,24 @@
 }
 
 .btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border-color: var(--border);
+  background: var(--surface, #ffffff);
+  color: var(--text, #111827);
+  border-color: var(--border, #e5e7eb);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  border-color: var(--primary);
-  background: var(--surface-hover);
+  border-color: var(--primary, #6366f1);
+  background: var(--surface-hover, #f3f4f6);
 }
 
 .btn-danger {
-  background: var(--danger);
+  background: var(--danger, #dc2626);
   color: white;
-  border-color: var(--danger);
+  border-color: var(--danger, #dc2626);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: var(--danger-hover);
+  background: var(--danger-hover, #b91c1c);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
@@ -233,7 +238,24 @@
 
 :host-context([data-theme="dark"]) .modal,
 [data-theme="dark"] .modal {
-  background-color: var(--surface);
-  border-color: var(--border);
+  background-color: var(--surface, #1f2937);
+  border-color: var(--border, #374151);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+:host-context([data-theme="dark"]) .modal-header h3,
+[data-theme="dark"] .modal-header h3 {
+  color: var(--text, #f9fafb);
+}
+
+:host-context([data-theme="dark"]) .delete-confirmation p,
+[data-theme="dark"] .delete-confirmation p {
+  color: var(--text, #f9fafb);
+}
+
+:host-context([data-theme="dark"]) .btn-secondary,
+[data-theme="dark"] .btn-secondary {
+  background: var(--surface, #374151);
+  color: var(--text, #f9fafb);
+  border-color: var(--border, #4b5563);
 }
