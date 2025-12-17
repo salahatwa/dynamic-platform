@@ -148,7 +148,7 @@ export class MediaComponent implements OnInit, OnDestroy {
         this.currentFolder.set(null);
         this.breadcrumbs.set([]);
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit() {
