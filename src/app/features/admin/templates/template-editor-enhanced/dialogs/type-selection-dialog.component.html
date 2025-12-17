@@ -1,0 +1,40 @@
+@if (show) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Select Template Type</h2>
+        <button class="btn-close" (click)="onClose()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="type-cards">
+          <div class="type-card" (click)="onTypeSelect(TemplateType.HTML)">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3>HTML Template</h3>
+            <p>Rich HTML editor with multiple pages, styling, and live preview</p>
+          </div>
+
+          <div class="type-card" (click)="onTypeSelect(TemplateType.TXT)">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3>Text Template</h3>
+            <p>Simple plain text template for emails and messages</p>
+          </div>
+
+          <div class="type-card disabled">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <h3>Form Template</h3>
+            <p>Coming soon - Dynamic form builder</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -64,22 +64,7 @@
     <!-- Filters & Tools Bar -->
     <div class="filters-bar">
       <div class="editor-tools">
-        <!-- Page Orientation Selector -->
-        <div class="tool-group">
-          <label class="tool-label">Orientation:</label>
-          <select class="form-control form-control-sm" [(ngModel)]="pageOrientation" 
-                  [title]="PageOrientationDescriptions[pageOrientation()]"
-                  (change)="onPageOrientationChange()">
-            <option [value]="PageOrientation.PORTRAIT" 
-                    [title]="PageOrientationDescriptions[PageOrientation.PORTRAIT]">
-              {{ PageOrientationLabels[PageOrientation.PORTRAIT] }}
-            </option>
-            <option [value]="PageOrientation.LANDSCAPE" 
-                    [title]="PageOrientationDescriptions[PageOrientation.LANDSCAPE]">
-              {{ PageOrientationLabels[PageOrientation.LANDSCAPE] }}
-            </option>
-          </select>
-        </div>
+        <!-- Page Orientation moved to filter-actions as icon button -->
 
         <!-- Editor Tab -->
         <div class="tool-group">
@@ -106,6 +91,25 @@
           </button>
         }
 
+        <!-- Page Orientation Toggle Button -->
+        <button class="btn-icon orientation-toggle" 
+                (click)="togglePageOrientation()" 
+                [title]="'Page Orientation: ' + PageOrientationLabels[pageOrientation()]">
+          @if (pageOrientation() === PageOrientation.PORTRAIT) {
+            <!-- Portrait Icon -->
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="2" width="12" height="20" rx="2" ry="2" stroke-width="2"/>
+              <line x1="12" y1="18" x2="12" y2="18" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          } @else {
+            <!-- Landscape Icon -->
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="2" y="6" width="20" height="12" rx="2" ry="2" stroke-width="2"/>
+              <line x1="18" y1="12" x2="18" y2="12" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          }
+        </button>
+
         <!-- Help Button -->
         <button class="btn-icon" (click)="showHelp = !showHelp" [class.active]="showHelp"
           title="Show help and tips">
@@ -119,77 +123,14 @@
   </div>
 
   <!-- Variables Panel (Overlay) -->
-  @if (showVariablesPanel()) {
-  <div class="variables-panel-overlay" (click)="closeVariablesPanel()">
-    <div class="variables-panel" (click)="$event.stopPropagation()">
-      <div class="variables-panel-header">
-        <div class="panel-title">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
-          <h3>Attributes</h3>
-          <span class="variables-count">{{ attributes().length }} variables</span>
-        </div>
-        <div class="panel-actions">
-          <button class="btn btn-sm btn-primary" (click)="openAttributeModal()">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <!-- Add Attribute -->
-          </button>
-          <button class="btn-close" (click)="closeVariablesPanel()">×</button>
-        </div>
-      </div>
-
-      <div class="variables-panel-content">
-        @if (attributes().length > 0) {
-        <div class="variables-grid">
-          @for (attr of attributes(); track attr.id) {
-          <div class="variable-card">
-            <div class="variable-header">
-              <div class="variable-type-badge" [attr.data-type]="attr.attributeType">
-                {{ attr.attributeType }}
-              </div>
-              <div class="variable-actions">
-                <button class="btn-icon-xs" (click)="editAttribute(attr)" title="Edit">
-                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-                <button class="btn-icon-xs danger" (click)="confirmDeleteAttribute(attr)" title="Delete">
-                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div class="variable-content">
-              <div class="variable-key">{{ attr.attributeKey }}</div>
-              <div class="variable-value">{{ attr.attributeValue || '(no default)' }}</div>
-              <div class="variable-description" *ngIf="attr.description">{{ attr.description }}</div>
-            </div>
-          </div>
-          }
-        </div>
-        } @else {
-        <div class="variables-empty-state">
-          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
-          <h4>No Variables Yet</h4>
-          <p>Add variables like {{ '{' }}{{ '{' }}name{{ '}' }}{{ '}' }}, {{ '{' }}{{ '{' }}email{{ '}' }}{{ '}' }} to
-            make your template dynamic</p>
-          <button class="btn btn-primary" (click)="openAttributeModal()">Add Your First Variable</button>
-        </div>
-        }
-      </div>
-    </div>
-  </div>
-  }
+  <app-variables-panel
+    [show]="showVariablesPanel()"
+    [attributes]="attributes()"
+    (close)="onVariablesPanelClose()"
+    (addAttribute)="onVariablesPanelAddAttribute()"
+    (editAttribute)="onVariablesPanelEditAttribute($event)"
+    (deleteAttribute)="onVariablesPanelDeleteAttribute($event)">
+  </app-variables-panel>
 
   <!-- Main Editor Area (Full Width) -->
   <div class="editor-main-fullwidth">
@@ -320,7 +261,7 @@
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
-          <button class="btn-icon-sm danger" (click)="confirmDeletePage(activePage()!)" title="Delete current page"
+          <button class="btn-icon-sm danger" (click)="confirmDeletePage(activePage()!); $event.stopPropagation()" title="Delete current page"
             *ngIf="activePage() && pages().length > 1">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -335,145 +276,45 @@
 
 
 
-  <!-- Type Selection Modal -->
-  @if (showTypeModal()) {
-  <div class="modal-overlay" (click)="closeModal('type')">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Select Template Type</h2>
-        <button class="btn-close" (click)="closeModal('type')">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="type-cards">
-          <div class="type-card" (click)="selectType(TemplateType.HTML)">
-            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3>HTML Template</h3>
-            <p>Rich HTML editor with multiple pages, styling, and live preview</p>
-          </div>
+  <!-- Type Selection Dialog -->
+  <app-type-selection-dialog
+    [show]="showTypeModal()"
+    (close)="closeModal('type')"
+    (typeSelected)="onTypeSelected($event)">
+  </app-type-selection-dialog>
 
-          <div class="type-card" (click)="selectType(TemplateType.TXT)">
-            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3>Text Template</h3>
-            <p>Simple plain text template for emails and messages</p>
-          </div>
+  <!-- Page Dialog -->
+  <app-page-dialog
+    [show]="showPageModal()"
+    [isEditing]="!!editingPageId()"
+    [saving]="saving()"
+    [pageName]="pageName()"
+    [pageContent]="pageContent()"
+    (close)="closeModal('page')"
+    (save)="onPageDialogSave($event)">
+  </app-page-dialog>
 
-          <div class="type-card disabled">
-            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <h3>Form Template</h3>
-            <p>Coming soon - Dynamic form builder</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  }
+  <!-- Attribute Dialog -->
+  <app-attribute-dialog
+    [show]="showAttributeModal()"
+    [isEditing]="!!editingAttributeId()"
+    [saving]="saving()"
+    [attributeKey]="attributeKey()"
+    [attributeValue]="attributeValue()"
+    [attributeType]="attributeType()"
+    [attributeDescription]="attributeDescription()"
+    (close)="closeModal('attribute')"
+    (save)="onAttributeDialogSave($event)">
+  </app-attribute-dialog>
 
-  <!-- Page Modal -->
-  @if (showPageModal()) {
-  <div class="modal-overlay" (click)="closeModal('page')">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ editingPageId() ? 'Edit Page' : 'Add Page' }}</h2>
-        <button class="btn-close" (click)="closeModal('page')">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Page Name *</label>
-          <input type="text" class="form-control" [(ngModel)]="pageName" placeholder="Page 1">
-        </div>
-        <div class="form-group">
-          <label>Initial Content (optional)</label>
-          <textarea class="form-control" [(ngModel)]="pageContent" rows="4"
-            placeholder="<h1>Page content...</h1>"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" (click)="closeModal('page')">Cancel</button>
-        <button class="btn btn-primary" (click)="savePage()" [disabled]="!isPageFormValid() || saving()">
-          @if (saving()) {
-            <span class="spinner-small"></span>
-          }
-          {{ editingPageId() ? 'Update' : 'Create' }}
-        </button>
-      </div>
-    </div>
-  </div>
-  }
-
-  <!-- Attribute Modal -->
-  @if (showAttributeModal()) {
-  <div class="modal-overlay" (click)="closeModal('attribute')">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ editingAttributeId() ? 'Edit Attribute' : 'Add Attribute' }}</h2>
-        <button class="btn-close" (click)="closeModal('attribute')">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Attribute Key *</label>
-          <input type="text" class="form-control" [(ngModel)]="attributeKey"
-            placeholder="e.g., subject, recipient, company">
-        </div>
-        <div class="form-group">
-          <label>Default Value</label>
-          <input type="text" class="form-control" [(ngModel)]="attributeValue" placeholder="Default value">
-        </div>
-        <div class="form-group">
-          <label>Type</label>
-          <select class="form-control" [(ngModel)]="attributeType">
-            <option value="STRING">String</option>
-            <option value="NUMBER">Number</option>
-            <option value="DATE">Date</option>
-            <option value="BOOLEAN">Boolean</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea class="form-control" [(ngModel)]="attributeDescription" rows="2"
-            placeholder="What is this attribute for?"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" (click)="closeModal('attribute')">Cancel</button>
-        <button class="btn btn-primary" (click)="saveAttribute()" [disabled]="!isAttributeFormValid() || saving()">
-          @if (saving()) {
-            <span class="spinner-small"></span>
-          }
-          {{ editingAttributeId() ? 'Update' : 'Create' }}
-        </button>
-      </div>
-    </div>
-  </div>
-  }
-
-  <!-- Delete Confirmation Modal -->
-  @if (showDeleteModal()) {
-  <div class="modal-overlay" (click)="closeModal('delete')">
-    <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Confirm Delete</h2>
-        <button class="btn-close" (click)="closeModal('delete')">×</button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete <strong>{{ deleteName() }}</strong>?</p>
-        <p class="text-danger">This action cannot be undone.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" (click)="closeModal('delete')">Cancel</button>
-        <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
-      </div>
-    </div>
-  </div>
-  }
+  <!-- Delete Confirmation Dialog -->
+  <app-delete-confirmation-dialog
+    [show]="showDeleteModal()"
+    [itemName]="deleteName()"
+    [itemType]="deleteType() || ''"
+    (close)="closeModal('delete')"
+    (confirm)="onDeleteConfirmed()">
+  </app-delete-confirmation-dialog>
 
   <!-- PDF Parameters Dialog -->
   <app-pdf-parameters-dialog

@@ -21,11 +21,26 @@ import { FreeMarkerInsertEvent } from '../../../../shared/components/freemarker-
 import { FreeMarkerService, FreeMarkerVariable } from '../../../../core/services/freemarker.service';
 import { EditorContentComponent, ContentChangeEvent, TextSelectionEvent } from '../../../../shared/components/template-editor/editor-content/editor-content.component';
 import { PdfParametersDialogComponent } from '../../../../shared/components/pdf-parameters-dialog/pdf-parameters-dialog.component';
+import { TypeSelectionDialogComponent } from './dialogs/type-selection-dialog.component';
+import { PageDialogComponent, PageDialogData } from './dialogs/page-dialog.component';
+import { AttributeDialogComponent, AttributeDialogData } from './dialogs/attribute-dialog.component';
+import { DeleteConfirmationDialogComponent } from './dialogs/delete-confirmation-dialog.component';
+import { VariablesPanelComponent } from './dialogs/variables-panel.component';
 
 @Component({
   selector: 'app-template-editor-enhanced',
   standalone: true,
-  imports: [CommonModule, FormsModule, EditorContentComponent, PdfParametersDialogComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    EditorContentComponent, 
+    PdfParametersDialogComponent,
+    TypeSelectionDialogComponent,
+    PageDialogComponent,
+    AttributeDialogComponent,
+    DeleteConfirmationDialogComponent,
+    VariablesPanelComponent
+  ],
   templateUrl: './template-editor-enhanced.component.html',
   styleUrls: ['./template-editor-enhanced.component.css']
 })
@@ -200,6 +215,17 @@ export class TemplateEditorEnhancedComponent implements OnInit {
     if (this.templateId()) {
       this.saveTemplateMetadata();
     }
+  }
+
+  togglePageOrientation() {
+    // Toggle between portrait and landscape
+    const currentOrientation = this.pageOrientation();
+    const newOrientation = currentOrientation === PageOrientation.PORTRAIT 
+      ? PageOrientation.LANDSCAPE 
+      : PageOrientation.PORTRAIT;
+    
+    this.pageOrientation.set(newOrientation);
+    this.onPageOrientationChange();
   }
 
   // Folder Management
@@ -928,9 +954,49 @@ export class TemplateEditorEnhancedComponent implements OnInit {
     this.showVariablesPanel.set(false);
   }
 
+  // Variables Panel Event Handlers
+  onVariablesPanelClose() {
+    this.closeVariablesPanel();
+  }
+
+  onVariablesPanelAddAttribute() {
+    this.openAttributeModal();
+  }
+
+  onVariablesPanelEditAttribute(attribute: TemplateAttribute) {
+    this.editAttribute(attribute);
+  }
+
+  onVariablesPanelDeleteAttribute(attribute: TemplateAttribute) {
+    this.confirmDeleteAttribute(attribute);
+  }
+
   // Help Panel Methods
   closeHelp() {
     this.showHelp = false;
+  }
+
+  // Dialog Event Handlers
+  onTypeSelected(type: TemplateType) {
+    this.selectType(type);
+  }
+
+  onPageDialogSave(data: PageDialogData) {
+    this.pageName.set(data.name);
+    this.pageContent.set(data.content);
+    this.savePage();
+  }
+
+  onAttributeDialogSave(data: AttributeDialogData) {
+    this.attributeKey.set(data.key);
+    this.attributeValue.set(data.value);
+    this.attributeType.set(data.type);
+    this.attributeDescription.set(data.description);
+    this.saveAttribute();
+  }
+
+  onDeleteConfirmed() {
+    this.confirmDelete();
   }
 
   // Page Navigation Methods

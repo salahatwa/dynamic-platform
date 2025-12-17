@@ -1,0 +1,70 @@
+@if (show) {
+<div class="variables-panel-overlay" (click)="onClose()">
+  <div class="variables-panel" (click)="$event.stopPropagation()">
+    <div class="variables-panel-header">
+      <div class="panel-title">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <h3>Attributes</h3>
+        <span class="variables-count">{{ attributes.length }} variables</span>
+      </div>
+      <div class="panel-actions">
+        <button class="btn btn-sm btn-primary" (click)="onAddAttribute()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+        <button class="btn-close" (click)="onClose()">×</button>
+      </div>
+    </div>
+
+    <div class="variables-panel-content">
+      @if (attributes.length > 0) {
+      <div class="variables-grid">
+        @for (attr of attributes; track attr.id) {
+        <div class="variable-card">
+          <div class="variable-header">
+            <div class="variable-type-badge" [attr.data-type]="attr.attributeType">
+              {{ attr.attributeType }}
+            </div>
+            <div class="variable-actions">
+              <button class="btn-icon-xs" (click)="onEditAttribute(attr)" title="Edit">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button class="btn-icon-xs danger" (click)="onDeleteAttribute(attr)" title="Delete">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="variable-content">
+            <div class="variable-key">{{ attr.attributeKey }}</div>
+            <div class="variable-value">{{ attr.attributeValue || '(no default)' }}</div>
+            <div class="variable-description" *ngIf="attr.description">{{ attr.description }}</div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="variables-empty-state">
+        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <h4>No Variables Yet</h4>
+        <p>Add variables like {{ '{' }}{{ '{' }}name{{ '}' }}{{ '}' }}, {{ '{' }}{{ '{' }}email{{ '}' }}{{ '}' }} to
+          make your template dynamic</p>
+        <button class="btn btn-primary" (click)="onAddAttribute()">Add Your First Variable</button>
+      </div>
+      }
+    </div>
+  </div>
+</div>
+}
