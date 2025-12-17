@@ -373,21 +373,45 @@ import { PermissionService } from '../../../core/services/permission.service';
     }
 
     .sidebar-toggle {
-      background: transparent;
-      border: none;
+      background: var(--surface);
+      border: 2px solid var(--border);
       color: var(--text-secondary);
       cursor: pointer;
       padding: 0.5rem;
-      border-radius: 8px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-toggle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 8px;
     }
 
     .sidebar-toggle:hover {
       background: var(--surface-hover);
-      color: var(--text);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    }
+
+    .sidebar-toggle:hover::before {
+      opacity: 1;
+    }
+
+    .sidebar-toggle:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
     }
     
     .sidebar.collapsed .sidebar-toggle {
@@ -625,6 +649,22 @@ import { PermissionService } from '../../../core/services/permission.service';
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Dark mode sidebar toggle */
+    :host-context([data-theme="dark"]) .sidebar-toggle,
+    [data-theme="dark"] .sidebar-toggle {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    :host-context([data-theme="dark"]) .sidebar-toggle:hover,
+    [data-theme="dark"] .sidebar-toggle:hover {
+      background: rgba(51, 65, 85, 0.9);
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     }
 
     /* RTL Main Content */

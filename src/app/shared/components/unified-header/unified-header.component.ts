@@ -505,33 +505,83 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       display: none;
       flex-direction: column;
       justify-content: center;
+      align-items: center;
       gap: 4px;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
       cursor: pointer;
       padding: 0;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mobile-toggle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .mobile-toggle:hover {
+      background: var(--surface-hover);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    }
+
+    .mobile-toggle:hover::before {
+      opacity: 1;
+    }
+
+    .mobile-toggle:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
     }
 
     .toggle-line {
-      width: 18px;
-      height: 2px;
+      width: 20px;
+      height: 2.5px;
       background: var(--text);
       border-radius: 2px;
-      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+    }
+
+    .mobile-toggle:hover .toggle-line {
+      background: var(--primary);
+    }
+
+    .mobile-toggle.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+    }
+
+    .mobile-toggle.active::before {
+      opacity: 1;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
+    }
+
+    .mobile-toggle.active .toggle-line {
+      background: var(--primary);
     }
 
     .mobile-toggle.active .toggle-line:nth-child(1) { 
-      transform: translateY(6px) rotate(45deg); 
+      transform: translateY(6.5px) rotate(45deg); 
     }
     .mobile-toggle.active .toggle-line:nth-child(2) { 
-      opacity: 0; 
+      opacity: 0;
+      transform: scale(0);
     }
     .mobile-toggle.active .toggle-line:nth-child(3) { 
-      transform: translateY(-6px) rotate(-45deg); 
+      transform: translateY(-6.5px) rotate(-45deg); 
     }
 
     .header-controls {
@@ -831,6 +881,12 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
       .mobile-toggle {
         display: flex;
+        margin-left: auto;
+      }
+
+      .rtl .mobile-toggle {
+        margin-left: 0;
+        margin-right: auto;
       }
 
       .header-controls {
@@ -997,6 +1053,27 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     [data-theme="dark"] .rtl .header-controls {
       border-right-color: rgba(255, 255, 255, 0.1);
       box-shadow: 20px 0 60px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Dark mode mobile toggle */
+    :host-context([data-theme="dark"]) .mobile-toggle,
+    [data-theme="dark"] .mobile-toggle {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    :host-context([data-theme="dark"]) .mobile-toggle:hover,
+    [data-theme="dark"] .mobile-toggle:hover {
+      background: rgba(51, 65, 85, 0.9);
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    :host-context([data-theme="dark"]) .mobile-toggle.active,
+    [data-theme="dark"] .mobile-toggle.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
     }
   `]
 })
