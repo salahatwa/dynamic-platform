@@ -34,10 +34,10 @@ export class InvitationsComponent implements OnInit {
   createDialog = signal(false);
   filterStatus = signal<'ALL' | InvitationStatus>('ALL');
 
-  invitationForm = {
+  invitationForm = signal({
     email: '',
     roleIds: [] as number[]
-  };
+  });
 
   private t = inject(TranslationService);
   private errorHandler = inject(ErrorHandlerService);
@@ -45,9 +45,10 @@ export class InvitationsComponent implements OnInit {
 
   // Form validation
   isInvitationFormValid = computed(() => {
-    return this.invitationForm.email.trim().length > 0 && 
-           this.invitationForm.email.includes('@') &&
-           this.invitationForm.roleIds.length > 0;
+    const form = this.invitationForm();
+    return form.email.trim().length > 0 && 
+           form.email.includes('@') &&
+           form.roleIds.length > 0;
   });
   
   constructor(
@@ -101,23 +102,39 @@ export class InvitationsComponent implements OnInit {
 
   openCreateDialog() {
     this.createDialog.set(true);
-    this.invitationForm = { email: '', roleIds: [] };
+    this.invitationForm.set({ email: '', roleIds: [] });
     this.formError.set(null);
   }
 
   closeCreateDialog() {
     this.createDialog.set(false);
-    this.invitationForm = { email: '', roleIds: [] };
+    this.invitationForm.set({ email: '', roleIds: [] });
     this.formError.set(null);
   }
 
   toggleRole(roleId: number) {
-    const index = this.invitationForm.roleIds.indexOf(roleId);
+    const currentForm = this.invitationForm();
+    const index = currentForm.roleIds.indexOf(roleId);
+    const newRoleIds = [...currentForm.roleIds];
+    
     if (index > -1) {
-      this.invitationForm.roleIds.splice(index, 1);
+      newRoleIds.splice(index, 1);
     } else {
-      this.invitationForm.roleIds.push(roleId);
+      newRoleIds.push(roleId);
     }
+    
+    this.invitationForm.set({
+      ...currentForm,
+      roleIds: newRoleIds
+    });
+  }
+
+  updateEmail(email: string) {
+    const currentForm = this.invitationForm();
+    this.invitationForm.set({
+      ...currentForm,
+      email: email
+    });
   }
 
   submitInvitation(event: Event) {
@@ -130,7 +147,7 @@ export class InvitationsComponent implements OnInit {
 
     this.submitting.set(true);
 
-    this.invitationService.createInvitation(this.invitationForm).subscribe({
+    this.invitationService.createInvitation(this.invitationForm()).subscribe({
       next: (invitation) => {
         this.invitations.update(invs => [invitation, ...invs]);
         this.closeCreateDialog();

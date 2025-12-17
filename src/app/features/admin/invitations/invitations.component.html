@@ -158,7 +158,8 @@
             <label>{{ 'invitations.dialog.create.email' | translate }}</label>
             <input 
               type="email" 
-              [(ngModel)]="invitationForm.email" 
+              [value]="invitationForm().email"
+              (input)="updateEmail($any($event.target).value)"
               name="email"
               [placeholder]="('invitations.dialog.create.emailPlaceholder' | translate)"
               required 
@@ -172,7 +173,7 @@
                 <label class="checkbox-label">
                   <input 
                     type="checkbox" 
-                    [checked]="invitationForm.roleIds.includes(role.id)"
+                    [checked]="invitationForm().roleIds.includes(role.id)"
                     (change)="toggleRole(role.id)" 
                   />
                   <span>{{ role.name }}</span>
