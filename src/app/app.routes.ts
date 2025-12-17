@@ -100,6 +100,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/media/media.component').then(m => m.MediaComponent)
       },
       {
+        path: 'organization',
+        loadComponent: () => import('./features/admin/organization/organization.component').then(m => m.OrganizationComponent)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

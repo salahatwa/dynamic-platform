@@ -28,7 +28,12 @@
     "profile": "الملف الشخصي",
     "account": "الحساب",
     "settings": "الإعدادات",
-    "userMenu": "قائمة المستخدم"
+    "userMenu": "قائمة المستخدم",
+    "reset": "إعادة تعيين",
+    "retry": "إعادة المحاولة",
+    "error": "خطأ",
+    "createdAt": "تاريخ الإنشاء",
+    "updatedAt": "تاريخ التحديث"
   },
   "landing": {
     "title": "المنصة الديناميكية",
@@ -155,7 +160,35 @@
     "users": "المستخدمين",
     "apiKeys": "مفاتيح API",
     "settings": "الإعدادات",
-    "invitations": "الدعوات"
+    "invitations": "الدعوات",
+    "organization": "المؤسسة"
+  },
+  "organization": {
+    "title": "إدارة المؤسسة",
+    "description": "إدارة معلومات وإعدادات مؤسستك",
+    "details": "تفاصيل المؤسسة",
+    "manageInfo": "إدارة معلومات مؤسستك",
+    "name": "اسم المؤسسة",
+    "namePlaceholder": "أدخل اسم المؤسسة",
+    "nameNotAvailable": "هذا الاسم مستخدم بالفعل",
+    "domain": "نطاق المؤسسة",
+    "domainPlaceholder": "أدخل نطاق المؤسسة",
+    "domainNotAvailable": "هذا النطاق مستخدم بالفعل",
+    "domainInvalid": "يجب أن يحتوي النطاق على أحرف وأرقام وشرطات فقط",
+    "domainHelp": "النطاق يستخدم للتعريف ويجب أن يكون فريداً",
+    "description": "الوصف",
+    "descriptionPlaceholder": "أدخل وصف المؤسسة (اختياري)",
+    "descriptionHelp": "وصف مختصر لمؤسستك",
+    "additionalInfo": "معلومات إضافية",
+    "id": "معرف المؤسسة"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "nameMinLength": "يجب أن يكون الاسم على الأقل حرفين",
+    "nameMaxLength": "لا يمكن أن يتجاوز الاسم 100 حرف",
+    "domainMinLength": "يجب أن يكون النطاق على الأقل حرفين",
+    "domainMaxLength": "لا يمكن أن يتجاوز النطاق 100 حرف",
+    "descriptionMaxLength": "لا يمكن أن يتجاوز الوصف 500 حرف"
   },
   "errorCode": {
     "title": "إدارة رموز الأخطاء",

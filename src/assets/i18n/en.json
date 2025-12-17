@@ -28,7 +28,12 @@
     "profile": "Profile",
     "account": "Account",
     "settings": "Settings",
-    "userMenu": "User menu"
+    "userMenu": "User menu",
+    "reset": "Reset",
+    "retry": "Retry",
+    "error": "Error",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At"
   },
   "landing": {
     "title": "Dynamic Platform",
@@ -155,7 +160,35 @@
     "users": "Users",
     "apiKeys": "API Keys",
     "settings": "Settings",
-    "invitations": "Invitations"
+    "invitations": "Invitations",
+    "organization": "Organization"
+  },
+  "organization": {
+    "title": "Organization Management",
+    "description": "Manage your organization information and settings",
+    "details": "Organization Details",
+    "manageInfo": "Manage your organization information",
+    "name": "Organization Name",
+    "namePlaceholder": "Enter organization name",
+    "nameNotAvailable": "This name is already taken",
+    "domain": "Organization Domain",
+    "domainPlaceholder": "Enter organization domain",
+    "domainNotAvailable": "This domain is already taken",
+    "domainInvalid": "Domain must contain only letters, numbers, and hyphens",
+    "domainHelp": "Domain is used for identification and must be unique",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter organization description (optional)",
+    "descriptionHelp": "Brief description of your organization",
+    "additionalInfo": "Additional Information",
+    "id": "Organization ID"
+  },
+  "validation": {
+    "required": "This field is required",
+    "nameMinLength": "Name must be at least 2 characters",
+    "nameMaxLength": "Name cannot exceed 100 characters",
+    "domainMinLength": "Domain must be at least 2 characters",
+    "domainMaxLength": "Domain cannot exceed 100 characters",
+    "descriptionMaxLength": "Description cannot exceed 500 characters"
   },
   "errorCode": {
     "title": "Error Codes",

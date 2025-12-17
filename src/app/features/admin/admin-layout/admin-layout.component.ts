@@ -222,6 +222,16 @@ import { ThemeService } from '../../../core/services/theme.service';
               <span>{{ 'admin.invitations' | translate }}</span>
             }
           </a>
+          
+          <a routerLink="/admin/organization" routerLinkActive="active" class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h2M7 3h10M12 7v8m-4-4h8"/>
+            </svg>
+             @if (!sidebarCollapsed()) {
+              <span>{{ 'admin.organization' | translate }}</span>
+            }
+          </a>
         </nav>
       </aside>
       
