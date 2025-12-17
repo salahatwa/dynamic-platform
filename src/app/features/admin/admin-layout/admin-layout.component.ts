@@ -3,14 +3,16 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { UnifiedHeaderComponent } from '../../../shared/components/unified-header/unified-header.component';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { PermissionService } from '../../../core/services/permission.service';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, UnifiedHeaderComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe, HasPermissionDirective, UnifiedHeaderComponent],
   template: `
     <div class="admin-layout" [attr.dir]="currentLanguage() === 'ar' ? 'rtl' : 'ltr'">
       <!-- Mobile Overlay -->
@@ -182,8 +184,8 @@ import { ThemeService } from '../../../core/services/theme.service';
           
           <div class="nav-divider"></div>
           
-          <!-- Always Accessible -->
-          <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">
+          <!-- Users - Permission Based -->
+          <a *hasPermission="'users:read'" routerLink="/admin/users" routerLinkActive="active" class="nav-item">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -638,6 +640,7 @@ import { ThemeService } from '../../../core/services/theme.service';
 export class AdminLayoutComponent {
   appContext = inject(AppContextService);
   themeService = inject(ThemeService);
+  permissionService = inject(PermissionService);
   sidebarCollapsed = signal(false);
   sidebarOpen = signal(false);
   isMobile = signal(window.innerWidth < 768);
