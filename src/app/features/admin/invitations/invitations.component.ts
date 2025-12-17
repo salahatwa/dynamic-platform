@@ -8,7 +8,9 @@ import { Invitation, InvitationRequest, InvitationStatus } from '../../../core/m
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { TranslationService } from '../../../core/services/translation.service';
+import { PermissionService } from '../../../core/services/permission.service';
 
 interface Role {
   id: number;
@@ -18,7 +20,7 @@ interface Role {
 @Component({
   selector: 'app-invitations',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, HasPermissionDirective],
   templateUrl: './invitations.component.html',
   styleUrls: ['./invitations.component.scss']
 })
@@ -42,6 +44,13 @@ export class InvitationsComponent implements OnInit {
   private t = inject(TranslationService);
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
+  private permissionService = inject(PermissionService);
+
+  // Permission checks
+  canCreateInvitations = computed(() => this.permissionService.canCreate('invitations'));
+  canUpdateInvitations = computed(() => this.permissionService.canUpdate('invitations'));
+  canDeleteInvitations = computed(() => this.permissionService.canDelete('invitations'));
+  canReadInvitations = computed(() => this.permissionService.canRead('invitations'));
 
   // Form validation
   isInvitationFormValid = computed(() => {

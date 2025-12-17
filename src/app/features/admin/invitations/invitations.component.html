@@ -4,7 +4,7 @@
       <h1>{{ 'invitations.title' | translate }}</h1>
       <p>{{ 'invitations.subtitle' | translate }}</p>
     </div>
-    <button class="btn-primary" (click)="openCreateDialog()">
+    <button *hasPermission="'invitations:create'" class="btn-primary" (click)="openCreateDialog()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -102,14 +102,14 @@
           
           @if (invitation.status === InvitationStatus.PENDING) {
             <div class="invitation-actions">
-              <button class="btn-secondary" (click)="resendInvitation(invitation.id)">
+              <button *hasPermission="'invitations:update'" class="btn-secondary" (click)="resendInvitation(invitation.id)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="23 4 23 10 17 10"></polyline>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
                 {{ 'invitations.actions.resend' | translate }}
               </button>
-              <button class="btn-danger" (click)="cancelInvitation(invitation.id)">
+              <button *hasPermission="'invitations:delete'" class="btn-danger" (click)="cancelInvitation(invitation.id)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>

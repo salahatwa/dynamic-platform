@@ -1,17 +1,19 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CorporateService } from '../../../core/services/corporate.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Corporate, CorporateUpdateRequest } from '../../../core/models/corporate.model';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { PermissionService } from '../../../core/services/permission.service';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
   selector: 'app-organization',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe, HasPermissionDirective],
   template: `
     <div class="organization-management">
       <div class="page-header">
@@ -22,6 +24,7 @@ import { of } from 'rxjs';
           </div>
           <div class="header-actions">
             <button 
+              *hasPermission="'organization:update'"
               type="button" 
               class="btn btn-outline"
               (click)="resetForm()"
@@ -32,6 +35,7 @@ import { of } from 'rxjs';
               <span>{{ 'common.reset' | translate }}</span>
             </button>
             <button 
+              *hasPermission="'organization:update'"
               type="submit" 
               form="organizationForm"
               class="btn btn-primary"
@@ -97,6 +101,7 @@ import { of } from 'rxjs';
                     formControlName="name"
                     [class.error]="organizationForm.get('name')?.invalid && organizationForm.get('name')?.touched"
                     [class.success]="nameAvailable() && organizationForm.get('name')?.valid"
+                    [readonly]="!canUpdateOrganization()"
                     placeholder="{{ 'organization.namePlaceholder' | translate }}"
                   />
                   @if (checkingName()) {
@@ -150,6 +155,7 @@ import { of } from 'rxjs';
                     formControlName="domain"
                     [class.error]="organizationForm.get('domain')?.invalid && organizationForm.get('domain')?.touched"
                     [class.success]="domainAvailable() && organizationForm.get('domain')?.valid"
+                    [readonly]="!canUpdateOrganization()"
                     placeholder="{{ 'organization.domainPlaceholder' | translate }}"
                   />
                   @if (checkingDomain()) {
@@ -206,6 +212,7 @@ import { of } from 'rxjs';
                   formControlName="description"
                   rows="4"
                   [class.error]="organizationForm.get('description')?.invalid && organizationForm.get('description')?.touched"
+                  [readonly]="!canUpdateOrganization()"
                   placeholder="{{ 'organization.descriptionPlaceholder' | translate }}"
                 ></textarea>
                 @if (organizationForm.get('description')?.invalid && organizationForm.get('description')?.touched) {
@@ -586,6 +593,7 @@ export class OrganizationComponent implements OnInit {
   private fb = inject(FormBuilder);
   private corporateService = inject(CorporateService);
   private toastService = inject(ToastService);
+  private permissionService = inject(PermissionService);
 
   // Signals
   loading = signal(false);
@@ -596,6 +604,9 @@ export class OrganizationComponent implements OnInit {
   domainAvailable = signal(true);
   checkingName = signal(false);
   checkingDomain = signal(false);
+
+  // Permission checks
+  canUpdateOrganization = computed(() => this.permissionService.canUpdate('organization'));
 
   // Form
   organizationForm: FormGroup;
