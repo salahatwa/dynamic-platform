@@ -21,7 +21,7 @@
           <span>{{ 'translationsMgmt.manageLanguages' | translate }}</span>
         </button> -->
 
-        <button class="btn btn-outline" (click)="exportTranslations()">
+        <button *hasPermission="'translations:read'" class="btn btn-outline" (click)="exportTranslations()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -29,7 +29,7 @@
           <span>{{ 'common.export' | translate }}</span>
         </button>
 
-        <button class="btn btn-primary" (click)="openKeyModal()">
+        <button *hasPermission="'translations:create'" class="btn btn-primary" (click)="openKeyModal()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -51,7 +51,7 @@
           <span>Languages</span>
           <span class="language-count">({{ availableLanguages().length }})</span>
         </div>
-        <button class="btn btn-sm btn-outline" (click)="openLanguageModal()"
+        <button *hasPermission="'translations:create'" class="btn btn-sm btn-outline" (click)="openLanguageModal()"
           title="{{ 'translationsMgmt.manageLanguages' | translate }}">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -72,7 +72,7 @@
               </div>
             </div>
             <div class="language-actions-compact" *ngIf="lang !== 'en' && availableLanguages().length > 1">
-              <button class="remove-btn-compact" 
+              <button *hasPermission="'translations:delete'" class="remove-btn-compact" 
                 (click)="$event.stopPropagation(); removeLanguage(lang)"
                 title="{{ 'translationsMgmt.langModal.remove' | translate }} {{ getLanguageInfo(lang).name }}">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@
           </svg>
         </div>
         <h3>{{ 'translationsMgmt.emptyKeysPrefix' | translate }} "{{ selectedApp()!.name }}"</h3>
-        <button class="btn btn-primary" (click)="openKeyModal()">{{ 'translationsMgmt.addFirstKey' | translate
+        <button *hasPermission="'translations:create'" class="btn btn-primary" (click)="openKeyModal()">{{ 'translationsMgmt.addFirstKey' | translate
           }}</button>
       </div>
 
@@ -194,20 +194,21 @@
                 <input type="text" class="form-control"
                   [value]="(key.translations[selectedLanguage()] && key.translations[selectedLanguage()].value) || ''"
                   (blur)="updateTranslation(key, selectedLanguage(), $any($event.target).value)"
+                  [disabled]="!canUpdateTranslations()"
                   placeholder="{{ 'translationsMgmt.enterTranslation' | translate }}">
               </div>
               <p class="text-secondary small mt-2 mb-0" *ngIf="key.description">{{ key.description }}</p>
             </div>
 
             <div class="card-footer bg-transparent border-top border-light p-3 d-flex justify-content-end gap-2">
-              <button class="btn btn-icon btn-sm btn-ghost text-primary" (click)="openKeyModal(key)"
+              <button *hasPermission="'translations:update'" class="btn btn-icon btn-sm btn-ghost text-primary" (click)="openKeyModal(key)"
                 title="{{ 'common.edit' | translate }}">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </button>
-              <button class="btn btn-icon btn-sm btn-ghost text-danger" (click)="confirmDelete(key)"
+              <button *hasPermission="'translations:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="confirmDelete(key)"
                 title="{{ 'common.delete' | translate }}">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -243,6 +244,7 @@
                   <input type="text" class="form-control form-control-sm"
                     [value]="(key.translations[selectedLanguage()] && key.translations[selectedLanguage()].value) || ''"
                     (blur)="updateTranslation(key, selectedLanguage(), $any($event.target).value)"
+                    [disabled]="!canUpdateTranslations()"
                     placeholder="{{ 'translationsMgmt.enterTranslation' | translate }}">
                 </td>
                 <!-- <td class="text-secondary small">
@@ -250,14 +252,14 @@
                 </td> -->
                 <td class="text-end">
                   <div class="d-flex justify-content-end gap-2">
-                    <button class="btn btn-icon btn-sm btn-ghost text-primary" (click)="openKeyModal(key)"
+                    <button *hasPermission="'translations:update'" class="btn btn-icon btn-sm btn-ghost text-primary" (click)="openKeyModal(key)"
                       title="{{ 'common.edit' | translate }}">
                       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
-                    <button class="btn btn-icon btn-sm btn-ghost text-danger" (click)="confirmDelete(key)"
+                    <button *hasPermission="'translations:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="confirmDelete(key)"
                       title="{{ 'common.delete' | translate }}">
                       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -358,12 +360,14 @@
                 'translationsMgmt.langModal.default' | translate }}</span>
             </div>
 
-            <button *ngIf="lang !== 'en' && appLanguages().length > 1" class="btn btn-icon btn-sm btn-ghost text-danger"
-              [disabled]="languageLoading()" (click)="removeLanguage(lang)"
-              title="{{ 'translationsMgmt.langModal.remove' | translate }}">
-              <span *ngIf="languageLoading()" class="spinner-sm"></span>
-              <span *ngIf="!languageLoading()">×</span>
-            </button>
+            <ng-container *ngIf="lang !== 'en' && appLanguages().length > 1">
+              <button *hasPermission="'translations:delete'" class="btn btn-icon btn-sm btn-ghost text-danger"
+                [disabled]="languageLoading()" (click)="removeLanguage(lang)"
+                title="{{ 'translationsMgmt.langModal.remove' | translate }}">
+                <span *ngIf="languageLoading()" class="spinner-sm"></span>
+                <span *ngIf="!languageLoading()">×</span>
+              </button>
+            </ng-container>
           </div>
         </div>
       </div>
@@ -379,7 +383,7 @@
               {{ lang.flag }} {{ lang.name }} ({{ lang.code.toUpperCase() }})
             </option>
           </select>
-          <button class="btn btn-primary text-nowrap" [disabled]="!isLanguageFormValid() || languageLoading()"
+          <button *hasPermission="'translations:create'" class="btn btn-primary text-nowrap" [disabled]="!isLanguageFormValid() || languageLoading()"
             (click)="addLanguage()">
             <span *ngIf="languageLoading()" class="spinner-sm me-1"></span>
             {{ languageLoading() ? ( 'translationsMgmt.langModal.adding' | translate ) : (

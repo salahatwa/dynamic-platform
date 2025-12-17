@@ -6,6 +6,7 @@ import { AppContextService } from '../../../core/services/app-context.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { PermissionService } from '../../../core/services/permission.service';
 import {
   TranslationKey,
   TranslationStatus,
@@ -15,6 +16,7 @@ import {
 
 // Import new unified components
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 
 
 @Component({
@@ -23,7 +25,8 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
   imports: [
     CommonModule,
     FormsModule,
-    TranslatePipe
+    TranslatePipe,
+    HasPermissionDirective
   ],
   templateUrl: './translations.component.html',
   styleUrls: ['./translations.component.scss']
@@ -34,6 +37,13 @@ export class TranslationsComponent implements OnInit {
   private themeService = inject(ThemeService);
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
+  private permissionService = inject(PermissionService);
+
+  // Permission checks
+  canCreateTranslations = computed(() => this.permissionService.canCreate('translations'));
+  canUpdateTranslations = computed(() => this.permissionService.canUpdate('translations'));
+  canDeleteTranslations = computed(() => this.permissionService.canDelete('translations'));
+  canReadTranslations = computed(() => this.permissionService.canRead('translations'));
 
   // State
   activeView = signal<'grid' | 'list'>('list');

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { CardComponent } from '../../../shared/components/card/card.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
@@ -76,7 +75,7 @@ interface AuditDialog {
 @Component({
   selector: 'app-templates',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardComponent, ButtonComponent, TranslatePipe, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, ButtonComponent, TranslatePipe, HasPermissionDirective],
   templateUrl: './templates.component.html',
   styleUrls: ['./templates.component.scss']
 })
