@@ -72,7 +72,7 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        console.log('User logged in successfully');
+        console.log('User logged in successfully', response);
         
         // Store token and user info
         localStorage.setItem('token', response.token);

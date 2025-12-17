@@ -7,12 +7,14 @@ import { Lov, LovRequest, LovType, LovVersion, LovAudit } from '../../../core/mo
 import { AppContextService } from '../../../core/services/app-context.service';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { PermissionService } from '../../../core/services/permission.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-lov-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, HasPermissionDirective],
   templateUrl: './lov-management.component.html',
   styleUrls: ['./lov-management.component.scss']
 })
@@ -121,6 +123,13 @@ export class LovManagementComponent implements OnInit {
 
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
+  private permissionService = inject(PermissionService);
+
+  // Permission checks
+  canCreateLov = computed(() => this.permissionService.canCreate('lov'));
+  canUpdateLov = computed(() => this.permissionService.canUpdate('lov'));
+  canDeleteLov = computed(() => this.permissionService.canDelete('lov'));
+  canReadLov = computed(() => this.permissionService.canRead('lov'));
 
   constructor(
     private lovService: LovService,

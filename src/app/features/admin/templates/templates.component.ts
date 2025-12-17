@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, effect } from '@angular/core';
+import { Component, inject, signal, OnInit, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,8 +6,10 @@ import { HttpClient } from '@angular/common/http';
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { TranslationService } from '../../../core/services/translation.service';
 import { AppContextService } from '../../../core/services/app-context.service';
+import { PermissionService } from '../../../core/services/permission.service';
 import { environment } from '../../../../environments/environment';
 
 interface Template {
@@ -74,7 +76,7 @@ interface AuditDialog {
 @Component({
   selector: 'app-templates',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardComponent, ButtonComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, CardComponent, ButtonComponent, TranslatePipe, HasPermissionDirective],
   templateUrl: './templates.component.html',
   styleUrls: ['./templates.component.scss']
 })
@@ -82,8 +84,14 @@ export class TemplatesComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   private appContext = inject(AppContextService);
+  private permissionService = inject(PermissionService);
   private apiUrl = `${environment.apiUrl}/template-editor`;
   private dashboardApiUrl = `${environment.apiUrl}/dashboard`;
+
+  // Permission checks
+  canCreateTemplates = computed(() => this.permissionService.canCreate('templates'));
+  canUpdateTemplates = computed(() => this.permissionService.canUpdate('templates'));
+  canDeleteTemplates = computed(() => this.permissionService.canDelete('templates'));
 
   // App context
   selectedApp = this.appContext.selectedApp;

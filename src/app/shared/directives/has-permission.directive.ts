@@ -49,13 +49,11 @@ export class HasPermissionDirective implements OnInit, OnDestroy {
     if (this.resource && this.action) {
       const hasPermission = this.permissionService.hasPermission(this.resource, this.action);
       
-      // Debug logging
-      console.log(`Permission check: ${this.resource}:${this.action} = ${hasPermission}`);
+      // Clear existing views first
+      this.viewContainer.clear();
       
       if (hasPermission) {
         this.viewContainer.createEmbeddedView(this.templateRef);
-      } else {
-        this.viewContainer.clear();
       }
     }
   }

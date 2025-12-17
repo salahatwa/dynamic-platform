@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, OnDestroy, effect } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -8,6 +8,7 @@ import { MediaService, MediaFile, MediaFolder, PagedResponse, CreateFolderReques
 import { AppContextService } from '../../../core/services/app-context.service';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { PermissionService } from '../../../core/services/permission.service';
 
 @Component({
   selector: 'app-media',
@@ -20,7 +21,13 @@ export class MediaComponent implements OnInit, OnDestroy {
   private mediaService = inject(MediaService);
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
+  private permissionService = inject(PermissionService);
   appContext = inject(AppContextService);
+
+  // Permission checks
+  canCreateMedia = computed(() => this.permissionService.canCreate('media'));
+  canUpdateMedia = computed(() => this.permissionService.canUpdate('media'));
+  canDeleteMedia = computed(() => this.permissionService.canDelete('media'));
 
   // Component instance identifier
   componentId = Math.random().toString(36).substring(2, 11);

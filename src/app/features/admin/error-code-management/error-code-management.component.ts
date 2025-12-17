@@ -5,6 +5,7 @@ import { ErrorCodeService } from '../../../core/services/error-code.service';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { PermissionService } from '../../../core/services/permission.service';
 import { 
   ErrorCode, 
   ErrorCodeCategory, 
@@ -13,11 +14,12 @@ import {
   ErrorStatus
 } from '../../../core/models/error-code.model';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-error-code-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, HasPermissionDirective],
   templateUrl: './error-code-management.component.html',
   styleUrls: ['./error-code-management.component.scss']
 })
@@ -26,6 +28,13 @@ export class ErrorCodeManagementComponent implements OnInit {
   private appContext = inject(AppContextService);
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
+  private permissionService = inject(PermissionService);
+
+  // Permission checks
+  canCreateErrorCode = computed(() => this.permissionService.canCreate('error_codes'));
+  canUpdateErrorCode = computed(() => this.permissionService.canUpdate('error_codes'));
+  canDeleteErrorCode = computed(() => this.permissionService.canDelete('error_codes'));
+  canReadErrorCode = computed(() => this.permissionService.canRead('error_codes'));
   
   // Signals
   errorCodes = signal<ErrorCode[]>([]);

@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { AppConfigService } from '../../../core/services/app-config.service';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { PermissionService } from '../../../core/services/permission.service';
 import { 
   AppConfig, 
   AppConfigGroup, 
@@ -20,7 +22,7 @@ import {
 @Component({
   selector: 'app-app-config-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, HasPermissionDirective],
   templateUrl: './app-config-management.component.html',
   styleUrls: ['./app-config-management.component.scss']
 })
@@ -29,6 +31,12 @@ export class AppConfigManagementComponent implements OnInit {
   private appContext = inject(AppContextService);
   private errorHandler = inject(ErrorHandlerService);
   private toastService = inject(ToastService);
+  private permissionService = inject(PermissionService);
+
+  // Permission checks
+  canCreateAppConfig = computed(() => this.permissionService.canCreate('app_config'));
+  canUpdateAppConfig = computed(() => this.permissionService.canUpdate('app_config'));
+  canDeleteAppConfig = computed(() => this.permissionService.canDelete('app_config'));
   
   // Data
   configs = signal<AppConfig[]>([]);

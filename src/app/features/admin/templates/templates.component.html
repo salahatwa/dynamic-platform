@@ -6,7 +6,7 @@
         <p class="subtitle">{{ 'templates.subtitle' | translate }}</p>
       </div>
       <div class="admin-header-actions">
-        <app-button variant="primary" (click)="createNew()">
+        <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -116,7 +116,7 @@
       </div>
       <h3>{{ 'templates.emptyTitle' | translate }}</h3>
       <p>{{ 'templates.emptyDesc' | translate }}</p>
-      <app-button variant="primary" (click)="createNew()">{{ 'templates.createTemplate' | translate }}</app-button>
+      <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()">{{ 'templates.createTemplate' | translate }}</app-button>
     </div>
     } @else {
     @if (activeView() === 'grid') {
@@ -156,21 +156,21 @@
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </button>
-          <button class="btn btn-icon btn-sm btn-ghost text-primary" (click)="editTemplate(template.id)"
+          <button *hasPermission="'templates:update'" class="btn btn-icon btn-sm btn-ghost text-primary" (click)="editTemplate(template.id)"
             title="{{ 'common.edit' | translate }}">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
-          <button class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
+          <button *hasPermission="'templates:create'" class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
             title="{{ 'common.duplicate' | translate }}">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
           </button>
-          <button class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
+          <button *hasPermission="'templates:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
             title="{{ 'common.delete' | translate }}">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -214,14 +214,14 @@
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </button>
-                <button class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
+                <button *hasPermission="'templates:create'" class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
                   title="{{ 'common.duplicate' | translate }}">
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </button>
-                <button class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
+                <button *hasPermission="'templates:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
                   title="{{ 'common.delete' | translate }}">
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
