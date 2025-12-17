@@ -928,6 +928,11 @@ export class TemplateEditorEnhancedComponent implements OnInit {
     this.showVariablesPanel.set(false);
   }
 
+  // Help Panel Methods
+  closeHelp() {
+    this.showHelp = false;
+  }
+
   // Page Navigation Methods
   getCurrentPageIndex(): number {
     const currentPage = this.activePage();

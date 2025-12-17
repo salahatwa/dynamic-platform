@@ -456,21 +456,86 @@
   color: var(--text-muted);
 }
 
-/* Help Panel (Dropdown style) */
+/* Help Panel (Modal style) */
+.help-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
 .help-panel {
-  position: absolute;
-  top: calc(var(--tab-height) + 12px);
-  /* Add gap for floating effect */
-  right: var(--spacing-lg);
-  width: 340px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
   background-color: var(--surface);
   border: 1px solid var(--border);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border-radius: var(--radius-lg);
-  z-index: 1000;
-  /* Ensure it stays above sticky ribbon (z-index 50) */
+  overflow: hidden;
+  animation: helpSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 1.5rem;
-  animation: helpSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-bottom: 1px solid var(--border);
+  background-color: var(--surface-elevated);
+}
+
+.help-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.help-title h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.help-title svg {
+  color: var(--primary);
+}
+
+.help-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.help-close-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.help-content {
+  padding: 1.5rem;
+  max-height: calc(80vh - 120px);
+  overflow-y: auto;
 }
 
 @keyframes helpSlideIn {
@@ -483,6 +548,47 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dark mode help panel */
+:host-context([data-theme="dark"]) .help-panel-overlay,
+[data-theme="dark"] .help-panel-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+:host-context([data-theme="dark"]) .help-panel,
+[data-theme="dark"] .help-panel {
+  background-color: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+:host-context([data-theme="dark"]) .help-header,
+[data-theme="dark"] .help-header {
+  background-color: var(--surface-elevated);
+  border-color: var(--border);
+}
+
+:host-context([data-theme="dark"]) .help-close-btn,
+[data-theme="dark"] .help-close-btn {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+:host-context([data-theme="dark"]) .help-close-btn:hover,
+[data-theme="dark"] .help-close-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .help-section {
@@ -1174,8 +1280,31 @@
   
   .help-panel {
     width: 95vw;
-    max-width: 300px;
-    padding: 1rem;
+    max-width: 320px;
+    max-height: 90vh;
+  }
+  
+  .help-header {
+    padding: 0.75rem;
+  }
+  
+  .help-content {
+    padding: 0.75rem;
+    max-height: calc(90vh - 60px);
+  }
+  
+  .help-title h3 {
+    font-size: 0.95rem;
+  }
+  
+  .help-close-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .help-close-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
   .help-section h4 {
@@ -1395,13 +1524,22 @@
   
   /* Help panel adjustments */
   .help-panel {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vw;
-    max-width: 320px;
-    right: auto;
+    width: 95vw;
+    max-width: 360px;
+    max-height: 85vh;
+  }
+  
+  .help-header {
+    padding: 1rem;
+  }
+  
+  .help-content {
+    padding: 1rem;
+    max-height: calc(85vh - 80px);
+  }
+  
+  .help-title h3 {
+    font-size: 1rem;
   }
 }
 
