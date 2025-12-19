@@ -122,24 +122,11 @@ export class TemplatesComponent implements OnInit, OnDestroy {
   activeView = signal<'grid' | 'list'>('grid');
 
   constructor() {
-    // Watch for app changes and reload templates
-    effect(() => {
-      const app = this.selectedApp();
-      console.log('Templates - App changed:', app);
-      if (app) {
-        console.log('Loading templates for app:', app.name);
-        this.currentPage.set(0);
-        this.loadTemplates(true);
-      }
-    }, { allowSignalWrites: true });
+    // No effect - we'll handle app changes manually
   }
 
   ngOnInit() {
-    // Effect will handle loading when app is available
-    // Only load if no app is selected (fallback)
-    if (!this.selectedApp()) {
-      this.loadTemplates();
-    }
+    this.loadTemplates();
   }
 
   ngOnDestroy() {
@@ -174,6 +161,11 @@ export class TemplatesComponent implements OnInit, OnDestroy {
       params.search = this.searchQuery;
     }
 
+    // Add type filtering as server-side parameter
+    if (this.selectedType() !== 'ALL') {
+      params.type = this.selectedType();
+    }
+
     // Add appName parameter for app-centric filtering
     const app = this.selectedApp();
     if (app) {
@@ -185,14 +177,9 @@ export class TemplatesComponent implements OnInit, OnDestroy {
     this.loadingRequest = this.http.get<PageResponse>(this.apiUrl, { params }).subscribe({
       next: (data) => {
         console.log('loadTemplates response:', data);
-        let filteredContent = data.content;
-
-        // Client-side filtering by type
-        if (this.selectedType() !== 'ALL') {
-          filteredContent = data.content.filter(t => t.type === this.selectedType());
-        }
-
-        this.templates.set(filteredContent);
+        
+        // Server-side filtering is now handled by params, no need for client-side filtering
+        this.templates.set(data.content);
         this.totalPages.set(data.totalPages);
         this.totalElements.set(data.totalElements);
         // Don't update currentPage from response to avoid conflicts
