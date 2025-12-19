@@ -248,10 +248,14 @@
         </button>
 
         @for (page of getPageNumbers(); track page) {
-        <button class="btn btn-sm" [class.btn-primary]="page === currentPage()"
-          [class.btn-outline]="page !== currentPage()" (click)="goToPage(page)">
-          {{ page + 1 }}
-        </button>
+          @if (page === -1) {
+            <span class="btn btn-sm btn-outline disabled">...</span>
+          } @else {
+            <button class="btn btn-sm" [class.btn-primary]="page === currentPage()"
+              [class.btn-outline]="page !== currentPage()" (click)="goToPage(page)">
+              {{ page + 1 }}
+            </button>
+          }
         }
 
         <button class="btn btn-icon btn-sm btn-outline" [disabled]="currentPage() === totalPages() - 1"

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, effect, computed } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -79,7 +79,7 @@ interface AuditDialog {
   templateUrl: './templates.component.html',
   styleUrls: ['./templates.component.scss']
 })
-export class TemplatesComponent implements OnInit {
+export class TemplatesComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private router = inject(Router);
   private appContext = inject(AppContextService);
@@ -104,6 +104,7 @@ export class TemplatesComponent implements OnInit {
   searchQuery = '';
   selectedType = signal<string>('ALL');
   private searchTimeout: any;
+  private loadingRequest: any = null;
 
   dialog = signal<DialogData>({
     show: false,
@@ -143,6 +144,7 @@ export class TemplatesComponent implements OnInit {
       const app = this.selectedApp();
       console.log('Templates - App changed:', app);
       if (app) {
+        console.log('Resetting to page 0 due to app change');
         this.currentPage.set(0);
         this.loadTemplates(true);
       }
@@ -153,9 +155,23 @@ export class TemplatesComponent implements OnInit {
     this.loadTemplates();
   }
 
+  ngOnDestroy() {
+    if (this.loadingRequest) {
+      this.loadingRequest.unsubscribe();
+    }
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+  }
+
   private i18n = inject(TranslationService);
 
   loadTemplates(useSkeletonLoading = false) {
+    // Cancel any existing request
+    if (this.loadingRequest) {
+      this.loadingRequest.unsubscribe();
+    }
+
     if (useSkeletonLoading) {
       this.skeletonLoading.set(true);
     } else {
@@ -177,8 +193,11 @@ export class TemplatesComponent implements OnInit {
       params.appName = app.name;
     }
 
-    this.http.get<PageResponse>(this.apiUrl, { params }).subscribe({
+    console.log('loadTemplates called with params:', params);
+
+    this.loadingRequest = this.http.get<PageResponse>(this.apiUrl, { params }).subscribe({
       next: (data) => {
+        console.log('loadTemplates response:', data);
         let filteredContent = data.content;
 
         // Client-side filtering by type
@@ -189,14 +208,18 @@ export class TemplatesComponent implements OnInit {
         this.templates.set(filteredContent);
         this.totalPages.set(data.totalPages);
         this.totalElements.set(data.totalElements);
-        this.currentPage.set(data.number);
+        // Don't update currentPage from response to avoid conflicts
+        // this.currentPage.set(data.number);
         this.loading.set(false);
         this.skeletonLoading.set(false);
         this.loadVersionCounts();
+        this.loadingRequest = null;
       },
-      error: () => {
+      error: (error) => {
+        console.error('loadTemplates error:', error);
         this.loading.set(false);
         this.skeletonLoading.set(false);
+        this.loadingRequest = null;
       }
     });
   }
@@ -233,6 +256,11 @@ export class TemplatesComponent implements OnInit {
   }
 
   goToPage(page: number) {
+    console.log('goToPage called with page:', page);
+    if (page < 0 || page >= this.totalPages()) {
+      console.warn('Invalid page number:', page, 'totalPages:', this.totalPages());
+      return;
+    }
     this.currentPage.set(page);
     this.loadTemplates(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });

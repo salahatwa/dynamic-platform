@@ -7,8 +7,8 @@
 export const environment = {
   production: false,
   name: 'development',
-  // apiUrl: 'http://localhost:8080/api',
-  apiUrl: 'http://35.196.142.99:8080/api',
+  apiUrl: 'http://localhost:8080/api',
+  // apiUrl: 'http://35.196.142.99:8080/api',
   
   // Feature flags for development
   features: {
