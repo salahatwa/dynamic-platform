@@ -15,19 +15,19 @@
       </div>
 
       <div class="admin-header-actions" *ngIf="selectedApp()">
-        <button *hasPermission="'app_config:create'" class="btn btn-secondary" (click)="openGroupModal()">
+        <button *hasPermission="'app_config:create'" class="btn btn-secondary responsive-btn" (click)="openGroupModal()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          {{ 'appConfig.actions.createGroupPrefix' | translate }}
+          <span class="btn-text">{{ 'appConfig.actions.createGroupPrefix' | translate }}</span>
         </button>
 
-        <button *hasPermission="'app_config:create'" class="btn btn-primary" (click)="openConfigModal()">
+        <button *hasPermission="'app_config:create'" class="btn btn-primary responsive-btn" (click)="openConfigModal()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          {{ 'appConfig.actions.createConfigPrefix' | translate }}
+          <span class="btn-text">{{ 'appConfig.actions.createConfigPrefix' | translate }}</span>
         </button>
       </div>
     </div>

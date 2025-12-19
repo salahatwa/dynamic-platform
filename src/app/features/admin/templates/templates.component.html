@@ -127,14 +127,7 @@
           <span class="status-badge neutral">
             {{ template.type }}
           </span>
-          <button class="status-badge info cursor-pointer border-0" (click)="openVersionsDialog(template)"
-            title="{{ 'templates.viewVersions' | translate }}">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{{ getVersionCount(template.id) }} {{ 'templates.versionsWord' | translate }}</span>
-          </button>
+
         </div>
 
         <div class="admin-card-body">
@@ -188,7 +181,7 @@
           <tr>
             <th>{{ 'templates.table.name' | translate }}</th>
             <th>{{ 'templates.table.type' | translate }}</th>
-            <th>{{ 'templates.table.versions' | translate }}</th>
+
             <th>{{ 'templates.table.updated' | translate }}</th>
             <th>{{ 'templates.table.actions' | translate }}</th>
           </tr>
@@ -198,12 +191,7 @@
           <tr class="cursor-pointer" (click)="editTemplate(template.id)">
             <td><strong>{{ template.name }}</strong></td>
             <td><span class="status-badge neutral">{{ template.type }}</span></td>
-            <td>
-              <button class="status-badge info cursor-pointer border-0"
-                (click)="$event.stopPropagation(); openVersionsDialog(template)">
-                {{ getVersionCount(template.id) }}
-              </button>
-            </td>
+
             <td>{{ formatDate(template.updatedAt) }}</td>
             <td (click)="$event.stopPropagation()">
               <div class="d-flex justify-content-end gap-2">
@@ -320,46 +308,7 @@
     </div>
     }
 
-    @if (versionsDialog().show) {
-    <div class="modal-overlay" (click)="closeVersionsDialog()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>{{ 'templates.versionHistory' | translate }}</h2>
-          <button class="btn-close" (click)="closeVersionsDialog()">×</button>
-        </div>
 
-        <div class="modal-body">
-          <h3 class="h6 mb-3 text-primary">{{ versionsDialog().template?.name }}</h3>
-
-          @if (versionsDialog().loading) {
-          <div class="text-center py-4">
-            <div class="spinner mb-2 mx-auto"></div>
-            <p class="text-secondary">{{ 'templates.versionLoading' | translate }}</p>
-          </div>
-          } @else if (versionsDialog().versions.length === 0) {
-          <div class="text-center py-4 text-secondary">
-            <p>{{ 'templates.versionEmpty' | translate }}</p>
-          </div>
-          } @else {
-          <div class="d-flex flex-column gap-3">
-            @for (version of versionsDialog().versions; track version.id) {
-            <div class="card bg-surface border">
-              <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <span class="fw-bold">{{ 'templates.versionWord' | translate }} {{ version.version }}</span>
-                  <span class="text-secondary small">{{ formatTimestamp(version.createdAt) }}</span>
-                </div>
-                <p class="mb-0 text-secondary small">{{ version.changeLog || ( 'templates.noChangeLog' | translate ) }}
-                </p>
-              </div>
-            </div>
-            }
-          </div>
-          }
-        </div>
-      </div>
-    </div>
-    }
 
     @if (auditDialog().show) {
     <div class="modal-overlay" (click)="closeAuditDialog()">

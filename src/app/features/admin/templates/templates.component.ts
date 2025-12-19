@@ -36,14 +36,7 @@ interface DialogData {
   loading: boolean;
 }
 
-interface TemplateVersion {
-  id: number;
-  version: number;
-  htmlContent: string;
-  cssStyles: string;
-  changeLog: string;
-  createdAt: string;
-}
+
 
 interface AuditLog {
   id: number;
@@ -58,12 +51,7 @@ interface AuditLog {
   ipAddress: string;
 }
 
-interface VersionsDialog {
-  show: boolean;
-  template: Template | null;
-  versions: TemplateVersion[];
-  loading: boolean;
-}
+
 
 interface AuditDialog {
   show: boolean;
@@ -113,12 +101,7 @@ export class TemplatesComponent implements OnInit, OnDestroy {
     loading: false
   });
 
-  versionsDialog = signal<VersionsDialog>({
-    show: false,
-    template: null,
-    versions: [],
-    loading: false
-  });
+
 
   auditDialog = signal<AuditDialog>({
     show: false,
@@ -127,7 +110,7 @@ export class TemplatesComponent implements OnInit, OnDestroy {
     loading: false
   });
 
-  versionCounts = signal<Map<number, number>>(new Map());
+
 
   templateTypes = [
     { value: 'ALL', label: 'All', icon: '📄', color: '#6366f1' },
@@ -144,7 +127,7 @@ export class TemplatesComponent implements OnInit, OnDestroy {
       const app = this.selectedApp();
       console.log('Templates - App changed:', app);
       if (app) {
-        console.log('Resetting to page 0 due to app change');
+        console.log('Loading templates for app:', app.name);
         this.currentPage.set(0);
         this.loadTemplates(true);
       }
@@ -152,7 +135,11 @@ export class TemplatesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadTemplates();
+    // Effect will handle loading when app is available
+    // Only load if no app is selected (fallback)
+    if (!this.selectedApp()) {
+      this.loadTemplates();
+    }
   }
 
   ngOnDestroy() {
@@ -212,7 +199,6 @@ export class TemplatesComponent implements OnInit, OnDestroy {
         // this.currentPage.set(data.number);
         this.loading.set(false);
         this.skeletonLoading.set(false);
-        this.loadVersionCounts();
         this.loadingRequest = null;
       },
       error: (error) => {
@@ -392,49 +378,7 @@ export class TemplatesComponent implements OnInit, OnDestroy {
     return d.toLocaleDateString();
   }
 
-  // Load version counts for all templates
-  loadVersionCounts() {
-    this.templates().forEach(template => {
-      this.http.get<TemplateVersion[]>(`${this.apiUrl}/${template.id}/versions`).subscribe({
-        next: (versions) => {
-          const counts = this.versionCounts();
-          counts.set(template.id, versions.length);
-          this.versionCounts.set(new Map(counts));
-        }
-      });
-    });
-  }
 
-  getVersionCount(templateId: number): number {
-    return this.versionCounts().get(templateId) || 0;
-  }
-
-  openVersionsDialog(template: Template) {
-    this.versionsDialog.set({
-      show: true,
-      template,
-      versions: [],
-      loading: true
-    });
-
-    this.http.get<TemplateVersion[]>(`${this.apiUrl}/${template.id}/versions`).subscribe({
-      next: (versions) => {
-        this.versionsDialog.update(d => ({ ...d, versions, loading: false }));
-      },
-      error: () => {
-        this.versionsDialog.update(d => ({ ...d, loading: false }));
-      }
-    });
-  }
-
-  closeVersionsDialog() {
-    this.versionsDialog.set({
-      show: false,
-      template: null,
-      versions: [],
-      loading: false
-    });
-  }
 
   openAuditDialog(template: Template) {
     this.auditDialog.set({
