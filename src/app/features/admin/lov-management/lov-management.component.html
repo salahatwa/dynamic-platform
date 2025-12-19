@@ -14,18 +14,18 @@
       </div>
 
       <div class="admin-header-actions">
-        <button *hasPermission="'lov:read'" class="btn btn-secondary" (click)="exportLovs()" [disabled]="!hasSelectedApp()">
+        <button *hasPermission="'lov:read'" class="btn btn-secondary responsive-btn" (click)="exportLovs()" [disabled]="!hasSelectedApp()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          {{ 'lov.export' | translate }}
+          <span class="btn-text">{{ 'lov.export' | translate }}</span>
         </button>
-        <button *hasPermission="'lov:create'" class="btn btn-primary" (click)="openLovModal()" [disabled]="!hasSelectedApp()">
+        <button *hasPermission="'lov:create'" class="btn btn-primary responsive-btn" (click)="openLovModal()" [disabled]="!hasSelectedApp()">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          {{ 'lov.newLov' | translate }}
+          <span class="btn-text">{{ 'lov.newLov' | translate }}</span>
         </button>
       </div>
     </div>

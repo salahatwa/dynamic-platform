@@ -6,11 +6,11 @@
         <p class="subtitle">{{ 'templates.subtitle' | translate }}</p>
       </div>
       <div class="admin-header-actions">
-        <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()">
+        <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()" class="responsive-btn">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          {{ 'templates.newTemplate' | translate }}
+          <span class="btn-text">{{ 'templates.newTemplate' | translate }}</span>
         </app-button>
       </div>
     </div>
@@ -29,7 +29,7 @@
           <input type="text" placeholder="{{ 'templates.searchPlaceholder' | translate }}" [(ngModel)]="searchQuery"
             (input)="onSearch()" class="search-input" />
           @if (searchQuery) {
-          <button class="clear-btn" (click)="clearSearch()">
+          <button class="clear-btn" (click)="clearSearch()" type="button" aria-label="Clear search">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
