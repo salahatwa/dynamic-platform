@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy, effect, computed } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,9 +6,13 @@ import { HttpClient } from '@angular/common/http';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { SearchComponent, SearchNavigationEvent } from '../../../shared/components/search/search.component';
+import { FolderContentComponent } from '../../../shared/components/folder-content/folder-content.component';
 import { TranslationService } from '../../../core/services/translation.service';
 import { AppContextService } from '../../../core/services/app-context.service';
 import { PermissionService } from '../../../core/services/permission.service';
+import { FolderService } from '../../../core/services/folder.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { environment } from '../../../../environments/environment';
 
 interface Template {
@@ -63,7 +67,7 @@ interface AuditDialog {
 @Component({
   selector: 'app-templates',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent, TranslatePipe, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, ButtonComponent, TranslatePipe, HasPermissionDirective, SearchComponent, FolderContentComponent],
   templateUrl: './templates.component.html',
   styleUrls: ['./templates.component.scss']
 })
@@ -72,6 +76,8 @@ export class TemplatesComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private appContext = inject(AppContextService);
   private permissionService = inject(PermissionService);
+  private folderService = inject(FolderService);
+  private toastService = inject(ToastService);
   private apiUrl = `${environment.apiUrl}/template-editor`;
   private dashboardApiUrl = `${environment.apiUrl}/dashboard`;
 
@@ -82,6 +88,15 @@ export class TemplatesComponent implements OnInit, OnDestroy {
 
   // App context
   selectedApp = this.appContext.selectedApp;
+  
+  // Folder management
+  currentFolderId = signal<number | null>(null); // null means root folder
+  showFolderView = signal(true); // Start in folder view by default
+  
+  // Folder creation dialog
+  showCreateFolderDialog = signal(false);
+  newFolderName = signal('');
+  refreshTrigger = signal(0);
 
   templates = signal<Template[]>([]);
   loading = signal(true);
@@ -118,15 +133,31 @@ export class TemplatesComponent implements OnInit, OnDestroy {
     { value: 'TXT', label: 'TXT', icon: '📊', color: '#8b5cf6' },
   ];
 
+  // Computed property for filtered template types (excluding 'ALL')
+  filteredTemplateTypes = computed(() => 
+    this.templateTypes.map(t => t.value).filter(t => t !== 'ALL')
+  );
+
   showFiltersDropdown = signal(false);
   activeView = signal<'grid' | 'list'>('grid');
+  
+  // Computed property for folder view mode - always use activeView for grid/list
+  folderViewMode = computed(() => this.activeView());
 
   constructor() {
     // No effect - we'll handle app changes manually
   }
 
   ngOnInit() {
-    this.loadTemplates();
+    // Always start in folder view and let folder-content component handle the API calls
+    // This ensures we call the correct folder-based API endpoints
+    this.showFolderView.set(true);
+    this.currentFolderId.set(null); // null means root folder
+    
+    console.log('Templates component initialized');
+    console.log('Show folder view:', this.showFolderView());
+    console.log('Current folder ID:', this.currentFolderId());
+    console.log('Selected app:', this.selectedApp());
   }
 
   ngOnDestroy() {
@@ -341,7 +372,20 @@ export class TemplatesComponent implements OnInit, OnDestroy {
   }
 
   createNew() {
-    this.router.navigate(['/admin/template-editor']);
+    // Pass the current folder ID as a query parameter so the template editor knows which folder to associate the new template with
+    const queryParams: any = {};
+    
+    if (this.currentFolderId()) {
+      queryParams.folderId = this.currentFolderId();
+    }
+    
+    // Also pass the application ID to ensure proper context
+    const app = this.selectedApp();
+    if (app) {
+      queryParams.applicationId = app.id;
+    }
+    
+    this.router.navigate(['/admin/template-editor'], { queryParams });
   }
 
   editTemplate(id: number) {
@@ -403,5 +447,117 @@ export class TemplatesComponent implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  onSearchResultSelected(event: SearchNavigationEvent): void {
+    if (event.type === 'template') {
+      // Navigate to template editor
+      this.editTemplate(event.id);
+    } else if (event.type === 'folder') {
+      // Navigate to the selected folder
+      this.currentFolderId.set(event.id);
+      // Make sure we're in folder view
+      if (!this.showFolderView()) {
+        this.showFolderView.set(true);
+      }
+    }
+  }
+
+  onSearchStateChanged(event: { query: string; hasResults: boolean }): void {
+    // Update the search query for the existing search functionality
+    this.searchQuery = event.query;
+    
+    // If there are search results from the comprehensive search,
+    // we might want to hide the regular template list or show a different view
+    if (event.hasResults && event.query) {
+      // The search component is handling the display of results
+      // We could hide the main template grid here if needed
+    } else if (!event.query) {
+      // If search is cleared, reload the regular template list
+      this.loadTemplates();
+    }
+  }
+
+  // Folder navigation methods
+  onFolderSelected(folder: any): void {
+    this.currentFolderId.set(folder?.id || null);
+  }
+
+  onTemplateSelected(template: any): void {
+    this.editTemplate(template.id);
+  }
+
+  onBreadcrumbClicked(breadcrumb: any): void {
+    // Handle null ID as root folder
+    this.currentFolderId.set(breadcrumb.id || null);
+  }
+
+  toggleView(): void {
+    this.showFolderView.set(!this.showFolderView());
+    
+    // If switching to legacy view, load templates using the old API
+    if (!this.showFolderView()) {
+      this.loadTemplates();
+    }
+  }
+
+  createFolder(): void {
+    this.newFolderName.set('');
+    this.showCreateFolderDialog.set(true);
+  }
+
+  confirmCreateFolder(): void {
+    const app = this.selectedApp();
+    const folderName = this.newFolderName().trim();
+    
+    if (!app) {
+      console.error('No application selected');
+      return;
+    }
+
+    if (!folderName) {
+      return;
+    }
+
+    const folderRequest = {
+      name: folderName,
+      applicationId: app.id,
+      parentId: this.currentFolderId(),
+      sortOrder: 0
+    };
+
+    this.http.post(`${environment.apiUrl}/template-folders`, folderRequest).subscribe({
+      next: (response) => {
+        this.showCreateFolderDialog.set(false);
+        this.newFolderName.set('');
+        
+        // Trigger refresh by incrementing the refresh trigger
+        this.refreshTrigger.set(this.refreshTrigger() + 1);
+        
+        console.log('Folder created successfully');
+        this.toastService.success('Folder Created', 'Template folder created successfully');
+      },
+      error: (error) => {
+        console.error('Error creating folder:', error);
+        
+        // Extract error message from backend response
+        let errorMessage = 'Failed to create folder. Please try again.';
+        if (error.error && typeof error.error === 'string') {
+          errorMessage = error.error;
+        } else if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        // Show toast notification instead of alert
+        this.toastService.error('Folder Creation Failed', errorMessage);
+      }
+    });
+  }
+
+  cancelCreateFolder(): void {
+    this.showCreateFolderDialog.set(false);
+    this.newFolderName.set('');
   }
 }

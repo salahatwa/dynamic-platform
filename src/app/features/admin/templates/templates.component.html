@@ -6,12 +6,25 @@
         <p class="subtitle">{{ 'templates.subtitle' | translate }}</p>
       </div>
       <div class="admin-header-actions">
-        <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()" class="responsive-btn">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          <span class="btn-text">{{ 'templates.newTemplate' | translate }}</span>
-        </app-button>
+     
+        <!-- Only show New Template button when inside a folder (not in root) -->
+        @if (showFolderView() && currentFolderId() !== null) {
+          <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()" class="responsive-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span class="btn-text">{{ 'templates.newTemplate' | translate }}</span>
+          </app-button>
+        }
+        <!-- Show New Template button in legacy view (non-folder view) -->
+        @if (!showFolderView()) {
+          <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()" class="responsive-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span class="btn-text">{{ 'templates.newTemplate' | translate }}</span>
+          </app-button>
+        }
       </div>
     </div>
   </div>
@@ -19,242 +32,254 @@
   <div class="container">
     <div class="admin-filters-section">
       <div class="admin-filters-grid">
+        <!-- Search functionality (always visible) -->
         <div class="search-filter">
-          <span class="search-icon">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </span>
-          <input type="text" placeholder="{{ 'templates.searchPlaceholder' | translate }}" [(ngModel)]="searchQuery"
-            (input)="onSearch()" class="search-input" />
-          @if (searchQuery) {
-          <button class="clear-btn" (click)="clearSearch()" type="button" aria-label="Clear search">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          }
+          <app-search 
+            [placeholder]="'templates.searchPlaceholder' | translate"
+            [showFilters]="true"
+            [templateTypes]="filteredTemplateTypes()"
+            (resultSelected)="onSearchResultSelected($event)"
+            (searchStateChanged)="onSearchStateChanged($event)"
+          ></app-search>
         </div>
 
-        <div class="filter-item filter-dropdown-wrapper">
-          <button class="form-control d-flex align-items-center justify-content-between bg-white cursor-pointer"
-            (click)="showFiltersDropdown.set(!showFiltersDropdown())">
-            <div class="d-flex align-items-center gap-2">
-              <span>{{ getSelectedTypeLabel() }}</span>
-            </div>
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              [class.rotate-180]="showFiltersDropdown()" class="transition-transform">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          @if (showFiltersDropdown()) {
-          <div class="dropdown-menu show" style="width: 100%; margin-top: 0.5rem;">
-            @for (type of templateTypes; track type.value) {
-            <button class="dropdown-item d-flex align-items-center gap-2" [class.active]="selectedType() === type.value"
-              (click)="selectTypeFromDropdown(type.value)">
-              <span class="filter-icon">{{ type.icon }}</span>
-              <span>{{ ('templates.type.' + type.value) | translate }}</span>
-              @if (selectedType() === type.value) {
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                class="ms-auto text-primary">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              }
-            </button>
+    
+        <!-- Toolbar actions (replaces the old view toggle section) -->
+        <div class="toolbar-actions ms-auto d-flex gap-2">
+          @if (showFolderView()) {
+            <!-- Back to Root button when in a folder -->
+            @if (currentFolderId() !== null) {
+              <button class="btn btn-sm btn-outline" (click)="onBreadcrumbClicked({id: null, name: 'Root', path: '/'})" title="Back to Root">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span class="btn-text d-none d-md-inline">Back to Root</span>
+              </button>
             }
-          </div>
+            
+            <!-- Create folder button -->
+            <button class="btn btn-sm btn-primary" (click)="createFolder()" title="Create Folder">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              <span class="btn-text d-none d-md-inline">Create Folder</span>
+            </button>
+            
+            <!-- Load All toggle -->
+            <!-- <button class="btn btn-sm btn-outline" title="Load All">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+              <span class="btn-text d-none d-md-inline">Load All</span>
+            </button> -->
           }
-        </div>
-
-        <div class="view-toggle ms-auto">
-          <button class="btn btn-icon" [class.btn-primary]="activeView() === 'grid'"
-            [class.btn-outline]="activeView() !== 'grid'" (click)="activeView.set('grid')"
-            title="{{ 'templates.gridView' | translate }}">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 3H3v7h7V3zM21 3h-7v7h7V3zM21 14h-7v7h7v-7zM10 14H3v7h7v-7z" />
-            </svg>
-          </button>
-          <button class="btn btn-icon" [class.btn-primary]="activeView() === 'list'"
-            [class.btn-outline]="activeView() !== 'list'" (click)="activeView.set('list')"
-            title="{{ 'templates.listView' | translate }}">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    @if (loading()) {
-    <div class="admin-empty-state">
-      <div class="spinner"></div>
-      <p>{{ 'templates.loading' | translate }}</p>
-    </div>
-    } @else if (skeletonLoading()) {
-    <div class="admin-grid">
-      @for (i of [1,2,3,4,5,6]; track i) {
-      <div class="admin-card">
-        <div class="admin-card-body">
-          <div class="skeleton-title"
-            style="height: 20px; width: 60%; background: var(--surface-hover); margin-bottom: 1rem; border-radius: 4px;">
+          
+          <!-- View toggle buttons (always visible) -->
+          <div class="view-toggle d-flex">
+           
+            <button class="btn btn-icon btn-sm" [class.btn-primary]="activeView() === 'grid'"
+              [class.btn-outline]="activeView() !== 'grid'" (click)="activeView.set('grid')"
+              title="{{ 'templates.gridView' | translate }}">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 3H3v7h7V3zM21 3h-7v7h7V3zM21 14h-7v7h7v-7zM10 14H3v7h7v-7z" />
+              </svg>
+            </button>
+            <button class="btn btn-icon btn-sm" [class.btn-primary]="activeView() === 'list'"
+              [class.btn-outline]="activeView() !== 'list'" (click)="activeView.set('list')"
+              title="{{ 'templates.listView' | translate }}">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+              </svg>
+            </button>
           </div>
-          <div class="skeleton-text"
-            style="height: 14px; width: 80%; background: var(--surface-hover); border-radius: 4px;"></div>
         </div>
       </div>
-      }
     </div>
-    } @else if (templates().length === 0) {
-    <div class="admin-empty-state">
-      <div class="empty-icon">
-        <svg width="100%" height="100%" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      </div>
-      <h3>{{ 'templates.emptyTitle' | translate }}</h3>
-      <p>{{ 'templates.emptyDesc' | translate }}</p>
-      <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()">{{ 'templates.createTemplate' | translate }}</app-button>
-    </div>
+
+    @if (showFolderView()) {
+      <!-- Folder-based view using the folder-content component -->
+      <app-folder-content
+        [folderId]="currentFolderId()"
+        [applicationId]="selectedApp()?.id || null"
+        [refreshTrigger]="refreshTrigger()"
+        [viewMode]="folderViewMode()"
+        (folderSelected)="onFolderSelected($event)"
+        (templateSelected)="onTemplateSelected($event)"
+        (breadcrumbClicked)="onBreadcrumbClicked($event)"
+        (createFolderRequested)="createFolder()"
+      ></app-folder-content>
     } @else {
-    @if (activeView() === 'grid') {
-    <div class="admin-grid">
-      @for (template of templates(); track template.id) {
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <span class="status-badge neutral">
-            {{ template.type }}
-          </span>
-
+      <!-- Legacy flat view -->
+      @if (loading()) {
+      <div class="admin-empty-state">
+        <div class="spinner"></div>
+        <p>{{ 'templates.loading' | translate }}</p>
+      </div>
+      } @else if (skeletonLoading()) {
+      <div class="admin-grid">
+        @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="admin-card">
+          <div class="admin-card-body">
+            <div class="skeleton-title"
+              style="height: 20px; width: 60%; background: var(--surface-hover); margin-bottom: 1rem; border-radius: 4px;">
+            </div>
+            <div class="skeleton-text"
+              style="height: 14px; width: 80%; background: var(--surface-hover); border-radius: 4px;"></div>
+          </div>
         </div>
+        }
+      </div>
+      } @else if (templates().length === 0) {
+      <div class="admin-empty-state">
+        <div class="empty-icon">
+          <svg width="100%" height="100%" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <h3>{{ 'templates.emptyTitle' | translate }}</h3>
+        <p>{{ 'templates.emptyDesc' | translate }}</p>
+        <app-button *hasPermission="'templates:create'" variant="primary" (click)="createNew()">{{ 'templates.createTemplate' | translate }}</app-button>
+      </div>
+      } @else {
+      @if (activeView() === 'grid') {
+      <div class="admin-grid">
+        @for (template of templates(); track template.id) {
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <span class="status-badge neutral">
+              {{ template.type }}
+            </span>
 
-        <div class="admin-card-body">
-          <h3 class="admin-card-title">{{ template.name }}</h3>
+          </div>
 
-          <div class="admin-card-meta">
-            <div class="meta-row">
-              <span class="label">{{ 'templates.updatedPrefix' | translate }}</span>
-              <span class="value">{{ formatDate(template.updatedAt) }}</span>
+          <div class="admin-card-body">
+            <h3 class="admin-card-title">{{ template.name }}</h3>
+
+            <div class="admin-card-meta">
+              <div class="meta-row">
+                <span class="label">{{ 'templates.updatedPrefix' | translate }}</span>
+                <span class="value">{{ formatDate(template.updatedAt) }}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="card-footer bg-transparent border-top border-light p-3 d-flex justify-content-end gap-2">
-          <button class="btn btn-icon btn-sm btn-ghost" (click)="openAuditDialog(template)"
-            title="{{ 'templates.auditHistory' | translate }}">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div class="card-footer bg-transparent border-top border-light p-3 d-flex justify-content-end gap-2">
+            <button class="btn btn-icon btn-sm btn-ghost" (click)="openAuditDialog(template)"
+              title="{{ 'templates.auditHistory' | translate }}">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+            <button *hasPermission="'templates:update'" class="btn btn-icon btn-sm btn-ghost text-primary" (click)="editTemplate(template.id)"
+              title="{{ 'common.edit' | translate }}">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button *hasPermission="'templates:create'" class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
+              title="{{ 'common.duplicate' | translate }}">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+            <button *hasPermission="'templates:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
+              title="{{ 'common.delete' | translate }}">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="admin-table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>{{ 'templates.table.name' | translate }}</th>
+              <th>{{ 'templates.table.type' | translate }}</th>
+
+              <th>{{ 'templates.table.updated' | translate }}</th>
+              <th>{{ 'templates.table.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (template of templates(); track template.id) {
+            <tr class="cursor-pointer" (click)="editTemplate(template.id)">
+              <td><strong>{{ template.name }}</strong></td>
+              <td><span class="status-badge neutral">{{ template.type }}</span></td>
+
+              <td>{{ formatDate(template.updatedAt) }}</td>
+              <td (click)="$event.stopPropagation()">
+                <div class="d-flex justify-content-end gap-2">
+                  <button class="btn btn-icon btn-sm btn-ghost" (click)="openAuditDialog(template)"
+                    title="{{ 'templates.auditHistory' | translate }}">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </button>
+                  <button *hasPermission="'templates:create'" class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
+                    title="{{ 'common.duplicate' | translate }}">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                  <button *hasPermission="'templates:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
+                    title="{{ 'common.delete' | translate }}">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+
+      @if (totalPages() > 1) {
+      <div class="pagination-container d-flex justify-content-center mt-4">
+        <div class="d-flex gap-2">
+          <button class="btn btn-icon btn-sm btn-outline" [disabled]="currentPage() === 0"
+            (click)="goToPage(currentPage() - 1)">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <button *hasPermission="'templates:update'" class="btn btn-icon btn-sm btn-ghost text-primary" (click)="editTemplate(template.id)"
-            title="{{ 'common.edit' | translate }}">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </button>
-          <button *hasPermission="'templates:create'" class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
-            title="{{ 'common.duplicate' | translate }}">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-          </button>
-          <button *hasPermission="'templates:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
-            title="{{ 'common.delete' | translate }}">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+
+          @for (page of getPageNumbers(); track page) {
+            @if (page === -1) {
+              <span class="btn btn-sm btn-outline disabled" style="pointer-events: none;">...</span>
+            } @else {
+              <button class="btn btn-sm" [class.btn-primary]="page === currentPage()"
+                [class.btn-outline]="page !== currentPage()" (click)="goToPage(page)">
+                {{ page + 1 }}
+              </button>
+            }
+          }
+
+          <button class="btn btn-icon btn-sm btn-outline" [disabled]="currentPage() === totalPages() - 1"
+            (click)="goToPage(currentPage() + 1)">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
       </div>
       }
-    </div>
-    } @else {
-    <div class="admin-table-container">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>{{ 'templates.table.name' | translate }}</th>
-            <th>{{ 'templates.table.type' | translate }}</th>
-
-            <th>{{ 'templates.table.updated' | translate }}</th>
-            <th>{{ 'templates.table.actions' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (template of templates(); track template.id) {
-          <tr class="cursor-pointer" (click)="editTemplate(template.id)">
-            <td><strong>{{ template.name }}</strong></td>
-            <td><span class="status-badge neutral">{{ template.type }}</span></td>
-
-            <td>{{ formatDate(template.updatedAt) }}</td>
-            <td (click)="$event.stopPropagation()">
-              <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-icon btn-sm btn-ghost" (click)="openAuditDialog(template)"
-                  title="{{ 'templates.auditHistory' | translate }}">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </button>
-                <button *hasPermission="'templates:create'" class="btn btn-icon btn-sm btn-ghost text-info" (click)="openDuplicateDialog(template)"
-                  title="{{ 'common.duplicate' | translate }}">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
-                <button *hasPermission="'templates:delete'" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="openDeleteDialog(template)"
-                  title="{{ 'common.delete' | translate }}">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    }
-
-    @if (totalPages() > 1) {
-    <div class="pagination-container d-flex justify-content-center mt-4">
-      <div class="d-flex gap-2">
-        <button class="btn btn-icon btn-sm btn-outline" [disabled]="currentPage() === 0"
-          (click)="goToPage(currentPage() - 1)">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        @for (page of getPageNumbers(); track page) {
-          @if (page === -1) {
-            <span class="btn btn-sm btn-outline disabled" style="pointer-events: none;">...</span>
-          } @else {
-            <button class="btn btn-sm" [class.btn-primary]="page === currentPage()"
-              [class.btn-outline]="page !== currentPage()" (click)="goToPage(page)">
-              {{ page + 1 }}
-            </button>
-          }
-        }
-
-        <button class="btn btn-icon btn-sm btn-outline" [disabled]="currentPage() === totalPages() - 1"
-          (click)="goToPage(currentPage() + 1)">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-    </div>
-    }
+      }
     }
 
     <!-- Dialogs -->
@@ -369,6 +394,40 @@
             }
           </div>
           }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Create Folder Dialog -->
+    @if (showCreateFolderDialog()) {
+    <div class="modal-overlay" (click)="cancelCreateFolder()">
+      <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="h5 mb-0">{{ 'templates.createFolder' | translate }}</h2>
+          <button class="btn-close" (click)="cancelCreateFolder()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="folderName" class="form-label">{{ 'templates.folderName' | translate }}</label>
+            <input 
+              type="text" 
+              id="folderName"
+              class="form-control" 
+              [value]="newFolderName()"
+              (input)="newFolderName.set($any($event.target).value)"
+              [placeholder]="'templates.folderNamePlaceholder' | translate"
+              (keyup.enter)="confirmCreateFolder()"
+              #folderNameInput>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="cancelCreateFolder()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button class="btn btn-primary" (click)="confirmCreateFolder()" [disabled]="!newFolderName().trim()">
+            {{ 'common.create' | translate }}
+          </button>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
   TemplateFolder,
@@ -27,8 +28,51 @@ export class TemplateManagementService {
     return this.http.get<TemplateFolder[]>(`${this.apiUrl}/template-folders`);
   }
 
-  getRootFolders(): Observable<TemplateFolder[]> {
-    return this.http.get<TemplateFolder[]>(`${this.apiUrl}/template-folders/root`);
+  getAllFoldersForApplication(applicationId: number): Observable<TemplateFolder[]> {
+    return this.http.get<TemplateFolder[]>(`${this.apiUrl}/template-folders/tree/${applicationId}`)
+      .pipe(
+        map((response: any) => {
+          // Extract all folders from the tree response
+          const allFolders: TemplateFolder[] = [];
+          
+          function extractFolders(node: any) {
+            if (node.id !== null) { // Skip virtual root
+              allFolders.push({
+                id: node.id,
+                name: node.name,
+                parentId: node.parentId,
+                applicationId: node.applicationId,
+                path: node.path,
+                level: node.level,
+                sortOrder: node.sortOrder
+              } as TemplateFolder);
+            }
+            
+            if (node.children) {
+              node.children.forEach((child: any) => extractFolders(child));
+            }
+          }
+          
+          if (response.rootFolder) {
+            extractFolders(response.rootFolder);
+          }
+          
+          return allFolders;
+        })
+      );
+  }
+
+  getRootFolders(applicationId?: number): Observable<TemplateFolder[]> {
+    if (applicationId) {
+      // Use the new application-based endpoint
+      return this.http.get<TemplateFolder[]>(`${this.apiUrl}/template-folders/tree/${applicationId}`)
+        .pipe(
+          map((response: any) => response.rootFolders || [])
+        );
+    } else {
+      // Fallback to the legacy endpoint
+      return this.http.get<TemplateFolder[]>(`${this.apiUrl}/template-folders/root`);
+    }
   }
 
   getFolderById(id: number): Observable<TemplateFolder> {

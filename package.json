@@ -7,23 +7,18 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    
     "start:dev": "ng serve --configuration=development --open",
     "start:uat": "ng serve --configuration=uat --open",
     "start:prod": "ng serve --configuration=production --open",
-    
     "build:dev": "ng build --configuration=development",
     "build:uat": "ng build --configuration=uat",
     "build:uat:deploy": "ng build --configuration=uat --base-href=/dynamic-platform/",
     "build:prod": "ng build --configuration=production",
     "build:prod:deploy": "ng build --configuration=production --base-href=/",
-    
     "watch:dev": "ng build --watch --configuration=development",
     "watch:uat": "ng build --watch --configuration=uat",
-    
     "lint": "ng lint",
     "e2e": "ng e2e",
-    
     "analyze": "ng build --configuration=production --stats-json && npx webpack-bundle-analyzer dist/dynamic-platform/stats.json",
     "analyze:uat": "ng build --configuration=uat --stats-json && npx webpack-bundle-analyzer dist/dynamic-platform/stats.json",
     "build:clean": "rimraf dist && npm run build:uat:deploy",
@@ -50,6 +45,7 @@
     "@angular/cli": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
     "@types/jasmine": "~5.1.0",
+    "fast-check": "^4.4.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

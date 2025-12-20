@@ -2,6 +2,11 @@ export interface TemplateFolder {
   id: number;
   name: string;
   parentId?: number;
+  applicationId?: number;
+  corporateId?: number;
+  path?: string;
+  level?: number;
+  sortOrder?: number;
   children?: TemplateFolder[];
   templatesCount: number;
   createdAt: string;

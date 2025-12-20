@@ -174,9 +174,29 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       this.templateId.set(+id);
       this.loadTemplate();
     } else {
+      // Check for folder ID from query parameters when creating a new template
+      const folderId = this.route.snapshot.queryParamMap.get('folderId');
+      if (folderId) {
+        // Pre-select the folder for the new template
+        console.log('Creating new template in folder:', folderId);
+        // We'll set the folder after loading folders
+        this.loadFolders().then(() => {
+          console.log('Available folders:', this.folders());
+          const folder = this.folders().find(f => f.id === +folderId);
+          if (folder) {
+            this.selectedFolder.set(folder);
+            console.log('Pre-selected folder:', folder);
+          } else {
+            console.warn('Folder not found in available folders. FolderId:', folderId);
+            console.warn('Available folder IDs:', this.folders().map(f => f.id));
+          }
+        });
+      } else {
+        this.loadFolders().catch(err => console.error('Error loading folders:', err));
+      }
+      
       this.showTypeModal.set(true);
     }
-    this.loadFolders();
 
     // Set initial sidebar tab based on template type
     if (this.isHtmlType()) {
@@ -229,13 +249,54 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   }
 
   // Folder Management
-  loadFolders() {
-    this.templateService.getRootFolders().subscribe({
-      next: (folders) => {
-        this.rootFolders.set(folders);
-        this.folders.set(folders);
-      },
-      error: (err) => this.errorHandler.handleError(err, 'load_template_folders')
+  loadFolders(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Get current application ID
+      const app = this.appContext.selectedApp();
+      if (!app) {
+        console.warn('No application selected, loading root folders only');
+        this.templateService.getRootFolders().subscribe({
+          next: (folders) => {
+            this.rootFolders.set(folders);
+            this.folders.set(folders);
+            resolve();
+          },
+          error: (err) => {
+            this.errorHandler.handleError(err, 'load_template_folders');
+            reject(err);
+          }
+        });
+        return;
+      }
+
+      // Load all folders for the current application
+      this.templateService.getAllFoldersForApplication(app.id).subscribe({
+        next: (allFolders) => {
+          console.log('Loaded all folders for application:', allFolders);
+          
+          // Separate root folders for the folder modal
+          const rootFolders = allFolders.filter(f => !f.parentId);
+          
+          this.rootFolders.set(rootFolders);
+          this.folders.set(allFolders); // Set all folders so nested folders can be found
+          resolve();
+        },
+        error: (err) => {
+          console.error('Error loading folders for application:', err);
+          // Fallback to root folders only
+          this.templateService.getRootFolders().subscribe({
+            next: (folders) => {
+              this.rootFolders.set(folders);
+              this.folders.set(folders);
+              resolve();
+            },
+            error: (fallbackErr) => {
+              this.errorHandler.handleError(fallbackErr, 'load_template_folders');
+              reject(fallbackErr);
+            }
+          });
+        }
+      });
     });
   }
 
@@ -256,7 +317,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       parentId: this.selectedFolder()?.id
     }).subscribe({
       next: (folder) => {
-        this.loadFolders();
+        this.loadFolders().catch(err => console.error('Error loading folders:', err));
         this.selectedFolder.set(folder);
         this.showFolderModal.set(false);
         this.toastService.success('Folder Created', 'Template folder created successfully');
