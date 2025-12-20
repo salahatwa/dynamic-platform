@@ -67,7 +67,6 @@ export class TemplateEditorEnhancedComponent implements OnInit {
   // Pages
   pages = signal<TemplatePage[]>([]);
   activePage = signal<TemplatePage | null>(null);
-  pageContent = signal('');
   pageName = signal('');
   editingPageId = signal<number | null>(null);
 
@@ -400,14 +399,12 @@ export class TemplateEditorEnhancedComponent implements OnInit {
 
   openPageModal() {
     this.pageName.set(`Page ${this.pages().length + 1}`);
-    this.pageContent.set('');
     this.editingPageId.set(null);
     this.showPageModal.set(true);
   }
 
   editPage(page: TemplatePage) {
     this.pageName.set(page.name);
-    this.pageContent.set(page.content);
     this.editingPageId.set(page.id);
     this.showPageModal.set(true);
   }
@@ -423,13 +420,16 @@ export class TemplateEditorEnhancedComponent implements OnInit {
     }
 
     this.saving.set(true);
-    const request: TemplatePageRequest = {
-      name: this.pageName(),
-      content: this.pageContent()
-    };
-
     const editingId = this.editingPageId();
+    
     if (editingId) {
+      // For editing, only update the page name, keep existing content
+      const existingPage = this.pages().find(p => p.id === editingId);
+      const request: TemplatePageRequest = {
+        name: this.pageName(),
+        content: existingPage?.content || '' // Keep existing content
+      };
+
       this.templateService.updatePage(id, editingId, request).subscribe({
         next: (updatedPage) => {
           // Update the page in the local array instead of reloading
@@ -449,6 +449,12 @@ export class TemplateEditorEnhancedComponent implements OnInit {
         }
       });
     } else {
+      // For new pages, create with default content
+      const request: TemplatePageRequest = {
+        name: this.pageName(),
+        content: '<h1>New Page</h1>\n<p>Start editing your content here...</p>'
+      };
+
       this.templateService.createPage(id, request).subscribe({
         next: (page) => {
           // Add the new page to the local array instead of reloading
@@ -475,7 +481,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
     // The page will be created when the template is saved
     const pageData = {
       name: this.pageName(),
-      content: this.pageContent()
+      content: '<h1>New Page</h1>\n<p>Start editing your content here...</p>' // Default content
     };
 
     // Store in pages array temporarily
@@ -483,7 +489,7 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       id: Date.now(), // temporary ID
       templateId: 0,
       name: pageData.name,
-      content: pageData.content || '',
+      content: pageData.content,
       pageOrder: this.pages().length,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -1044,7 +1050,6 @@ export class TemplateEditorEnhancedComponent implements OnInit {
 
   onPageDialogSave(data: PageDialogData) {
     this.pageName.set(data.name);
-    this.pageContent.set(data.content);
     this.savePage();
   }
 

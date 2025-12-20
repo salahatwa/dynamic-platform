@@ -499,6 +499,11 @@
     "emptyTitle": "لا توجد قوالب بعد",
     "emptyDesc": "أنشئ أول قالب للبدء",
     "createTemplate": "إنشاء قالب",
+    "createFolder": "إنشاء مجلد",
+    "folderName": "اسم المجلد",
+    "folderNamePlaceholder": "أدخل اسم المجلد",
+    "gridView": "عرض شبكي",
+    "listView": "عرض قائمة",
     "viewVersions": "عرض الإصدارات",
     "versionsWord": "إصدارات",
     "updatedPrefix": "تم التحديث",
@@ -510,6 +515,12 @@
     "noChangeLog": "لا يوجد سجل تغييرات",
     "auditLoading": "جاري تحميل سجلات التدقيق...",
     "auditEmpty": "لا توجد سجلات تدقيق",
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "updated": "التحديث",
+      "actions": "الإجراءات"
+    },
     "dialog": {
       "deleteTitle": "حذف القالب",
       "deleteConfirmPrefix": "هل أنت متأكد من حذف",
@@ -1020,6 +1031,35 @@
     "description": "الوصف",
     "descriptionPlaceholder": "أدخل وصفاً لهذا التكوين",
     "testConnection": "اختبار الاتصال"
+  },
+  "search": {
+    "placeholder": "بحث...",
+    "filters": "المرشحات",
+    "searching": "جاري البحث...",
+    "resultsFound": "نتائج موجودة",
+    "templates": "القوالب",
+    "folders": "المجلدات",
+    "viewAllResults": "عرض جميع النتائج",
+    "noResults": "لا توجد نتائج",
+    "noResultsDesc": "حاول تعديل مصطلحات البحث أو المرشحات",
+    "suggestions": "جرب هذه الاقتراحات:",
+    "suggestion1": "تحقق من الإملاء",
+    "suggestion2": "استخدم كلمات مفتاحية مختلفة",
+    "suggestion3": "جرب مصطلحات بحث أوسع",
+    "recentSearches": "عمليات البحث الأخيرة",
+    "clearHistory": "مسح السجل",
+    "results": "نتائج",
+    "filters": {
+      "content": "نوع المحتوى",
+      "templates": "القوالب",
+      "folders": "المجلدات",
+      "templateTypes": "أنواع القوالب"
+    },
+    "matchType": {
+      "exact": "تطابق تام",
+      "partial": "تطابق جزئي",
+      "fuzzy": "تطابق مشابه"
+    }
   },
   "errors": {
     "generic": {

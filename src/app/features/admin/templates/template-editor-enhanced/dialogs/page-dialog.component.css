@@ -1,5 +1,5 @@
-/* Page Dialog Styles */
-.modal-overlay {
+/* Page Dialog Styles - Use specific class to avoid conflicts */
+.page-dialog-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -16,16 +16,14 @@
   z-index: 1100;
   padding: 1rem;
   animation: fadeIn 0.2s ease-out;
-  
-  /* Additional centering techniques for better browser compatibility */
-  place-items: center;
-  place-content: center;
+  box-sizing: border-box;
 }
 
-.modal {
+.page-dialog-modal {
   width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
+  max-width: 450px;
+  min-height: auto;
+  max-height: 400px;
   background-color: var(--surface);
   border: 1px solid var(--border);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -35,20 +33,18 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  margin: auto;
-  
-  /* Ensure modal stays centered */
-  align-self: center;
-  justify-self: center;
+  box-sizing: border-box;
+  height: auto !important;
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border);
   background-color: var(--surface-elevated);
+  flex-shrink: 0;
 }
 
 .modal-header h3 {
@@ -81,13 +77,12 @@
 }
 
 .modal-body {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  flex-shrink: 0;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
 }
 
 .form-group:last-child {
@@ -124,21 +119,15 @@
   color: var(--text-muted);
 }
 
-textarea.form-control {
-  resize: vertical;
-  min-height: 120px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  line-height: 1.5;
-}
-
 .modal-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.75rem;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   border-top: 1px solid var(--border);
   background-color: var(--surface-elevated);
+  flex-shrink: 0;
 }
 
 .btn {
@@ -218,57 +207,70 @@ textarea.form-control {
   }
 }
 
-/* Ensure dialog is always centered */
-.modal-overlay {
-  box-sizing: border-box;
-}
-
-.modal-overlay * {
-  box-sizing: border-box;
-}
-
-/* Additional centering for better compatibility */
-.modal-overlay::before {
-  content: '';
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-  width: 0;
-}
-
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .modal {
+  .page-dialog-modal {
     width: 95vw;
-    max-height: 95vh;
+    max-width: 350px;
+    max-height: 350px;
   }
   
-  .modal-header,
-  .modal-body,
-  .modal-footer {
+  .page-dialog-modal .modal-header,
+  .page-dialog-modal .modal-body,
+  .page-dialog-modal .modal-footer {
     padding: 1rem;
   }
   
-  .modal-footer {
+  .page-dialog-modal .modal-footer {
     flex-direction: column;
     gap: 0.5rem;
   }
   
-  .modal-footer .btn {
+  .page-dialog-modal .modal-footer .btn {
     width: 100%;
     justify-content: center;
   }
 }
 
 /* Dark mode adjustments */
-:host-context([data-theme="dark"]) .modal-overlay,
-[data-theme="dark"] .modal-overlay {
+:host-context([data-theme="dark"]) .page-dialog-overlay,
+[data-theme="dark"] .page-dialog-overlay {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-:host-context([data-theme="dark"]) .modal,
-[data-theme="dark"] .modal {
+:host-context([data-theme="dark"]) .page-dialog-modal,
+[data-theme="dark"] .page-dialog-modal {
   background-color: var(--surface);
   border-color: var(--border);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Force compact layout - Override any global modal styles */
+.page-dialog-modal {
+  height: fit-content !important;
+  min-height: fit-content !important;
+}
+
+.page-dialog-modal .modal-body {
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+
+/* Ensure no extra spacing */
+.page-dialog-overlay * {
+  box-sizing: border-box;
+}
+
+/* Override Bootstrap or global modal styles specifically for page dialog */
+.page-dialog-modal .modal-body {
+  max-height: none !important;
+  overflow-y: visible !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.page-dialog-modal {
+  height: auto !important;
+  min-height: auto !important;
 }
