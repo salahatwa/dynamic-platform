@@ -62,10 +62,16 @@ export class AuthService {
       this.currentUserSubject.next({ token });
       
       // Initialize app context when token is available on page refresh
+      // Use a longer delay to ensure all services are properly initialized
       setTimeout(() => {
-        console.log('Initializing apps for authenticated user on page refresh');
-        this.appContextService.initialize();
-      }, 100);
+        // Only initialize if apps haven't been loaded yet
+        if (!this.appContextService.hasApps() && !this.appContextService.loading()) {
+          console.log('Initializing apps for authenticated user on page refresh');
+          this.appContextService.initialize();
+        } else {
+          console.log('Apps already loaded or loading, skipping initialization on page refresh');
+        }
+      }, 200);
     }
   }
   
@@ -95,7 +101,7 @@ export class AuthService {
         setTimeout(() => {
           console.log('Initializing apps for newly logged in user');
           this.appContextService.initialize();
-        }, 100);
+        }, 150);
       })
     );
   }

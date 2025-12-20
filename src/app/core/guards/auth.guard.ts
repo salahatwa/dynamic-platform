@@ -9,11 +9,15 @@ export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   
   if (authService.isAuthenticated()) {
-    // Ensure apps are initialized when accessing admin routes
-    // This handles cases where the user refreshes the page or navigates directly to admin routes
+    // Only initialize apps if they haven't been loaded and aren't currently loading
+    // This prevents duplicate API calls when navigating between admin routes
     if (!appContextService.hasApps() && !appContextService.loading()) {
       console.log('Auth guard: Initializing apps for authenticated user');
       appContextService.initialize();
+    } else if (appContextService.hasApps()) {
+      console.log('Auth guard: Apps already loaded, skipping initialization');
+    } else if (appContextService.loading()) {
+      console.log('Auth guard: Apps currently loading, skipping duplicate initialization');
     }
     
     return true;

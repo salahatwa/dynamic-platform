@@ -48,10 +48,25 @@ export class AppContextService {
     });
   }
 
+  // Track ongoing request to prevent duplicates
+  private loadAppsRequest: any = null;
+
   /**
    * Load all apps for the user
    */
   loadApps(): void {
+    // Prevent duplicate requests
+    if (this.loadingSignal() || this.loadAppsRequest) {
+      console.log('Apps already loading, skipping duplicate request');
+      return;
+    }
+
+    // If apps are already loaded, don't reload unless explicitly requested
+    if (this.appsSignal().length > 0) {
+      console.log('Apps already loaded, skipping duplicate request');
+      return;
+    }
+
     console.log('Loading apps for current user...');
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
@@ -60,7 +75,7 @@ export class AppContextService {
     this.appsSignal.set([]);
     this.selectedAppSignal.set(null);
 
-    this.appService.getActiveApps().pipe(
+    this.loadAppsRequest = this.appService.getActiveApps().pipe(
       tap(apps => {
         console.log('Loaded apps for current user:', apps);
         console.log('Number of apps loaded:', apps.length);
@@ -71,6 +86,7 @@ export class AppContextService {
         
         this.appsSignal.set(apps);
         this.loadingSignal.set(false);
+        this.loadAppsRequest = null;
 
         // Always try to restore or auto-select app when apps are loaded
         this.restoreOrAutoSelectApp(apps);
@@ -79,6 +95,7 @@ export class AppContextService {
         console.error('Error loading apps:', error);
         this.errorSignal.set('Failed to load applications');
         this.loadingSignal.set(false);
+        this.loadAppsRequest = null;
         return of([]);
       })
     ).subscribe();
@@ -151,6 +168,14 @@ export class AppContextService {
    * Refresh apps list
    */
   refreshApps(): void {
+    // Cancel any ongoing request
+    if (this.loadAppsRequest) {
+      this.loadAppsRequest.unsubscribe();
+      this.loadAppsRequest = null;
+    }
+    
+    // Clear existing apps to force reload
+    this.appsSignal.set([]);
     this.loadApps();
   }
 
@@ -257,6 +282,13 @@ export class AppContextService {
    */
   reset(): void {
     console.log('Resetting AppContextService state');
+    
+    // Cancel any ongoing request
+    if (this.loadAppsRequest) {
+      this.loadAppsRequest.unsubscribe();
+      this.loadAppsRequest = null;
+    }
+    
     this.selectedAppSignal.set(null);
     this.appsSignal.set([]);
     this.loadingSignal.set(false);
