@@ -500,6 +500,11 @@
     "emptyTitle": "No Templates Yet",
     "emptyDesc": "Create your first template to get started",
     "createTemplate": "Create Template",
+    "createFolder": "Create Folder",
+    "folderName": "Folder Name",
+    "folderNamePlaceholder": "Enter folder name",
+    "gridView": "Grid View",
+    "listView": "List View",
     "viewVersions": "View Versions",
     "versionsWord": "versions",
     "updatedPrefix": "Updated",
@@ -511,6 +516,12 @@
     "noChangeLog": "No change log",
     "auditLoading": "Loading audit logs...",
     "auditEmpty": "No audit logs found",
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
     "dialog": {
       "deleteTitle": "Delete Template",
       "deleteConfirmPrefix": "Are you sure you want to delete",
@@ -1259,5 +1270,34 @@
     "deselectGroup": "Deselect Group",
     "confirmDeletePrefix": "Delete role",
     "noDescription": "No description provided"
+  },
+  "search": {
+    "placeholder": "Search...",
+    "filters": "Filters",
+    "searching": "Searching...",
+    "resultsFound": "results found",
+    "templates": "Templates",
+    "folders": "Folders",
+    "viewAllResults": "View All Results",
+    "noResults": "No Results Found",
+    "noResultsDesc": "Try adjusting your search terms or filters",
+    "suggestions": "Try these suggestions:",
+    "suggestion1": "Check your spelling",
+    "suggestion2": "Use different keywords",
+    "suggestion3": "Try broader search terms",
+    "recentSearches": "Recent Searches",
+    "clearHistory": "Clear History",
+    "results": "results",
+    "filters": {
+      "content": "Content Type",
+      "templates": "Templates",
+      "folders": "Folders",
+      "templateTypes": "Template Types"
+    },
+    "matchType": {
+      "exact": "Exact Match",
+      "partial": "Partial Match",
+      "fuzzy": "Similar Match"
+    }
   }
 }
