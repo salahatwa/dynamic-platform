@@ -317,7 +317,7 @@
   }
 }
 
-// Modal overrides to ensure proper layering - Copied from LOV to ensure consistency
+// Modal overrides - Scrollable & Responsive Design
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -328,6 +328,12 @@
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  overflow-y: auto; /* Allow overlay to scroll */
+  
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    align-items: flex-start; /* Start from top on mobile */
+  }
 }
 
 .modal-content {
@@ -336,14 +342,29 @@
   box-shadow: var(--shadow-xl);
   width: 100%;
   max-width: 600px;
-  max-height: 90vh;
+  max-height: calc(100vh - 2rem); /* Leave space for padding */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
+  margin: auto; /* Center vertically when content is small */
 
   &.modal-sm {
     max-width: 400px;
+  }
+  
+  &.modal-md {
+    max-width: 600px;
+  }
+  
+  &.modal-lg {
+    max-width: 800px;
+  }
+  
+  @media (max-width: 768px) {
+    max-width: 100%;
+    max-height: calc(100vh - 1rem);
+    margin: 0.5rem auto;
   }
 }
 
@@ -353,18 +374,81 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0; /* Prevent header from shrinking */
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 
   h2 {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
   }
+  
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1rem 1.5rem;
+    
+    h2 {
+      font-size: 1.125rem;
+    }
+  }
 }
 
 .modal-body {
   padding: 2rem;
-  overflow-y: auto;
-  flex: 1;
+  overflow-y: auto; /* Make body scrollable */
+  overflow-x: hidden;
+  flex: 1; /* Take remaining space */
+  
+  /* Modern scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+    
+    &:hover {
+      background: var(--text-tertiary);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    
+    /* Hide scrollbar on mobile for cleaner look */
+    scrollbar-width: none;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 .modal-footer {
@@ -375,6 +459,22 @@
   gap: 1rem;
   background: var(--surface-hover);
   flex-wrap: wrap;
+  flex-shrink: 0; /* Prevent footer from shrinking */
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  
+  @media (max-width: 768px) {
+    padding: 1rem 1.5rem;
+    gap: 0.75rem;
+  }
+  
+  @media (max-width: 480px) {
+    .btn {
+      flex: 1; /* Make buttons equal width on mobile */
+      justify-content: center;
+    }
+  }
 }
 
 // Typography utilities

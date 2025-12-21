@@ -34,34 +34,36 @@
   }
 
   <!-- Content Area -->
-  @if (loading()) {
-  <!-- Loading state -->
-  <div class="folder-content-loading">
-    <div class="spinner"></div>
-    <p>Loading folder contents...</p>
-  </div>
-  } @else if (templates().length === 0 && subfolders().length === 0) {
-  <!-- Empty state -->
-  <div class="folder-content-empty">
-    <div class="empty-icon">
-      <svg width="100%" height="100%" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-      </svg>
-    </div>
-    <h3>This folder is empty</h3>
-    <p>Create templates or subfolders to organize your content</p>
-    <div class="empty-actions">
-      <button class="btn btn-primary" (click)="requestCreateFolder()">
-        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
-        Create Folder
-      </button>
-    </div>
-  </div>
-  } @else if (currentViewMode() === 'grid') {
+  <div class="content-area">
+    <div class="scrollable-content">
+      @if (loading()) {
+      <!-- Loading state -->
+      <div class="folder-content-loading">
+        <div class="spinner"></div>
+        <p>Loading folder contents...</p>
+      </div>
+      } @else if (templates().length === 0 && subfolders().length === 0) {
+      <!-- Empty state -->
+      <div class="folder-content-empty">
+        <div class="empty-icon">
+          <svg width="100%" height="100%" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+        </div>
+        <h3>This folder is empty</h3>
+        <p>Create templates or subfolders to organize your content</p>
+        <div class="empty-actions">
+          <button class="btn btn-primary" (click)="requestCreateFolder()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+            Create Folder
+          </button>
+        </div>
+      </div>
+      } @else if (currentViewMode() === 'grid') {
   <!-- Grid view -->
   <div class="folder-content-grid">
     <!-- Subfolders -->
@@ -260,6 +262,8 @@
     </table>
   </div>
   }
+    </div>
+  </div>
 
   <!-- Pagination -->
   @if (totalElements() > 0 && totalPages() > 1) {

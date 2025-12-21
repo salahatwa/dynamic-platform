@@ -4,13 +4,120 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 1rem;
+  min-height: 0; /* Important for flex child to shrink */
+}
+
+/* ==================== SCROLLABLE CONTENT AREA ==================== */
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for flex child to shrink */
+  overflow: hidden;
+  
+  // Define minimum and maximum heights for different screen sizes
+  @media (min-height: 600px) {
+    min-height: 400px;
+    max-height: calc(100vh - 300px); /* Account for header, breadcrumbs, pagination */
+  }
+  
+  @media (min-height: 800px) {
+    min-height: 500px;
+    max-height: calc(100vh - 280px);
+  }
+  
+  @media (min-height: 1000px) {
+    min-height: 600px;
+    max-height: calc(100vh - 260px);
+  }
+  
+  @media (max-height: 599px) {
+    min-height: 300px;
+    max-height: calc(100vh - 200px);
+  }
+}
+
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 0;
+  position: relative;
+  
+  /* Modern scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background: var(--text-tertiary);
+    }
+  }
+  
+  &::-webkit-scrollbar-thumb:active {
+    background: var(--text-secondary);
+  }
+  
+  /* Scroll fade effects for better UX */
+  &::before,
+  &::after {
+    content: '';
+    position: sticky;
+    left: 0;
+    right: 0;
+    height: 20px;
+    pointer-events: none;
+    z-index: 5;
+  }
+  
+  &::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
+  }
+  
+  &::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--surface) 0%, transparent 100%);
+  }
+  
+  /* Hide scrollbar on mobile for cleaner look */
+  @media (max-width: 768px) {
+    scrollbar-width: none;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Reduce fade effects on mobile */
+    &::before,
+    &::after {
+      height: 10px;
+    }
+  }
 }
 
 /* ==================== BREADCRUMB NAVIGATION ==================== */
 .breadcrumb-nav {
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0; /* Prevent breadcrumb from shrinking */
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .breadcrumb-list {
@@ -151,8 +258,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  flex: 1;
+  padding: 2rem;
   text-align: center;
+  min-height: 200px;
   
   .spinner {
     width: 40px;
@@ -175,8 +284,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  flex: 1;
+  padding: 2rem;
   text-align: center;
+  min-height: 200px;
   
   .empty-icon {
     width: 80px;
@@ -197,15 +308,19 @@
     color: var(--text-secondary);
     font-size: 0.875rem;
   }
+  
+  .empty-actions {
+    margin-top: 1.5rem;
+  }
 }
 
 /* ==================== GRID VIEW ==================== */
 .folder-content-grid {
   display: grid;
   gap: 1rem;
-  padding-bottom: 2rem;
+  padding: 0 1rem 1rem 1rem;
   
-  // Responsive grid
+  // Responsive grid with better spacing
   grid-template-columns: 1fr;
   
   @media (min-width: 480px) {
@@ -214,11 +329,15 @@
   }
   
   @media (min-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
   }
   
   @media (min-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  @media (min-width: 1200px) {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
@@ -347,10 +466,12 @@
 
 /* ==================== LIST VIEW ==================== */
 .folder-content-list {
+  margin: 0 1rem 1rem 1rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .content-table {
@@ -471,7 +592,11 @@
   gap: 1rem;
   flex-wrap: wrap;
   border-top: 1px solid var(--border);
-  margin-top: 1rem;
+  background: var(--surface);
+  flex-shrink: 0; /* Prevent pagination from shrinking */
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
   
   @media (max-width: 768px) {
     flex-direction: column;
