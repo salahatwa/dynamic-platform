@@ -3,6 +3,13 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
+        <!-- Professional Back Icon Button -->
+        <button class="back-btn" (click)="navigateBack()" title="Back to Templates" aria-label="Back to Templates">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        
         <h1 class="page-title">
           <input type="text" class="template-name-input" [(ngModel)]="templateName" placeholder="Enter template name"
             (blur)="updateTemplateName()">

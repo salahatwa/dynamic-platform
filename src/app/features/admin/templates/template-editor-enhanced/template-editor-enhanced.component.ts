@@ -1281,4 +1281,19 @@ export class TemplateEditorEnhancedComponent implements OnInit {
       this.downloadFile(blob, filename, 'application/pdf');
     }
   }
+
+  // Navigation Methods
+  navigateBack() {
+    // Navigate back to templates page, preserving folder context if available
+    const folder = this.selectedFolder();
+    if (folder) {
+      // Navigate to the specific folder
+      this.router.navigate(['/admin/templates'], { 
+        queryParams: { folderId: folder.id } 
+      });
+    } else {
+      // Navigate to root templates page
+      this.router.navigate(['/admin/templates']);
+    }
+  }
 }

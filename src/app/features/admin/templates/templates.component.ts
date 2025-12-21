@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -74,6 +74,7 @@ interface AuditDialog {
 export class TemplatesComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private appContext = inject(AppContextService);
   private permissionService = inject(PermissionService);
   private folderService = inject(FolderService);
@@ -152,10 +153,16 @@ export class TemplatesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // Check for folderId query parameter to restore folder context
+    const folderId = this.route.snapshot.queryParamMap.get('folderId');
+    if (folderId) {
+      this.currentFolderId.set(+folderId);
+      console.log('Restored folder context from query params:', folderId);
+    }
+    
     // Always start in folder view and let folder-content component handle the API calls
     // This ensures we call the correct folder-based API endpoints
     this.showFolderView.set(true);
-    this.currentFolderId.set(null); // null means root folder
     
     console.log('Templates component initialized');
     console.log('Show folder view:', this.showFolderView());
