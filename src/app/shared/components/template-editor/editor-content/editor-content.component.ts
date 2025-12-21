@@ -121,17 +121,15 @@ export interface TextSelectionEvent {
                       [placeholder]="placeholder"></textarea>
           }
         } @else {
-          <!-- Preview Mode (Visual Editor) -->
+          <!-- Preview Mode (Visual Editor) - Using Sandboxed Iframe -->
           <div class="preview-container">
-             <div #previewDiv
-                  class="preview-area" 
-                  [class.device-desktop]="previewDevice() === 'desktop'"
-                  [class.device-tablet]="previewDevice() === 'tablet'"
-                  [class.device-mobile]="previewDevice() === 'mobile'"
-                  contenteditable="true"
-                  (input)="onPreviewInput($event)"
-                  (mouseup)="onTextSelect()"
-                  (keyup)="onTextSelect()"></div>
+             <iframe #previewFrame
+                     class="preview-iframe" 
+                     [class.device-desktop]="previewDevice() === 'desktop'"
+                     [class.device-tablet]="previewDevice() === 'tablet'"
+                     [class.device-mobile]="previewDevice() === 'mobile'"
+                     sandbox="allow-same-origin allow-scripts"
+                     (load)="onIframeLoad()"></iframe>
           </div>
         }
       </div>
@@ -298,48 +296,46 @@ export interface TextSelectionEvent {
       align-items: flex-start;
     }
 
-    .preview-area {
+    .preview-iframe {
       flex: 1; /* Default to full width for desktop if class not override */
-      min-height: 100px;
+      min-height: 500px;
+      height: 100%;
       background: white;
-      color: black;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      border: none;
       outline: none;
       transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
     }
 
-    /* Device Simulations */
-    .preview-area.device-desktop {
+    /* Device Simulations for Iframe */
+    .preview-iframe.device-desktop {
       width: 100%;
       max-width: 100%;
-      padding: 2rem; /* Normal padding */
     }
 
-    .preview-area.device-tablet {
+    .preview-iframe.device-tablet {
       width: 768px;
+      height: 1024px;
       flex: none; /* Disable flex growth */
-      padding: 3rem 2rem; /* More vertical padding for tablet feel */
       border: 8px solid #2d3748; /* Tablet Bezel */
       border-radius: 24px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
 
-    .preview-area.device-mobile {
+    .preview-iframe.device-mobile {
       width: 375px;
+      height: 667px;
       flex: none;
-      padding: 2rem 1rem;
       border: 8px solid #1a202c; /* Phone Bezel */
       border-radius: 32px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
 
-    [data-theme="dark"] .preview-area {
+    [data-theme="dark"] .preview-iframe {
       background: #1e1e1e;
-      color: #e0e0e0;
     }
     
-    [data-theme="dark"] .preview-area.device-tablet,
-    [data-theme="dark"] .preview-area.device-mobile {
+    [data-theme="dark"] .preview-iframe.device-tablet,
+    [data-theme="dark"] .preview-iframe.device-mobile {
        border-color: #4b5563; /* Lighter bezel in dark mode */
     }
 
@@ -377,7 +373,7 @@ export class EditorContentComponent implements OnInit, OnChanges {
 
   @ViewChild('textEditor') textEditor?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('htmlEditor') htmlEditor?: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('previewDiv') previewDiv?: ElementRef<HTMLDivElement>;
+  @ViewChild('previewFrame') previewFrame?: ElementRef<HTMLIFrameElement>;
 
   private sanitizer = inject(DomSanitizer);
 
@@ -405,11 +401,9 @@ export class EditorContentComponent implements OnInit, OnChanges {
       // Content changed from parent, update editor
       this.updateEditorContent();
 
-      // If in view mode, also update the preview div if it differs
-      if (this.viewMode() === 'view' && this.previewDiv) {
-        if (this.previewDiv.nativeElement.innerHTML !== this.content) {
-          this.previewDiv.nativeElement.innerHTML = this.content || '<p>No content</p>';
-        }
+      // If in view mode, also update the iframe if it differs
+      if (this.viewMode() === 'view' && this.previewFrame) {
+        this.updateIframeContent();
       }
     }
   }
@@ -419,12 +413,10 @@ export class EditorContentComponent implements OnInit, OnChanges {
       const newMode = mode === 'code' ? 'view' : 'code';
 
       if (newMode === 'view') {
-        // Switching TO view mode: sync content to preview div
+        // Switching TO view mode: sync content to iframe
         // Need to wait for view to render
         setTimeout(() => {
-          if (this.previewDiv) {
-            this.previewDiv.nativeElement.innerHTML = this.content || '<p>No content</p>';
-          }
+          this.updateIframeContent();
         }, 0);
       } else {
         // Switching FROM view mode: Ensure savedRange is cleared
@@ -433,6 +425,288 @@ export class EditorContentComponent implements OnInit, OnChanges {
 
       return newMode;
     });
+  }
+
+  onIframeLoad() {
+    // Initialize iframe content when it loads
+    if (this.viewMode() === 'view') {
+      this.updateIframeContent();
+    }
+  }
+
+  private updateIframeContent() {
+    if (!this.previewFrame) return;
+    
+    const iframe = this.previewFrame.nativeElement;
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+    
+    if (!iframeDoc) return;
+
+    // Check if content already has full HTML structure
+    const hasHtmlTag = /<html[^>]*>/i.test(this.content);
+    const hasBodyTag = /<body[^>]*>/i.test(this.content);
+    
+    let htmlContent: string;
+    
+    if (hasHtmlTag || hasBodyTag) {
+      // Content already has structure, ensure it's complete and add contenteditable
+      htmlContent = this.ensureCompleteHtmlWithEditable(this.content);
+    } else {
+      // Content is just body content, wrap it in our sandboxed HTML
+      htmlContent = this.createSandboxedHtml(this.content);
+    }
+    
+    // Write the content to the iframe
+    iframeDoc.open();
+    iframeDoc.write(htmlContent);
+    iframeDoc.close();
+
+    // Set up event listeners for editing
+    this.setupIframeEventListeners(iframeDoc);
+  }
+
+  private createSandboxedHtml(content: string): string {
+    // Check if content already has html/body tags
+    const hasHtmlTag = /<html[^>]*>/i.test(content);
+    const hasBodyTag = /<body[^>]*>/i.test(content);
+    
+    if (hasHtmlTag || hasBodyTag) {
+      // Content already has structure, use as-is but ensure it's complete
+      return this.ensureCompleteHtml(content);
+    }
+    
+    // Wrap content in a complete HTML document with aggressive style isolation
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Preview</title>
+    <style>
+        /* CSS Reset to prevent style inheritance */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Prevent any external styles from affecting content */
+        html, body {
+            all: initial;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+            line-height: 1.6 !important;
+            color: #333 !important;
+            margin: 2rem !important;
+            background: white !important;
+            font-size: 16px !important;
+            overflow-wrap: break-word !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* Ensure contenteditable styling */
+        body[contenteditable="true"] {
+            outline: none !important;
+            border: none !important;
+            min-height: 200px !important;
+        }
+        
+        /* Typography with !important to override any external styles */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: bold !important;
+            margin: 1em 0 0.5em 0 !important;
+            line-height: 1.2 !important;
+            color: inherit !important;
+        }
+        
+        h1 { font-size: 2em !important; }
+        h2 { font-size: 1.5em !important; }
+        h3 { font-size: 1.17em !important; }
+        h4 { font-size: 1em !important; }
+        h5 { font-size: 0.83em !important; }
+        h6 { font-size: 0.67em !important; }
+        
+        p { 
+            margin: 1em 0 !important; 
+            line-height: inherit !important;
+            color: inherit !important;
+        }
+        
+        ul, ol { 
+            margin: 1em 0 !important; 
+            padding-left: 2em !important; 
+            color: inherit !important;
+        }
+        
+        li { 
+            margin: 0.5em 0 !important; 
+            color: inherit !important;
+        }
+        
+        blockquote {
+            margin: 1em 0 !important;
+            padding: 0.5em 1em !important;
+            border-left: 4px solid #ddd !important;
+            background: #f9f9f9 !important;
+            font-style: italic !important;
+            color: inherit !important;
+        }
+        
+        code {
+            background: #f1f1f1 !important;
+            padding: 0.2em 0.4em !important;
+            border-radius: 3px !important;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+            font-size: 0.9em !important;
+            color: #c7254e !important;
+        }
+        
+        pre {
+            background: #f1f1f1 !important;
+            padding: 1em !important;
+            border-radius: 6px !important;
+            overflow-x: auto !important;
+            margin: 1em 0 !important;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+            color: inherit !important;
+        }
+        
+        pre code {
+            background: none !important;
+            padding: 0 !important;
+            color: inherit !important;
+        }
+        
+        a {
+            color: #0066cc !important;
+            text-decoration: underline !important;
+        }
+        
+        a:hover {
+            color: #0052a3 !important;
+        }
+        
+        img {
+            max-width: 100% !important;
+            height: auto !important;
+            margin: 1em 0 !important;
+        }
+        
+        table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin: 1em 0 !important;
+            color: inherit !important;
+        }
+        
+        th, td {
+            border: 1px solid #ddd !important;
+            padding: 0.5em !important;
+            text-align: left !important;
+            color: inherit !important;
+        }
+        
+        th {
+            background: #f5f5f5 !important;
+            font-weight: bold !important;
+        }
+        
+        hr {
+            border: none !important;
+            border-top: 1px solid #ddd !important;
+            margin: 2em 0 !important;
+        }
+        
+        /* Text formatting */
+        strong, b { font-weight: bold !important; color: inherit !important; }
+        em, i { font-style: italic !important; color: inherit !important; }
+        u { text-decoration: underline !important; color: inherit !important; }
+        s, strike { text-decoration: line-through !important; color: inherit !important; }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 480px) {
+            body { 
+                margin: 1rem !important; 
+                font-size: 14px !important; 
+            }
+            h1 { font-size: 1.8em !important; }
+            h2 { font-size: 1.4em !important; }
+            h3 { font-size: 1.2em !important; }
+            table { font-size: 12px !important; }
+            th, td { padding: 0.3em !important; }
+        }
+        
+        /* Prevent any external CSS from interfering */
+        body * {
+            font-family: inherit !important;
+        }
+    </style>
+</head>
+<body contenteditable="true">
+${content || '<p>No content</p>'}
+</body>
+</html>`;
+  }
+
+  private ensureCompleteHtml(content: string): string {
+    // If content has html/body tags, ensure it's a complete document
+    if (!content.includes('<!DOCTYPE')) {
+      content = '<!DOCTYPE html>\n' + content;
+    }
+    
+    if (!content.includes('<html')) {
+      content = '<html>\n' + content + '\n</html>';
+    }
+    
+    return content;
+  }
+
+  private ensureCompleteHtmlWithEditable(content: string): string {
+    // Ensure complete HTML structure
+    let htmlContent = this.ensureCompleteHtml(content);
+    
+    // Add contenteditable to body if not present
+    if (!htmlContent.includes('contenteditable')) {
+      htmlContent = htmlContent.replace(/<body([^>]*)>/i, '<body$1 contenteditable="true">');
+    }
+    
+    // If no body tag exists, add it
+    if (!htmlContent.includes('<body')) {
+      htmlContent = htmlContent.replace('</html>', '<body contenteditable="true">' + content + '</body></html>');
+    }
+    
+    return htmlContent;
+  }
+
+  private setupIframeEventListeners(iframeDoc: Document) {
+    // Set up input event listener for content changes
+    iframeDoc.body.addEventListener('input', (event) => {
+      const newContent = this.extractContentFromIframe(iframeDoc);
+      if (this.content !== newContent) {
+        this.content = newContent;
+        this.onContentChange(newContent);
+      }
+    });
+
+    // Set up selection event listeners
+    iframeDoc.addEventListener('mouseup', () => this.handleIframeSelection(iframeDoc));
+    iframeDoc.addEventListener('keyup', () => this.handleIframeSelection(iframeDoc));
+  }
+
+  private handleIframeSelection(iframeDoc: Document) {
+    const selection = iframeDoc.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const text = selection.toString();
+      this.currentSelection.set(text);
+      
+      if (text.trim()) {
+        // Save the range for later use
+        this.savedRange = selection.getRangeAt(0).cloneRange();
+      }
+    } else {
+      this.currentSelection.set('');
+      this.savedRange = null;
+    }
   }
 
   setPreviewDevice(device: 'desktop' | 'tablet' | 'mobile') {
@@ -488,21 +762,13 @@ export class EditorContentComponent implements OnInit, OnChanges {
 
   onTextSelect() {
     if (this.viewMode() === 'view') {
-      // Handle selection in preview mode
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const text = selection.toString();
-        this.currentSelection.set(text);
-
-        // Save the actual range so we can restore it later
-        // Only save if the selection is inside our preview div
-        const range = selection.getRangeAt(0);
-        if (this.previewDiv && this.previewDiv.nativeElement.contains(range.commonAncestorContainer)) {
-          this.savedRange = range.cloneRange();
+      // Handle selection in iframe preview mode
+      if (this.previewFrame) {
+        const iframe = this.previewFrame.nativeElement;
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          this.handleIframeSelection(iframeDoc);
         }
-      } else {
-        this.currentSelection.set('');
-        this.savedRange = null;
       }
       return;
     }
@@ -528,11 +794,15 @@ export class EditorContentComponent implements OnInit, OnChanges {
   }
 
   private restoreSelection() {
-    if (this.savedRange && this.viewMode() === 'view') {
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(this.savedRange);
+    if (this.savedRange && this.viewMode() === 'view' && this.previewFrame) {
+      const iframe = this.previewFrame.nativeElement;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (iframeDoc) {
+        const selection = iframeDoc.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(this.savedRange);
+        }
       }
     }
   }
@@ -577,10 +847,32 @@ export class EditorContentComponent implements OnInit, OnChanges {
   handleFreeMarkerInsert(event: FreeMarkerInsertEvent) {
     if (this.viewMode() === 'view') {
       this.restoreSelection();
-      document.execCommand('insertText', false, event.code);
-
-      if (this.previewDiv) {
-        this.onPreviewInput({ target: this.previewDiv.nativeElement } as any);
+      
+      if (this.previewFrame) {
+        const iframe = this.previewFrame.nativeElement;
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          iframe.contentWindow?.focus();
+          
+          // Use safe text insertion instead of execCommand
+          const selection = iframeDoc.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const textNode = iframeDoc.createTextNode(event.code);
+            range.deleteContents();
+            range.insertNode(textNode);
+            
+            // Move cursor after inserted text
+            selection.removeAllRanges();
+            const newRange = iframeDoc.createRange();
+            newRange.setStartAfter(textNode);
+            newRange.collapse(true);
+            selection.addRange(newRange);
+          }
+          
+          // Update content after insertion - use the new method that preserves structure
+          this.updateContentFromIframe(iframeDoc);
+        }
       }
       return;
     }
@@ -629,49 +921,230 @@ export class EditorContentComponent implements OnInit, OnChanges {
   }
 
   private executeVisualCommand(event: RichTextInsertEvent) {
-    const tag = event.startTag.toLowerCase();
+    if (!this.previewFrame) return;
+    
+    const iframe = this.previewFrame.nativeElement;
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!iframeDoc) return;
 
-    if (tag.includes('<b>') || tag.includes('<strong>')) {
-      document.execCommand('bold');
-    } else if (tag.includes('<i>') || tag.includes('<em>')) {
-      document.execCommand('italic');
-    } else if (tag.includes('<u>')) {
-      document.execCommand('underline');
-    } else if (tag.includes('<s>') || tag.includes('<strike>')) {
-      document.execCommand('strikeThrough');
-    } else if (tag.includes('<h1>')) {
-      document.execCommand('formatBlock', false, 'H1');
-    } else if (tag.includes('<h2>')) {
-      document.execCommand('formatBlock', false, 'H2');
-    } else if (tag.includes('<h3>')) {
-      document.execCommand('formatBlock', false, 'H3');
-    } else if (tag.includes('<ul>')) {
-      document.execCommand('insertUnorderedList');
-    } else if (tag.includes('<ol>')) {
-      document.execCommand('insertOrderedList');
-    } else if (tag.includes('blockquote')) {
-      document.execCommand('formatBlock', false, 'blockquote');
-    } else if (tag.includes('<hr>')) {
-      document.execCommand('insertHorizontalRule');
-    } else if (tag.includes('<a')) {
-      this.insertVisualHtml(event);
-    } else if (tag.includes('<img')) {
-      this.insertVisualHtml(event);
-    } else if (tag.includes('<code>')) {
-      this.insertVisualHtml(event);
-    } else {
-      this.insertVisualHtml(event);
+    // Focus the iframe first
+    iframe.contentWindow?.focus();
+    
+    const tag = event.startTag.toLowerCase();
+    const selection = iframeDoc.getSelection();
+    
+    if (!selection || selection.rangeCount === 0) {
+      // No selection, just insert the HTML
+      this.insertVisualHtml(event, iframeDoc);
+      this.updateContentFromIframe(iframeDoc);
+      return;
     }
 
-    if (this.previewDiv) {
-      this.onPreviewInput({ target: this.previewDiv.nativeElement } as any);
+    const selectedText = selection.toString();
+    
+    // For formatting commands, wrap selected text instead of using execCommand
+    if (tag.includes('<b>') || tag.includes('<strong>')) {
+      this.wrapSelectionWithTag(iframeDoc, 'strong', selectedText);
+    } else if (tag.includes('<i>') || tag.includes('<em>')) {
+      this.wrapSelectionWithTag(iframeDoc, 'em', selectedText);
+    } else if (tag.includes('<u>')) {
+      this.wrapSelectionWithTag(iframeDoc, 'u', selectedText);
+    } else if (tag.includes('<s>') || tag.includes('<strike>')) {
+      this.wrapSelectionWithTag(iframeDoc, 's', selectedText);
+    } else if (tag.includes('<code>')) {
+      this.wrapSelectionWithTag(iframeDoc, 'code', selectedText);
+    } else if (tag.includes('<h1>')) {
+      this.wrapSelectionWithTag(iframeDoc, 'h1', selectedText);
+    } else if (tag.includes('<h2>')) {
+      this.wrapSelectionWithTag(iframeDoc, 'h2', selectedText);
+    } else if (tag.includes('<h3>')) {
+      this.wrapSelectionWithTag(iframeDoc, 'h3', selectedText);
+    } else if (tag.includes('<ul>')) {
+      this.createList(iframeDoc, 'ul', selectedText);
+    } else if (tag.includes('<ol>')) {
+      this.createList(iframeDoc, 'ol', selectedText);
+    } else if (tag.includes('blockquote')) {
+      this.wrapSelectionWithTag(iframeDoc, 'blockquote', selectedText);
+    } else if (tag.includes('<hr>')) {
+      this.insertHorizontalRule(iframeDoc);
+    } else {
+      // For complex HTML, use insertHTML
+      this.insertVisualHtml(event, iframeDoc);
+    }
+
+    // Update content after command - use the new method that preserves structure
+    this.updateContentFromIframe(iframeDoc);
+  }
+
+  private wrapSelectionWithTag(iframeDoc: Document, tagName: string, selectedText: string) {
+    const selection = iframeDoc.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    
+    // Create the wrapper element
+    const wrapper = iframeDoc.createElement(tagName);
+    
+    try {
+      // Extract the selected content
+      const contents = range.extractContents();
+      
+      // If no text was selected, add placeholder text
+      if (!selectedText.trim()) {
+        wrapper.textContent = this.getPlaceholderText(tagName);
+      } else {
+        wrapper.appendChild(contents);
+      }
+      
+      // Insert the wrapped content
+      range.insertNode(wrapper);
+      
+      // Clear selection and place cursor after the inserted element
+      selection.removeAllRanges();
+      const newRange = iframeDoc.createRange();
+      newRange.setStartAfter(wrapper);
+      newRange.collapse(true);
+      selection.addRange(newRange);
+      
+    } catch (error) {
+      console.warn('Error wrapping selection:', error);
+      // Safe fallback: manual DOM insertion without execCommand
+      this.safeInsertHtml(iframeDoc, `<${tagName}>${selectedText || this.getPlaceholderText(tagName)}</${tagName}>`);
     }
   }
 
-  private insertVisualHtml(event: RichTextInsertEvent) {
-    const text = event.defaultText || window.getSelection()?.toString() || '';
+  private createList(iframeDoc: Document, listType: 'ul' | 'ol', selectedText: string) {
+    const selection = iframeDoc.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    
+    try {
+      // Create list structure
+      const list = iframeDoc.createElement(listType);
+      const listItem = iframeDoc.createElement('li');
+      
+      if (selectedText.trim()) {
+        // Split selected text by lines to create multiple list items
+        const lines = selectedText.split('\n').filter(line => line.trim());
+        if (lines.length > 1) {
+          lines.forEach(line => {
+            const li = iframeDoc.createElement('li');
+            li.textContent = line.trim();
+            list.appendChild(li);
+          });
+        } else {
+          listItem.textContent = selectedText;
+          list.appendChild(listItem);
+        }
+      } else {
+        listItem.textContent = 'List item';
+        list.appendChild(listItem);
+      }
+      
+      // Replace selection with list
+      range.deleteContents();
+      range.insertNode(list);
+      
+      // Place cursor in the first list item
+      selection.removeAllRanges();
+      const newRange = iframeDoc.createRange();
+      newRange.selectNodeContents(list.firstElementChild as Element);
+      newRange.collapse(false);
+      selection.addRange(newRange);
+      
+    } catch (error) {
+      console.warn('Error creating list:', error);
+      // Safe fallback: manual DOM insertion without execCommand
+      this.safeInsertHtml(iframeDoc, `<${listType}><li>${selectedText || 'List item'}</li></${listType}>`);
+    }
+  }
+
+  private insertHorizontalRule(iframeDoc: Document) {
+    const selection = iframeDoc.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    const hr = iframeDoc.createElement('hr');
+    
+    try {
+      range.deleteContents();
+      range.insertNode(hr);
+      
+      // Place cursor after HR
+      selection.removeAllRanges();
+      const newRange = iframeDoc.createRange();
+      newRange.setStartAfter(hr);
+      newRange.collapse(true);
+      selection.addRange(newRange);
+      
+    } catch (error) {
+      console.warn('Error inserting HR:', error);
+      // Safe fallback: manual DOM insertion without execCommand
+      this.safeInsertHtml(iframeDoc, '<hr>');
+    }
+  }
+
+  private getPlaceholderText(tagName: string): string {
+    const placeholders: { [key: string]: string } = {
+      'strong': 'Bold text',
+      'em': 'Italic text',
+      'u': 'Underlined text',
+      's': 'Strikethrough text',
+      'code': 'Code',
+      'h1': 'Heading 1',
+      'h2': 'Heading 2',
+      'h3': 'Heading 3',
+      'h4': 'Heading 4',
+      'h5': 'Heading 5',
+      'h6': 'Heading 6',
+      'blockquote': 'Quote text'
+    };
+    return placeholders[tagName] || 'Text';
+  }
+
+  private insertVisualHtml(event: RichTextInsertEvent, iframeDoc: Document) {
+    const selection = iframeDoc.getSelection();
+    const text = event.defaultText || selection?.toString() || '';
     const html = event.startTag + text + event.endTag;
-    document.execCommand('insertHTML', false, html);
+    this.safeInsertHtml(iframeDoc, html);
+  }
+
+  private safeInsertHtml(iframeDoc: Document, html: string) {
+    const selection = iframeDoc.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    
+    try {
+      // Create a temporary container to parse the HTML
+      const tempDiv = iframeDoc.createElement('div');
+      tempDiv.innerHTML = html;
+      
+      // Extract all nodes from the temporary container
+      const fragment = iframeDoc.createDocumentFragment();
+      while (tempDiv.firstChild) {
+        fragment.appendChild(tempDiv.firstChild);
+      }
+      
+      // Replace the selection with the fragment
+      range.deleteContents();
+      range.insertNode(fragment);
+      
+      // Move cursor to the end of inserted content
+      selection.removeAllRanges();
+      const newRange = iframeDoc.createRange();
+      newRange.setStartAfter(fragment.lastChild || range.startContainer);
+      newRange.collapse(true);
+      selection.addRange(newRange);
+      
+    } catch (error) {
+      console.warn('Error inserting HTML safely:', error);
+      // Last resort: direct text insertion to avoid corruption
+      const textNode = iframeDoc.createTextNode(html);
+      range.deleteContents();
+      range.insertNode(textNode);
+    }
   }
 
   private updateContentAndCursor(newContent: string, newCursorPos: number) {
@@ -707,6 +1180,28 @@ export class EditorContentComponent implements OnInit, OnChanges {
       start: this.selectionStart,
       end: this.selectionEnd
     };
+  }
+
+  private updateContentFromIframe(iframeDoc: Document) {
+    const newContent = this.extractContentFromIframe(iframeDoc);
+    if (this.content !== newContent) {
+      this.content = newContent;
+      this.onContentChange(newContent);
+    }
+  }
+
+  private extractContentFromIframe(iframeDoc: Document): string {
+    // Check if the original content had html/body structure
+    const hasHtmlTag = /<html[^>]*>/i.test(this.content);
+    const hasBodyTag = /<body[^>]*>/i.test(this.content);
+    
+    if (hasHtmlTag || hasBodyTag) {
+      // Original content had structure, return the full document
+      return iframeDoc.documentElement.outerHTML;
+    } else {
+      // Original content was just body content, return only body innerHTML
+      return iframeDoc.body.innerHTML;
+    }
   }
 
   focus() {
