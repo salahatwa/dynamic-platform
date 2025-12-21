@@ -167,19 +167,24 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
               isLoading: false
             });
             
-            // Debug pagination - extract from Spring Boot Page object
+            // Calculate combined pagination info
+            const totalItems = response.totalItems || 0;
+            const pageSize = this.pageSize();
+            const calculatedTotalPages = Math.ceil(totalItems / pageSize);
+            
             console.log('Folder content loaded:', {
               templatesCount: response.templates?.content?.length || 0,
-              totalPages: response.templates?.totalPages || 1,
-              totalElements: response.templates?.totalElements || 0,
+              subfoldersCount: response.subfolders?.length || 0,
+              totalItems: totalItems,
+              calculatedTotalPages: calculatedTotalPages,
               currentPage: this.currentPage(),
-              pageSize: this.pageSize(),
+              pageSize: pageSize,
               responseTemplates: response.templates
             });
             
-            // Extract pagination info from Spring Boot Page object
-            this.totalPages.set(response.templates?.totalPages || 1);
-            this.totalElements.set(response.templates?.totalElements || 0);
+            // Set pagination info based on combined total items
+            this.totalPages.set(calculatedTotalPages);
+            this.totalElements.set(totalItems);
             this.loading.set(false);
           },
           error: (error) => {
@@ -215,19 +220,24 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
             isLoading: false
           });
           
-          // Debug pagination for root - extract from Spring Boot Page object
+          // Calculate combined pagination info
+          const totalItems = response.totalItems || 0;
+          const pageSize = this.pageSize();
+          const calculatedTotalPages = Math.ceil(totalItems / pageSize);
+          
           console.log('Root folder content loaded:', {
             templatesCount: response.templates?.content?.length || 0,
-            totalPages: response.templates?.totalPages || 1,
-            totalElements: response.templates?.totalElements || 0,
+            subfoldersCount: response.subfolders?.length || 0,
+            totalItems: totalItems,
+            calculatedTotalPages: calculatedTotalPages,
             currentPage: this.currentPage(),
-            pageSize: this.pageSize(),
+            pageSize: pageSize,
             responseTemplates: response.templates
           });
           
-          // Extract pagination info from Spring Boot Page object
-          this.totalPages.set(response.templates?.totalPages || 1);
-          this.totalElements.set(response.templates?.totalElements || 0);
+          // Set pagination info based on combined total items
+          this.totalPages.set(calculatedTotalPages);
+          this.totalElements.set(totalItems);
           this.loading.set(false);
         },
         error: (error) => {
