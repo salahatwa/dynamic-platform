@@ -7,6 +7,9 @@ export interface TemplateFolder {
   path?: string;
   level?: number;
   sortOrder?: number;
+  active?: boolean;
+  description?: string;
+  imageUrl?: string;
   children?: TemplateFolder[];
   templatesCount: number;
   createdAt: string;
@@ -74,6 +77,10 @@ export const PageOrientationDescriptions = {
 export interface TemplateFolderRequest {
   name: string;
   parentId?: number;
+  applicationId?: number;
+  active?: boolean;
+  description?: string;
+  imageUrl?: string;
 }
 
 export interface TemplatePageRequest {

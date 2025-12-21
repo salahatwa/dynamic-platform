@@ -96,6 +96,9 @@ export class TemplatesComponent implements OnInit, OnDestroy {
   // Folder creation dialog
   showCreateFolderDialog = signal(false);
   newFolderName = signal('');
+  newFolderDescription = signal('');
+  newFolderImageUrl = signal('');
+  newFolderActive = signal(true);
   refreshTrigger = signal(0);
 
   templates = signal<Template[]>([]);
@@ -503,6 +506,9 @@ export class TemplatesComponent implements OnInit, OnDestroy {
 
   createFolder(): void {
     this.newFolderName.set('');
+    this.newFolderDescription.set('');
+    this.newFolderImageUrl.set('');
+    this.newFolderActive.set(true);
     this.showCreateFolderDialog.set(true);
   }
 
@@ -523,13 +529,19 @@ export class TemplatesComponent implements OnInit, OnDestroy {
       name: folderName,
       applicationId: app.id,
       parentId: this.currentFolderId(),
-      sortOrder: 0
+      sortOrder: 0,
+      active: this.newFolderActive(),
+      description: this.newFolderDescription().trim() || undefined,
+      imageUrl: this.newFolderImageUrl().trim() || undefined
     };
 
     this.http.post(`${environment.apiUrl}/template-folders`, folderRequest).subscribe({
       next: (response) => {
         this.showCreateFolderDialog.set(false);
         this.newFolderName.set('');
+        this.newFolderDescription.set('');
+        this.newFolderImageUrl.set('');
+        this.newFolderActive.set(true);
         
         // Trigger refresh by incrementing the refresh trigger
         this.refreshTrigger.set(this.refreshTrigger() + 1);
@@ -559,5 +571,8 @@ export class TemplatesComponent implements OnInit, OnDestroy {
   cancelCreateFolder(): void {
     this.showCreateFolderDialog.set(false);
     this.newFolderName.set('');
+    this.newFolderDescription.set('');
+    this.newFolderImageUrl.set('');
+    this.newFolderActive.set(true);
   }
 }

@@ -58,6 +58,9 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
   showDeleteFolderDialog = signal(false);
   editingFolder = signal<TemplateFolder | null>(null);
   editFolderName = signal('');
+  editFolderDescription = signal('');
+  editFolderImageUrl = signal('');
+  editFolderActive = signal(true);
   folderActionLoading = signal(false);
   
   // Template management dialogs
@@ -414,6 +417,9 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
     
     this.editingFolder.set(folder);
     this.editFolderName.set(folder.name);
+    this.editFolderDescription.set(folder.description || '');
+    this.editFolderImageUrl.set(folder.imageUrl || '');
+    this.editFolderActive.set(folder.active !== false); // Default to true if undefined
     this.showEditFolderDialog.set(true);
     console.log('Edit dialog should be visible now');
   }
@@ -448,7 +454,10 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
     const updateRequest = {
       name: newName,
       applicationId: this.applicationId,
-      sortOrder: folder.sortOrder || 0
+      sortOrder: folder.sortOrder || 0,
+      active: this.editFolderActive(),
+      description: this.editFolderDescription().trim() || undefined,
+      imageUrl: this.editFolderImageUrl().trim() || undefined
     };
 
     console.log('Making PUT request to:', `${environment.apiUrl}/template-folders/${folder.id}`, 'with body:', updateRequest);
@@ -461,6 +470,9 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
           this.showEditFolderDialog.set(false);
           this.editingFolder.set(null);
           this.editFolderName.set('');
+          this.editFolderDescription.set('');
+          this.editFolderImageUrl.set('');
+          this.editFolderActive.set(true);
           this.folderActionLoading.set(false);
           this.loadFolderContent(); // Refresh the content
           this.toastService.success('Folder Updated', 'Folder updated successfully');
@@ -539,6 +551,9 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
     this.showDeleteFolderDialog.set(false);
     this.editingFolder.set(null);
     this.editFolderName.set('');
+    this.editFolderDescription.set('');
+    this.editFolderImageUrl.set('');
+    this.editFolderActive.set(true);
     this.folderActionLoading.set(false);
   }
 
@@ -604,5 +619,49 @@ export class FolderContentComponent implements OnInit, OnDestroy, OnChanges {
     this.showDeleteTemplateDialog.set(false);
     this.editingTemplate.set(null);
     this.templateActionLoading.set(false);
+  }
+
+  // Image error handling
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    // The template will show the default folder icon when the image is hidden
+  }
+
+  // Toggle folder status
+  toggleFolderStatus(folder: TemplateFolder, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    console.log('Toggling folder status for:', folder);
+    
+    // Use PUT method and include applicationId as query parameter
+    const params = { applicationId: this.applicationId!.toString() };
+    
+    this.http.put(`${environment.apiUrl}/template-folders/${folder.id}/toggle-status`, {}, { params })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          console.log('Folder status toggled successfully:', response);
+          this.loadFolderContent(); // Refresh the content to show updated status
+          const statusText = response.active ? 'activated' : 'deactivated';
+          this.toastService.success('Folder Status Updated', `Folder ${statusText} successfully`);
+        },
+        error: (error) => {
+          console.error('Error toggling folder status:', error);
+          
+          let errorMessage = 'Failed to update folder status. Please try again.';
+          if (error.error && typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          this.toastService.error('Status Update Failed', errorMessage);
+        }
+      });
   }
 }

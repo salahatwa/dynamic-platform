@@ -44,7 +44,10 @@ export class TemplateManagementService {
                 applicationId: node.applicationId,
                 path: node.path,
                 level: node.level,
-                sortOrder: node.sortOrder
+                sortOrder: node.sortOrder,
+                active: node.active,
+                description: node.description,
+                imageUrl: node.imageUrl
               } as TemplateFolder);
             }
             
@@ -93,6 +96,11 @@ export class TemplateManagementService {
 
   deleteFolder(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/template-folders/${id}`);
+  }
+
+  toggleFolderStatus(id: number, applicationId: number): Observable<TemplateFolder> {
+    const params = { applicationId: applicationId.toString() };
+    return this.http.put<TemplateFolder>(`${this.apiUrl}/template-folders/${id}/toggle-status`, {}, { params });
   }
 
   // Page Management

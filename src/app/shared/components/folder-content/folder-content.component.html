@@ -76,6 +76,21 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
         </button>
+        <button type="button" class="btn btn-icon btn-xs btn-ghost" 
+                [class.text-success]="folder.active === false"
+                [class.text-warning]="folder.active !== false"
+                (click)="toggleFolderStatus(folder, $event)" 
+                [title]="folder.active === false ? 'Activate folder' : 'Deactivate folder'">
+          @if (folder.active === false) {
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          } @else {
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
+        </button>
         <button type="button" class="btn btn-icon btn-xs btn-ghost text-danger" (click)="deleteFolder(folder, $event)" title="Delete folder">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -84,15 +99,28 @@
       </div>
 
       <div class="folder-icon">
-        <svg width="48" height="48" fill="currentColor" viewBox="0 0 24 24">
-          <path
-            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
+        @if (folder.imageUrl) {
+          <img [src]="folder.imageUrl" [alt]="folder.name" class="folder-custom-image" 
+               (error)="onImageError($event)" />
+        } @else {
+          <svg width="48" height="48" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+        }
+        @if (folder.active === false) {
+          <div class="inactive-overlay">
+            <span class="inactive-badge">Inactive</span>
+          </div>
+        }
       </div>
 
       <div class="folder-info">
         <h4 class="folder-name">{{ folder.name }}</h4>
         <p class="folder-meta">{{ folder.templatesCount }} templates</p>
+        @if (folder.description) {
+          <p class="folder-description">{{ folder.description }}</p>
+        }
       </div>
     </div>
     }
@@ -141,11 +169,19 @@
           (dragstart)="onDragStart($event, folder)" (click)="navigateToFolder(folder)">
           <td class="col-name">
             <div class="name-cell">
-              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
+              @if (folder.imageUrl) {
+                <img [src]="folder.imageUrl" [alt]="folder.name" class="folder-list-image" 
+                     (error)="onImageError($event)" />
+              } @else {
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+              }
               <strong>{{ folder.name }}</strong>
+              @if (folder.active === false) {
+                <span class="inactive-badge-small">Inactive</span>
+              }
             </div>
           </td>
           <td class="col-type">
@@ -158,6 +194,21 @@
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
+              </button>
+              <button type="button" class="btn btn-icon btn-sm btn-ghost" 
+                      [class.text-success]="folder.active === false"
+                      [class.text-warning]="folder.active !== false"
+                      (click)="toggleFolderStatus(folder, $event)" 
+                      [title]="folder.active === false ? 'Activate folder' : 'Deactivate folder'">
+                @if (folder.active === false) {
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                } @else {
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                }
               </button>
               <button type="button" class="btn btn-icon btn-sm btn-ghost text-danger" (click)="deleteFolder(folder, $event)" title="Delete folder">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,7 +302,7 @@
 <!-- Edit Folder Dialog -->
 @if (showEditFolderDialog()) {
 <div class="modal-overlay" (click)="cancelFolderDialog()">
-  <div class="modal-dialog" (click)="$event.stopPropagation()">
+  <div class="modal-dialog modal-md" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3>Edit Folder</h3>
       <button class="btn btn-icon btn-sm btn-ghost" (click)="cancelFolderDialog()">
@@ -261,8 +312,8 @@
       </button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label for="editFolderName">Folder Name</label>
+      <div class="form-group mb-3">
+        <label for="editFolderName">Folder Name <span class="text-danger">*</span></label>
         <input 
           id="editFolderName"
           type="text" 
@@ -273,6 +324,47 @@
           [disabled]="folderActionLoading()"
           (keyup.enter)="confirmEditFolder()"
         />
+      </div>
+      
+      <div class="form-group mb-3">
+        <label for="editFolderDescription">Description</label>
+        <textarea 
+          id="editFolderDescription"
+          class="form-control" 
+          rows="3"
+          [ngModel]="editFolderDescription()"
+          (ngModelChange)="editFolderDescription.set($event)"
+          placeholder="Enter folder description (optional)"
+          [disabled]="folderActionLoading()">
+        </textarea>
+      </div>
+      
+      <div class="form-group mb-3">
+        <label for="editFolderImageUrl">Image URL</label>
+        <input 
+          id="editFolderImageUrl"
+          type="url" 
+          class="form-control" 
+          [ngModel]="editFolderImageUrl()"
+          (ngModelChange)="editFolderImageUrl.set($event)"
+          placeholder="Enter image URL (optional)"
+          [disabled]="folderActionLoading()"
+        />
+        <small class="form-text text-muted">If provided, this image will be displayed instead of the default folder icon</small>
+      </div>
+      
+      <div class="form-group mb-3">
+        <div class="form-check">
+          <input 
+            type="checkbox" 
+            id="editFolderActive"
+            class="form-check-input" 
+            [ngModel]="editFolderActive()"
+            (ngModelChange)="editFolderActive.set($event)"
+            [disabled]="folderActionLoading()">
+          <label for="editFolderActive" class="form-check-label">Active</label>
+        </div>
+        <small class="form-text text-muted">Inactive folders will be hidden from users</small>
       </div>
     </div>
     <div class="modal-footer">

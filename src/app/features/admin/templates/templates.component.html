@@ -402,14 +402,14 @@
     <!-- Create Folder Dialog -->
     @if (showCreateFolderDialog()) {
     <div class="modal-overlay" (click)="cancelCreateFolder()">
-      <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-content modal-md" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2 class="h5 mb-0">{{ 'templates.createFolder' | translate }}</h2>
           <button class="btn-close" (click)="cancelCreateFolder()">×</button>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <label for="folderName" class="form-label">{{ 'templates.folderName' | translate }}</label>
+          <div class="form-group mb-3">
+            <label for="folderName" class="form-label">{{ 'templates.folderName' | translate }} <span class="text-danger">*</span></label>
             <input 
               type="text" 
               id="folderName"
@@ -419,6 +419,43 @@
               [placeholder]="'templates.folderNamePlaceholder' | translate"
               (keyup.enter)="confirmCreateFolder()"
               #folderNameInput>
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="folderDescription" class="form-label">{{ 'templates.folderDescription' | translate }}</label>
+            <textarea 
+              id="folderDescription"
+              class="form-control" 
+              rows="3"
+              [value]="newFolderDescription()"
+              (input)="newFolderDescription.set($any($event.target).value)"
+              [placeholder]="'templates.folderDescriptionPlaceholder' | translate">
+            </textarea>
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="folderImageUrl" class="form-label">{{ 'templates.folderImageUrl' | translate }}</label>
+            <input 
+              type="url" 
+              id="folderImageUrl"
+              class="form-control" 
+              [value]="newFolderImageUrl()"
+              (input)="newFolderImageUrl.set($any($event.target).value)"
+              [placeholder]="'templates.folderImageUrlPlaceholder' | translate">
+            <small class="form-text text-muted">{{ 'templates.folderImageUrlHelp' | translate }}</small>
+          </div>
+          
+          <div class="form-group mb-3">
+            <div class="form-check">
+              <input 
+                type="checkbox" 
+                id="folderActive"
+                class="form-check-input" 
+                [checked]="newFolderActive()"
+                (change)="newFolderActive.set($any($event.target).checked)">
+              <label for="folderActive" class="form-check-label">{{ 'templates.folderActive' | translate }}</label>
+            </div>
+            <small class="form-text text-muted">{{ 'templates.folderActiveHelp' | translate }}</small>
           </div>
         </div>
         <div class="modal-footer">
